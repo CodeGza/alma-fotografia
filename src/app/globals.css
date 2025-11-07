@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* 🎨 Paleta base de Alma Fotografía */
+:root {
+  --background: #FFF8E2; /* Beige claro */
+  --foreground: #000000; /* Texto principal */
+  --brand-brown: #79502A;
+  --brand-gold: #C6A97D;
+  --brand-white: #FFFFFF;
+}
+
+/* 🧩 Configuración inline de Tailwind v4 */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-brown: var(--brand-brown);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-white: var(--brand-white);
+  --font-voga: var(--font-voga);
+  --font-fira: var(--font-fira);
+}
+
+/* 🌙 Modo oscuro (por si se usa en el futuro) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* 🌐 Estilos base del documento */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-fira, Arial, Helvetica, sans-serif);
+}
+
+/* 🔠 Titulares con Voga */
+h1, h2, h3 {
+  font-family: var(--font-voga, serif);
+  letter-spacing: 0.02em;
+}
+
+/* ✨ Enlaces y botones con acento dorado */
+a, button {
+  transition: all 0.2s ease;
+}
+
+a:hover, button:hover {
+  color: var(--brand-brown);
+}

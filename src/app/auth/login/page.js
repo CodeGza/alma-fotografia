@@ -96,8 +96,7 @@ export default function LoginPage() {
                 {/* Input principal */}
                 <input
                   type="email"
-                  className={`w-full pl-11 pr-4 py-3 bg-white border-2 rounded-xl text-[#000000] placeholder:text-[#C6A97D]/50 
-                    focus:outline-none transition-all duration-300 ease-in-out relative z-10
+                  className={`w-full pl-11 pr-4 py-3 bg-white border-2 rounded-xl text-[#000000] placeholder:text-[#C6A97D]/50 focus:outline-none transition-all duration-300 ease-in-out relative z-10
                     ${emailFocused 
                       ? 'border-[#79502A]' 
                       : 'border-[#C6A97D]/30 hover:border-[#C6A97D]/50'
@@ -146,8 +145,7 @@ export default function LoginPage() {
                 {/* Input principal */}
                 <input
                   type="password"
-                  className={`w-full pl-11 pr-4 py-3 bg-white border-2 rounded-xl text-[#000000] placeholder:text-[#C6A97D]/50 
-                    focus:outline-none transition-all duration-300 ease-in-out relative z-10
+                  className={`w-full pl-11 pr-4 py-3 bg-white border-2 rounded-xl text-[#000000] placeholder:text-[#C6A97D]/50 focus:outline-none transition-all duration-300 ease-in-out relative z-10
                     ${passwordFocused 
                       ? 'border-[#79502A]' 
                       : 'border-[#C6A97D]/30 hover:border-[#C6A97D]/50'
@@ -190,10 +188,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 bg-[#79502A] hover:bg-[#5a3c1f] 
-              text-white rounded-xl py-3.5 font-semibold transition-all duration-300 
-              shadow-lg hover:shadow-xl 
-              disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full mt-6 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-xl py-3.5 font-semibold transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">

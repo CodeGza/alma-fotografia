@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import React from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -25,7 +24,9 @@ import {
   Star,
   Loader2,
   Briefcase,
-  GripVertical
+  GripVertical,
+  MessageSquare,
+  Heart
 } from 'lucide-react';
 import {
   DndContext,
@@ -45,13 +46,12 @@ import ShareGalleryModal from './ShareGalleryModal';
 import EditGalleryModal from './EditGalleryModal';
 import PhotoUploader from './PhotoUploader';
 import Modal from '@/components/ui/Modal';
-import Lightbox from '@/components/ui/Lightbox';
 import { useModal } from '@/hooks/useModal';
 import { createClient } from '@/lib/supabaseClient';
 import { iconMap } from '@/lib/validations/gallery';
 
 // Componente SortablePhoto para drag & drop
-function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsCover, changingCover, openLightbox }) {
+function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsCover, changingCover }) {
   const {
     attributes,
     listeners,
@@ -71,9 +71,8 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative mb-0.5 sm:mb-2 break-inside-avoid ${
-        isReorderMode ? 'cursor-move' : 'cursor-pointer'
-      }`}
+      className={`group relative mb-0.5 sm:mb-2 break-inside-avoid ${isReorderMode ? 'cursor-move' : 'cursor-pointer'
+        }`}
     >
       <div className="relative w-full bg-gray-100 overflow-hidden">
         <Image
@@ -123,16 +122,6 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
                   <span className="hidden sm:inline">PORTADA</span>
                 </button>
               )}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openLightbox(photoIndex);
-                }}
-                className="flex-1 py-1 sm:py-1.5 bg-white/95 hover:bg-white rounded text-[9px] sm:text-[10px] font-fira font-bold text-black flex items-center justify-center gap-1"
-              >
-                <Eye size={10} />
-                VER
-              </button>
             </div>
           </div>
         )}
@@ -162,8 +151,6 @@ export default function GalleryDetailView({ gallery }) {
   const [changingCover, setChangingCover] = useState(false);
   const [localPhotos, setLocalPhotos] = useState(gallery.photos);
   const [savingOrder, setSavingOrder] = useState(false);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
   const [deletingGallery, setDeletingGallery] = useState(false);
   const [serviceIcon, setServiceIcon] = useState(null);
   const [serviceName, setServiceName] = useState(null);
@@ -200,6 +187,14 @@ export default function GalleryDetailView({ gallery }) {
     photos,
     created_at,
     service_type,
+    allow_downloads,
+    allow_comments,
+    notify_on_view,
+    notify_on_favorites,
+    custom_message,
+    password,
+    expiration_date,
+    max_favorites,
   } = gallery;
 
   // Usar localPhotos para permitir reordenar antes de guardar
@@ -313,7 +308,7 @@ export default function GalleryDetailView({ gallery }) {
       const supabase = await createClient();
 
       // Crear array de promesas - se ejecutan en paralelo
-      const updatePromises = workingPhotos.map((photo, index) => 
+      const updatePromises = workingPhotos.map((photo, index) =>
         supabase
           .from('photos')
           .update({ display_order: index + 1 })
@@ -357,24 +352,6 @@ export default function GalleryDetailView({ gallery }) {
     setReorderMode(false);
   };
 
-  // Lightbox controls
-  const openLightbox = (index) => {
-    setLightboxIndex(index);
-    setLightboxOpen(true);
-  };
-
-  const closeLightbox = () => {
-    setLightboxOpen(false);
-  };
-
-  const nextPhoto = () => {
-    setLightboxIndex((prev) => (prev + 1) % workingPhotos.length);
-  };
-
-  const prevPhoto = () => {
-    setLightboxIndex((prev) => (prev - 1 + workingPhotos.length) % workingPhotos.length);
-  };
-
   // Eliminar galería completa
   const handleDeleteGallery = () => {
     showModal({
@@ -410,7 +387,7 @@ export default function GalleryDetailView({ gallery }) {
 
         if (!deleteFolderResponse.ok) {
           console.warn('⚠️ No se pudo eliminar carpeta, eliminando archivos individualmente...');
-          
+
           // Fallback: eliminar archivos uno por uno
           const deletePromises = workingPhotos.map(photo => {
             const publicId = extractPublicIdFromUrl(photo.file_path);
@@ -440,14 +417,14 @@ export default function GalleryDetailView({ gallery }) {
       if (cover_image) {
         const isGalleryPhoto = workingPhotos.some(p => p.file_path === cover_image);
         const isInGalleryFolder = cover_image.includes(`galleries/${id}`);
-        
+
         console.log('🖼️ Portada es foto de galería?', isGalleryPhoto);
         console.log('🖼️ Portada está en carpeta de galería?', isInGalleryFolder);
-        
+
         if (!isGalleryPhoto && !isInGalleryFolder) {
           const publicId = extractPublicIdFromUrl(cover_image);
           console.log('🔍 Portada independiente → PublicID:', publicId);
-          
+
           if (publicId) {
             try {
               await fetch('/api/cloudinary/delete', {
@@ -887,17 +864,46 @@ export default function GalleryDetailView({ gallery }) {
                     </p>
                   )}
 
+                  {/* Configuraciones activas */}
+                  {(allow_downloads || allow_comments || password || max_favorites !== 150) && (
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {allow_downloads && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full font-fira text-[10px] font-medium">
+                          <Download size={10} />
+                          Descargas
+                        </span>
+                      )}
+                      {allow_comments && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full font-fira text-[10px] font-medium">
+                          <MessageSquare size={10} />
+                          Comentarios
+                        </span>
+                      )}
+                      {password && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full font-fira text-[10px] font-medium">
+                          <Lock size={10} />
+                          Protegida
+                        </span>
+                      )}
+                      {max_favorites && max_favorites !== 151 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-pink-500/20 text-pink-300 rounded-full font-fira text-[10px] font-medium">
+                          <Star size={10} />
+                          Máx {max_favorites} favoritos
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-white/60">
                     {service_type && (
                       <div className="flex items-center gap-2">
-                        {serviceIcon && iconMap[serviceIcon] ? (
-                          React.createElement(iconMap[serviceIcon], {
-                            size: 14,
-                            className: "text-white/40 flex-shrink-0"
-                          })
-                        ) : (
-                          <Briefcase size={14} className="text-white/40 flex-shrink-0" />
-                        )}
+                        {(() => {
+                          if (serviceIcon && iconMap[serviceIcon]) {
+                            const IconComponent = iconMap[serviceIcon];
+                            return <IconComponent size={14} className="text-white/40 flex-shrink-0" />;
+                          }
+                          return <Briefcase size={14} className="text-white/40 flex-shrink-0" />;
+                        })()}
                         <span className="font-fira">{serviceName || service_type}</span>
                       </div>
                     )}
@@ -982,14 +988,13 @@ export default function GalleryDetailView({ gallery }) {
               {serviceName && (
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-white/10 rounded-lg">
-                    {serviceIcon && iconMap[serviceIcon] ? (
-                      React.createElement(iconMap[serviceIcon], {
-                        size: 18,
-                        className: "text-[#79502A]"
-                      })
-                    ) : (
-                      <Briefcase className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#79502A]" />
-                    )}
+                    {(() => {
+                      if (serviceIcon && iconMap[serviceIcon]) {
+                        const IconComponent = iconMap[serviceIcon];
+                        return <IconComponent size={18} className="text-[#79502A]" />;
+                      }
+                      return <Briefcase className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#79502A]" />;
+                    })()}
                   </div>
                   <div>
                     <p className="font-fira text-base sm:text-lg font-semibold">{serviceName}</p>
@@ -997,7 +1002,65 @@ export default function GalleryDetailView({ gallery }) {
                   </div>
                 </div>
               )}
+
+              {/* Descargas permitidas */}
+              {allow_downloads !== undefined && (
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Download className={`w-4 h-4 sm:w-[18px] sm:h-[18px] ${allow_downloads ? 'text-green-400' : 'text-red-400'}`} />
+                  </div>
+                  <div>
+                    <p className="font-fira text-base sm:text-lg font-semibold">{allow_downloads ? 'Sí' : 'No'}</p>
+                    <p className="font-fira text-xs text-white/60">Descargas</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Límite de favoritos */}
+              {max_favorites !== undefined && (
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Heart className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-pink-400" />
+                  </div>
+                  <div>
+                    <p className="font-fira text-base sm:text-lg font-semibold">{max_favorites}</p>
+                    <p className="font-fira text-xs text-white/60">Máx. favoritos</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Contraseña */}
+              {password && (
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Lock className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="font-fira text-base sm:text-lg font-semibold">Protegida</p>
+                    <p className="font-fira text-xs text-white/60">Contraseña</p>
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* Mensaje personalizado */}
+            {custom_message && (
+              <div className="mt-4 pt-4 border-t border-white/10 ">
+                <div className="bg-[#fff]/90 border border-[#222] rounded-lg p-3 mb-3">
+                  <div className="flex items-start gap-2">
+                    <MessageSquare size={14} className="text-[#222] flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="font-fira text-xs font-semibold text-[#222] mb-1">
+                        Mensaje para el cliente
+                      </p>
+                      <p className="font-fira text-sm text-black leading-relaxed">
+                        {custom_message}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1081,11 +1144,11 @@ export default function GalleryDetailView({ gallery }) {
                 Subir fotos
               </h2>
             </div>
-            <PhotoUploader 
-              galleryId={id} 
+            <PhotoUploader
+              galleryId={id}
               gallerySlug={slug}
               galleryTitle={title}
-              onUploadComplete={handleUploadComplete} 
+              onUploadComplete={handleUploadComplete}
             />
           </div>
 
@@ -1120,7 +1183,7 @@ export default function GalleryDetailView({ gallery }) {
                       )}
                     </>
                   )}
-                  
+
                   {selectionMode && (
                     <>
                       <button
@@ -1234,7 +1297,6 @@ export default function GalleryDetailView({ gallery }) {
                           isReorderMode={true}
                           handleSetAsCover={handleSetAsCover}
                           changingCover={changingCover}
-                          openLightbox={openLightbox}
                         />
                       ))}
                     </div>
@@ -1254,9 +1316,8 @@ export default function GalleryDetailView({ gallery }) {
                       <div
                         key={photo.id}
                         onClick={() => togglePhotoSelection(photo.id)}
-                        className={`group relative mb-0.5 sm:mb-2 break-inside-avoid cursor-pointer transition-all hover:opacity-80 ${
-                          isSelected ? 'ring-2 sm:ring-4 ring-[#79502A]' : ''
-                        }`}
+                        className={`group relative mb-0.5 sm:mb-2 break-inside-avoid cursor-pointer transition-all hover:opacity-80 ${isSelected ? 'ring-2 sm:ring-4 ring-[#79502A]' : ''
+                          }`}
                       >
                         <div className="relative w-full bg-gray-100 overflow-hidden">
                           <Image
@@ -1269,11 +1330,10 @@ export default function GalleryDetailView({ gallery }) {
                           />
 
                           <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 z-10">
-                            <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-colors ${
-                              isSelected
+                            <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-colors ${isSelected
                                 ? 'bg-[#79502A] border-[#79502A]'
                                 : 'bg-white/90 border-gray-300'
-                            }`}>
+                              }`}>
                               {isSelected && <CheckSquare size={14} className="sm:w-4 sm:h-4 text-white" strokeWidth={3} />}
                             </div>
                           </div>
@@ -1305,7 +1365,6 @@ export default function GalleryDetailView({ gallery }) {
                       isReorderMode={false}
                       handleSetAsCover={handleSetAsCover}
                       changingCover={changingCover}
-                      openLightbox={() => openLightbox(startIdx + index)}
                     />
                   ))}
                 </div>
@@ -1354,16 +1413,6 @@ export default function GalleryDetailView({ gallery }) {
           gallery={gallery}
           onClose={() => setShowEditModal(false)}
           onSuccess={() => router.refresh()}
-        />
-      )}
-
-      {lightboxOpen && (
-        <Lightbox
-          photos={workingPhotos}
-          currentIndex={lightboxIndex}
-          onClose={closeLightbox}
-          onNext={nextPhoto}
-          onPrev={prevPhoto}
         />
       )}
 

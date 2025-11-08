@@ -22,7 +22,8 @@ import {
     EyeOff,
     Image as ImageIcon,
     Info,
-    Clock
+    Clock,
+    ArrowLeft
 } from 'lucide-react';
 import Image from 'next/image';
 import { gallerySchema, generateSlug } from '@/lib/validations/gallery';
@@ -399,6 +400,15 @@ export default function CreateGalleryForm() {
             className="w-full p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto"
         >
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
+
+
+                <button
+                    onClick={() => router.push('/dashboard/galerias')}
+                    className="flex items-center gap-2 text-black/60 hover:text-black transition-colors font-fira text-sm mb-4"
+                >
+                    <ArrowLeft size={16} />
+                    <span>Volver</span>
+                </button>
 
                 {/* Título */}
                 <motion.div

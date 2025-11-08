@@ -47,6 +47,14 @@ async function GalleryContent({ galleryId }) {
         is_public,
         views_count,
         service_type,
+        allow_downloads,
+        allow_comments,
+        notify_on_view,
+        notify_on_favorites,
+        custom_message,
+        password,
+        expiration_date,
+        max_favorites,
         created_at,
         photos:photos(
           id,
@@ -130,4 +138,4 @@ export async function generateMetadata({ params }) {
   return {
     title: gallery ? `${gallery.title} | Dashboard` : 'Galería | Dashboard',
   };
-}   
+}

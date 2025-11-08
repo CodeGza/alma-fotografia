@@ -1,53 +1,107 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // ✅ Agregado useEffect
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
-import { Upload, Loader2, Check, X } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { defaultServiceTypes } from '@/lib/validations/gallery';
+import { Bell, MessageSquare } from 'lucide-react';
+import ServiceTypeSelector from './ServiceTypeSelector';
+import { motion, AnimatePresence } from 'framer-motion';
+import Modal from '@/components/ui/Modal';
+import { useModal } from '@/hooks/useModal';
+import {
+    Upload,
+    Loader2,
+    Check,
+    X,
+    Calendar,
+    Mail,
+    Lock,
+    Eye,
+    EyeOff,
+    Image as ImageIcon,
+    Info,
+    Clock
+} from 'lucide-react';
 import Image from 'next/image';
+import { gallerySchema, generateSlug } from '@/lib/validations/gallery';
+import { createClient } from '@/lib/supabaseClient';
 
 /**
- * CreateGalleryForm - Formulario optimizado de creación de galería
+ * CreateGalleryForm - Formulario profesional de creación de galería
  * 
- * Optimizaciones de imágenes:
- * - Compresión automática antes de subir
- * - Resize a máximo 1920px de ancho
- * - Conversión a WebP (mejor compresión)
- * - Validación de peso y tipo
+ * Features completas inspiradas en Pixieset:
+ * - Protección por contraseña (opcional)
+ * - Fecha de expiración
+ * - Control de descargas
+ * - Control de comentarios
+ * - Límite de favoritos personalizado
+ * - Portada optimizada
+ * 
+ * Optimizaciones:
+ * - React Hook Form + Zod
+ * - Animaciones con Framer Motion
+ * - Optimización de imágenes
+ * - Validaciones en tiempo real
  */
 export default function CreateGalleryForm() {
     const router = useRouter();
+    const { modalState, showModal, closeModal } = useModal();
 
-    const [formData, setFormData] = useState({
-        title: '',
-        slug: '',
-        description: '',
-        eventDate: '',
-        clientEmail: '',
-        isPublic: false,
-    });
+    // ✅ Estado para el origin (fix hydration)
+    const [origin, setOrigin] = useState('');
 
     const [coverImage, setCoverImage] = useState(null);
     const [coverImagePreview, setCoverImagePreview] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errors, setErrors] = useState({});
+    const [showPassword, setShowPassword] = useState(false);
+    const [showAdvanced, setShowAdvanced] = useState(false);
+
+    // ✅ Setear origin en el cliente
+    useEffect(() => {
+        setOrigin(window.location.origin);
+    }, []);
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        setValue,
+        formState: { errors, isSubmitting }
+    } = useForm({
+        resolver: zodResolver(gallerySchema),
+        defaultValues: {
+            title: '',
+            slug: '',
+            description: '',
+            eventDate: '',
+            clientEmail: '',
+            isPublic: false,
+            serviceType: '',
+            customMessage: '',
+            notifyOnView: false,
+            notifyOnFavorites: true,
+            password: '',
+            expirationDate: '',
+            allowDownloads: true,
+            allowComments: true,
+            maxFavorites: 150,
+        }
+    });
+
+    // Auto-generar slug cuando cambia el título
+    const handleTitleChange = (e) => {
+        const newTitle = e.target.value;
+        setValue('title', newTitle);
+        setValue('slug', generateSlug(newTitle));
+    };
 
     /**
      * Optimiza imagen antes de subirla
-     * 
-     * Por qué necesario:
-     * - Reduce costos de storage
-     * - Mejora velocidad de carga para clientes
-     * - Ahorra bandwidth
-     * 
-     * Optimizaciones:
-     * 1. Resize a máximo 1920px ancho (mantiene aspecto)
-     * 2. Compresión con calidad 85% (buen balance calidad/peso)
-     * 3. Conversión a WebP (30-50% menos peso que JPG)
-     * 
-     * @param {File} file - Imagen original
-     * @returns {Promise<Blob>} - Imagen optimizada
+     * - Resize a máximo 1920px
+     * - Conversión a WebP
+     * - Compresión 85%
      */
     const optimizeImage = async (file) => {
         return new Promise((resolve, reject) => {
@@ -57,17 +111,14 @@ export default function CreateGalleryForm() {
                 const img = document.createElement('img');
 
                 img.onload = () => {
-                    // Crear canvas para redimensionar
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
 
-                    // Calcular dimensiones manteniendo aspecto
                     const MAX_WIDTH = 1920;
                     const MAX_HEIGHT = 1920;
                     let width = img.width;
                     let height = img.height;
 
-                    // Solo redimensionar si es más grande que MAX_WIDTH
                     if (width > MAX_WIDTH) {
                         height = (height * MAX_WIDTH) / width;
                         width = MAX_WIDTH;
@@ -78,24 +129,17 @@ export default function CreateGalleryForm() {
                         height = MAX_HEIGHT;
                     }
 
-                    // Configurar canvas
                     canvas.width = width;
                     canvas.height = height;
-
-                    // Dibujar imagen redimensionada
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Convertir a Blob (WebP, 85% calidad)
                     canvas.toBlob(
                         (blob) => {
-                            if (blob) {
-                                resolve(blob);
-                            } else {
-                                reject(new Error('Error al optimizar imagen'));
-                            }
+                            if (blob) resolve(blob);
+                            else reject(new Error('Error al optimizar imagen'));
                         },
-                        'image/webp', // Formato WebP para mejor compresión
-                        0.85 // 85% de calidad (buen balance)
+                        'image/webp',
+                        0.85
                     );
                 };
 
@@ -108,73 +152,36 @@ export default function CreateGalleryForm() {
         });
     };
 
-    const generateSlug = (title) => {
-        return title
-            .toLowerCase()
-            .trim()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^\w\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-+|-+$/g, '');
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        const newValue = type === 'checkbox' ? checked : value;
-
-        setFormData(prev => ({
-            ...prev,
-            [name]: newValue,
-            ...(name === 'title' && { slug: generateSlug(value) })
-        }));
-
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: null }));
-        }
-    };
-
     /**
-     * Maneja selección de imagen con optimización
-     * 
-     * Flujo:
-     * 1. Validar tipo y tamaño original
-     * 2. Optimizar imagen (resize + compress + webp)
-     * 3. Mostrar preview
-     * 4. Guardar blob optimizado para upload
+     * Maneja selección y optimización de imagen
      */
     const handleImageSelect = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Validar tipo
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
         if (!validTypes.includes(file.type)) {
-            setErrors(prev => ({
-                ...prev,
-                coverImage: 'Solo se permiten imágenes JPG, PNG o WebP'
-            }));
+            showModal({
+                title: 'Formato inválido',
+                message: 'Solo se permiten imágenes JPG, PNG o WebP',
+                type: 'error'
+            });
             return;
         }
 
-        // Validar tamaño original (máx 10MB antes de optimizar)
         if (file.size > 10 * 1024 * 1024) {
-            setErrors(prev => ({
-                ...prev,
-                coverImage: 'La imagen no debe superar los 10MB'
-            }));
+            showModal({
+                title: 'Archivo muy grande',
+                message: 'La imagen no debe superar los 10MB',
+                type: 'error'
+            });
             return;
         }
 
         try {
-            // Mostrar loading mientras optimiza
             setIsUploading(true);
 
-            // Optimizar imagen
             const optimizedBlob = await optimizeImage(file);
-
-            // Crear File desde Blob optimizado
             const optimizedFile = new File(
                 [optimizedBlob],
                 `${file.name.split('.')[0]}.webp`,
@@ -182,378 +189,799 @@ export default function CreateGalleryForm() {
             );
 
             setCoverImage(optimizedFile);
-            setErrors(prev => ({ ...prev, coverImage: null }));
 
-            // Generar preview
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setCoverImagePreview(reader.result);
-            };
+            reader.onloadend = () => setCoverImagePreview(reader.result);
             reader.readAsDataURL(optimizedFile);
 
-            // Log de optimización (solo dev)
+            // Log optimización (solo dev)
             if (process.env.NODE_ENV === 'development') {
                 const reduction = ((1 - optimizedBlob.size / file.size) * 100).toFixed(1);
-                console.log(`📸 Imagen optimizada: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(optimizedBlob.size / 1024 / 1024).toFixed(2)}MB (${reduction}% reducción)`);
+                console.log(`📸 Optimizada: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(optimizedBlob.size / 1024 / 1024).toFixed(2)}MB (-${reduction}%)`);
             }
         } catch (error) {
             console.error('Error optimizing image:', error);
-            setErrors(prev => ({
-                ...prev,
-                coverImage: 'Error al procesar la imagen. Intenta con otra.'
-            }));
+            showModal({
+                title: 'Error procesando imagen',
+                message: 'Error al procesar la imagen',
+                type: 'error'
+            });
         } finally {
             setIsUploading(false);
         }
     };
 
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!formData.title.trim()) {
-            newErrors.title = 'El título es obligatorio';
-        }
-
-        if (!formData.slug.trim()) {
-            newErrors.slug = 'El slug es obligatorio';
-        }
-
-        if (formData.clientEmail && !formData.clientEmail.includes('@')) {
-            newErrors.clientEmail = 'Email inválido';
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
     /**
-     * Sube imagen de portada a Cloudinary
-     * 
-     * Por qué Cloudinary en lugar de Supabase:
-     * - 25GB gratis (vs 1GB)
-     * - Optimización automática mejor
-     * - CDN global
+     * Sube imagen a Cloudinary
      */
     const uploadCoverImage = async () => {
         if (!coverImage) return null;
 
         try {
-            // ✅ Crear FormData para enviar a API Route
             const formData = new FormData();
             formData.append('file', coverImage);
             formData.append('folder', 'gallery-covers');
             formData.append('resourceType', 'image');
 
-            // ✅ Subir a Cloudinary via API Route
             const response = await fetch('/api/upload', {
                 method: 'POST',
                 body: formData,
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error uploading image');
-            }
+            if (!response.ok) throw new Error('Error uploading image');
 
             const result = await response.json();
+            if (!result.success) throw new Error(result.error);
 
-            if (!result.success) {
-                throw new Error(result.error || 'Upload failed');
-            }
-
-            console.log('✅ Imagen subida a Cloudinary:', result.url);
-
-            // ✅ Retornar URL de Cloudinary
             return result.url;
         } catch (error) {
-            console.error('❌ Error uploading cover image:', error);
-            setErrors(prev => ({
-                ...prev,
-                coverImage: 'Error al subir la imagen. Intenta nuevamente.'
-            }));
-            return null;
+            console.error('Error uploading cover:', error);
+            throw error;
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!validateForm()) return;
-
-        setIsSubmitting(true);
-
+    /**
+     * Submit del formulario
+     */
+    const onSubmit = async (data) => {
         try {
-            // ✅ USAR supabase directamente (ya importado arriba)
+            console.log('📋 Iniciando creación de galería...', data);
+
+            const supabase = await createClient();
             const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error('Usuario no autenticado');
 
-            const coverImageUrl = await uploadCoverImage();
-
-            if (coverImage && !coverImageUrl) {
-                setIsSubmitting(false);
+            if (!user) {
+                showModal({
+                    title: 'Usuario no autenticado',
+                    message: 'Debes iniciar sesión para crear galerías',
+                    type: 'error'
+                });
                 return;
             }
 
+            console.log('👤 Usuario autenticado:', user.id);
+
+            // ✅ Validar que siempre tenga tipo de servicio
+            if (!data.serviceType) {
+                showModal({
+                    title: 'Tipo de servicio requerido',
+                    message: 'Debes seleccionar un tipo de servicio para crear la galería',
+                    type: 'warning'
+                });
+                return;
+            }
+
+            console.log('✅ Tipo de servicio:', data.serviceType);
+
+            // ✅ Validar galería pública única por servicio
+            if (data.isPublic && data.serviceType) {
+                console.log('🔍 Verificando galerías públicas existentes...');
+
+                const { data: existing, error: checkError } = await supabase
+                    .from('galleries')
+                    .select('id')
+                    .eq('is_public', true)
+                    .eq('service_type', data.serviceType)
+                    .single();
+
+                if (checkError && checkError.code !== 'PGRST116') {
+                    // PGRST116 = no rows returned (está bien, no hay duplicados)
+                    console.error('❌ Error verificando galerías:', checkError);
+                    throw checkError;
+                }
+
+                if (existing) {
+                    console.log('⚠️ Ya existe galería pública con este servicio');
+                    showModal({
+                        title: 'Galería duplicada',
+                        message: `Ya existe una galería pública de este tipo de servicio. Solo puede haber una galería pública por servicio.`,
+                        type: 'warning'
+                    });
+                    return;
+                }
+            }
+
+            // Subir portada si existe
+            console.log('📸 Subiendo imagen de portada...');
+            const coverImageUrl = await uploadCoverImage();
+            console.log('✅ Imagen subida:', coverImageUrl || 'Sin imagen');
+
+            // Preparar datos
+            const galleryData = {
+                title: data.title.trim(),
+                slug: data.slug.trim(),
+                description: data.description?.trim() || null,
+                event_date: data.eventDate || null,
+                client_email: data.clientEmail?.trim() || null,
+                cover_image: coverImageUrl,
+                is_public: data.isPublic,
+                created_by: user.id,
+                views_count: 0,
+                service_type: data.serviceType || null,
+                custom_message: data.customMessage?.trim() || null,
+                notify_on_view: data.notifyOnView,
+                notify_on_favorites: data.notifyOnFavorites,
+                password: data.password?.trim() || null,
+                expiration_date: data.expirationDate || null,
+                allow_downloads: data.allowDownloads,
+                allow_comments: data.allowComments,
+                max_favorites: data.maxFavorites || 150,
+            };
+
+            console.log('💾 Insertando galería en Supabase:', galleryData);
+
             const { data: gallery, error } = await supabase
                 .from('galleries')
-                .insert({
-                    title: formData.title.trim(),
-                    slug: formData.slug.trim(),
-                    description: formData.description.trim() || null,
-                    event_date: formData.eventDate || null,
-                    client_email: formData.clientEmail.trim() || null,
-                    cover_image: coverImageUrl,
-                    is_public: formData.isPublic,
-                    created_by: user.id,
-                    views_count: 0,
-                })
+                .insert(galleryData)
                 .select()
                 .single();
 
             if (error) {
+                console.error('❌ Error de Supabase:', error);
+
                 if (error.code === '23505') {
-                    setErrors({ slug: 'Este slug ya existe. Elige otro.' });
-                    setIsSubmitting(false);
+                    if (error.message.includes('unique_public_service_gallery')) {
+                        showModal({
+                            title: 'Galería duplicada',
+                            message: 'Ya existe una galería pública con este tipo de servicio',
+                            type: 'error'
+                        });
+                    } else if (error.message.includes('slug')) {
+                        showModal({
+                            title: 'URL duplicada',
+                            message: 'Ya existe una galería con esta URL. Elige otra.',
+                            type: 'error'
+                        });
+                    } else {
+                        showModal({
+                            title: 'Error de duplicado',
+                            message: error.message,
+                            type: 'error'
+                        });
+                    }
                     return;
                 }
-                throw error;
+
+                // Otros errores
+                showModal({
+                    title: 'Error al crear galería',
+                    message: `Error: ${error.message || 'Desconocido'}`,
+                    type: 'error'
+                });
+                return;
             }
 
-            router.push('/dashboard/galerias');
-        } catch (error) {
-            console.error('Error creating gallery:', error);
-            setErrors({
-                submit: 'Error al crear la galería. Intenta nuevamente.'
+            console.log('✅ Galería creada exitosamente:', gallery);
+
+            showModal({
+                title: 'Galería creada',
+                message: 'La galería se creó correctamente',
+                type: 'success',
+                onConfirm: () => router.push('/dashboard/galerias')
             });
-        } finally {
-            setIsSubmitting(false);
+
+        } catch (error) {
+            console.error('❌ Error creating gallery:', error);
+
+            showModal({
+                title: 'Error al crear galería',
+                message: error.message || 'Ocurrió un error inesperado. Revisa la consola para más detalles.',
+                type: 'error'
+            });
         }
     };
 
     return (
-        <div className="p-4 sm:p-8 lg:p-12 max-w-4xl mx-auto">
-            <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-                {errors.submit && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <p className="font-fira text-sm text-red-800">{errors.submit}</p>
-                    </div>
-                )}
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="w-full p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto"
+        >
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
 
-                <div>
+                {/* Título */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                >
                     <label className="block font-fira text-sm font-medium text-black mb-2">
                         Título de la galería *
                     </label>
                     <input
                         type="text"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleInputChange}
+                        {...register('title')}
+                        onChange={handleTitleChange}
                         placeholder="Ej: Sesión María y Juan - Casamiento"
-                        className={`w-full px-4 py-3 border rounded-lg font-fira text-sm text-black focus:outline-none focus:ring-2 transition-colors ${errors.title
-                            ? 'border-red-300 focus:ring-red-200'
-                            : 'border-black/10 focus:ring-golden/30'
+                        className={`w-full px-4 py-3 border rounded-lg font-fira text-sm text-black 
+                            focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all
+                            ${errors.title
+                                ? 'border-red-300'
+                                : 'border-gray-300 hover:border-gray-400'
                             }`}
                     />
                     {errors.title && (
-                        <p className="mt-2 font-fira text-sm text-red-600">{errors.title}</p>
+                        <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-2 font-fira text-sm text-red-600"
+                        >
+                            {errors.title.message}
+                        </motion.p>
                     )}
-                </div>
+                </motion.div>
 
-                <div>
+                {/* Slug */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.15 }}
+                >
                     <label className="block font-fira text-sm font-medium text-black mb-2">
                         URL de la galería *
                     </label>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="font-fira text-sm text-black/60">
-                            {typeof window !== 'undefined' && window.location.origin}/galeria/
-                        </span>
+                    <div className="flex flex-col sm:flex-row items-stretch gap-2">
+                        <div className="flex items-center px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg">
+                            <span className="font-fira text-sm text-black/60 whitespace-nowrap text-xs sm:text-sm">
+                                {origin || 'tudominio.com'}/galeria/
+                            </span>
+                        </div>
                         <input
                             type="text"
-                            name="slug"
-                            value={formData.slug}
-                            onChange={handleInputChange}
+                            {...register('slug')}
                             placeholder="sesion-maria-juan"
-                            className={`flex-1 px-4 py-3 border rounded-lg font-fira text-sm text-black focus:outline-none focus:ring-2 transition-colors ${errors.slug
-                                ? 'border-red-300 focus:ring-red-200'
-                                : 'border-black/10 focus:ring-golden/30'
+                            className={`flex-1 px-4 py-3 border rounded-lg font-fira text-sm text-black 
+                                focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all
+                                ${errors.slug
+                                    ? 'border-red-300'
+                                    : 'border-gray-300 hover:border-gray-400'
                                 }`}
                         />
                     </div>
-                    <p className="font-fira text-xs text-black/50">
+                    <p className="mt-1 font-fira text-xs text-black/50 flex items-center gap-1">
+                        <Info size={12} />
                         Se genera automáticamente, pero puedes editarlo
                     </p>
                     {errors.slug && (
-                        <p className="mt-2 font-fira text-sm text-red-600">{errors.slug}</p>
+                        <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-2 font-fira text-sm text-red-600"
+                        >
+                            {errors.slug.message}
+                        </motion.p>
                     )}
-                </div>
+                </motion.div>
 
-                <div>
+                {/* Tipo de servicio */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.18 }}
+                >
+                    <label className="block font-fira text-sm font-medium text-black mb-3">
+                        Tipo de servicio * {watch('isPublic') && <span className="text-[#79502A]">*</span>}
+                    </label>
+                    <ServiceTypeSelector
+                        value={watch('serviceType')}
+                        onChange={(slug) => setValue('serviceType', slug)}
+                        isPublic={watch('isPublic')}
+                        error={errors.serviceType?.message}
+                    />
+                </motion.div>
+
+                {/* Descripción */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                >
                     <label className="block font-fira text-sm font-medium text-black mb-2">
-                        Descripción (opcional)
+                        Descripción
                     </label>
                     <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
+                        {...register('description')}
                         placeholder="Breve descripción de la sesión..."
                         rows={4}
-                        className="w-full px-4 py-3 border border-black/10 rounded-lg font-fira text-sm text-black focus:outline-none focus:ring-2 focus:ring-golden/30 transition-colors resize-none"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm text-black 
+                            focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all resize-none
+                            hover:border-gray-400"
                     />
-                </div>
-
-                <div>
-                    <label className="block font-fira text-sm font-medium text-black mb-2">
-                        Fecha del evento (opcional)
-                    </label>
-                    <input
-                        type="date"
-                        name="eventDate"
-                        value={formData.eventDate}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-black/10 rounded-lg font-fira text-sm text-black focus:outline-none focus:ring-2 focus:ring-golden/30 transition-colors"
-                    />
-                </div>
-
-                <div>
-                    <label className="block font-fira text-sm font-medium text-black mb-2">
-                        Email del cliente (opcional)
-                    </label>
-                    <input
-                        type="email"
-                        name="clientEmail"
-                        value={formData.clientEmail}
-                        onChange={handleInputChange}
-                        placeholder="cliente@ejemplo.com"
-                        className={`w-full px-4 py-3 border rounded-lg font-fira text-sm text-black focus:outline-none focus:ring-2 transition-colors ${errors.clientEmail
-                            ? 'border-red-300 focus:ring-red-200'
-                            : 'border-black/10 focus:ring-golden/30'
-                            }`}
-                    />
-                    {errors.clientEmail && (
-                        <p className="mt-2 font-fira text-sm text-red-600">{errors.clientEmail}</p>
+                    {errors.description && (
+                        <p className="mt-2 font-fira text-sm text-red-600">{errors.description.message}</p>
                     )}
-                </div>
+                </motion.div>
 
-                <div>
-                    <label className="block font-fira text-sm font-medium text-black mb-2">
-                        Imagen de portada (opcional)
+                {/* Mensaje personalizado para el cliente */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.23 }}
+                >
+                    <label className="block font-fira text-sm font-medium text-black mb-2 flex items-center gap-2">
+                        <MessageSquare size={16} className="text-[#79502A]" />
+                        Mensaje para el cliente
                     </label>
+                    <textarea
+                        {...register('customMessage')}
+                        placeholder="Ej: ¡Hola María! Acá están tus fotos 💕 Elegí hasta 150 favoritas para tu álbum"
+                        rows={3}
+                        maxLength={300}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm text-black 
+                            focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all resize-y
+                            hover:border-gray-400"
+                    />
+                    <div className="flex items-center justify-between mt-1">
+                        <p className="font-fira text-xs text-black/50">
+                            Este mensaje aparecerá al inicio de la galería
+                        </p>
+                        <p className="font-fira text-xs text-black/40">
+                            {watch('customMessage')?.length || 0}/300
+                        </p>
+                    </div>
+                    {errors.customMessage && (
+                        <p className="mt-2 font-fira text-sm text-red-600">{errors.customMessage.message}</p>
+                    )}
+                </motion.div>
 
-                    {coverImagePreview ? (
-                        <div className="relative w-full aspect-video bg-beige/20 rounded-lg overflow-hidden mb-4">
-                            <Image
-                                src={coverImagePreview}
-                                alt="Preview"
-                                fill
-                                className="object-cover"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setCoverImage(null);
-                                    setCoverImagePreview(null);
-                                }}
-                                disabled={isUploading}
-                                className="absolute top-4 right-4 p-2 bg-white/90 hover:bg-white rounded-full transition-colors disabled:opacity-50"
-                            >
-                                <X size={20} className="text-black" />
-                            </button>
-                        </div>
-                    ) : (
-                        <label className={`block w-full aspect-video border-2 border-dashed rounded-lg transition-colors ${isUploading
-                            ? 'border-golden bg-golden/5'
-                            : 'border-black/20 hover:border-golden cursor-pointer'
-                            }`}>
-                            <div className="flex flex-col items-center justify-center h-full">
-                                {isUploading ? (
-                                    <>
-                                        <Loader2 size={48} className="text-golden animate-spin mb-4" strokeWidth={1.5} />
-                                        <p className="font-fira text-sm text-black/60">
-                                            Optimizando imagen...
-                                        </p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Upload size={48} className="text-black/30 mb-4" strokeWidth={1} />
-                                        <p className="font-fira text-sm text-black/60">
-                                            Click para subir imagen
-                                        </p>
-                                        <p className="font-fira text-xs text-black/40 mt-1">
-                                            JPG, PNG o WebP (máx. 10MB)
-                                        </p>
-                                        <p className="font-fira text-xs text-golden mt-2">
-                                            Se optimizará automáticamente
-                                        </p>
-                                    </>
-                                )}
-                            </div>
-                            <input
-                                type="file"
-                                accept="image/jpeg,image/jpg,image/png,image/webp"
-                                onChange={handleImageSelect}
-                                disabled={isUploading}
-                                className="hidden"
-                            />
+                {/* Fecha del evento y Email en grid */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
+                >
+                    {/* Fecha */}
+                    <div>
+                        <label className="block font-fira text-sm font-medium text-black mb-2 flex items-center gap-2">
+                            <Calendar size={16} className="text-[#79502A]" />
+                            Fecha del evento
                         </label>
-                    )}
+                        <input
+                            type="date"
+                            {...register('eventDate')}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm text-black 
+                                focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all
+                                hover:border-gray-400"
+                        />
+                    </div>
 
-                    {errors.coverImage && (
-                        <p className="mt-2 font-fira text-sm text-red-600">{errors.coverImage}</p>
-                    )}
-                </div>
+                    {/* Email cliente */}
+                    <div>
+                        <label className="block font-fira text-sm font-medium text-black mb-2 flex items-center gap-2">
+                            <Mail size={16} className="text-[#79502A]" />
+                            Email del cliente
+                        </label>
+                        <input
+                            type="email"
+                            {...register('clientEmail')}
+                            placeholder="cliente@ejemplo.com"
+                            className={`w-full px-4 py-3 border rounded-lg font-fira text-sm text-black 
+                                focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all
+                                ${errors.clientEmail
+                                    ? 'border-red-300'
+                                    : 'border-gray-300 hover:border-gray-400'
+                                }`}
+                        />
+                        {errors.clientEmail && (
+                            <p className="mt-2 font-fira text-sm text-red-600">{errors.clientEmail.message}</p>
+                        )}
+                    </div>
+                </motion.div>
 
-                <div className="flex items-center gap-3 p-4 bg-beige/20 rounded-lg border border-black/10">
-                    <input
-                        type="checkbox"
-                        id="isPublic"
-                        name="isPublic"
-                        checked={formData.isPublic}
-                        onChange={handleInputChange}
-                        className="w-5 h-5 accent-golden"
-                    />
-                    <label htmlFor="isPublic" className="flex-1 cursor-pointer">
-                        <p className="font-fira text-sm font-medium text-black">
-                            Galería pública
-                        </p>
-                        <p className="font-fira text-xs text-black/60 mt-1">
-                            Si está activado, la galería aparecerá en la página principal
-                        </p>
+                {/* Imagen de portada */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                >
+                    <label className="block font-fira text-sm font-medium text-black mb-2 flex items-center gap-2">
+                        <ImageIcon size={16} className="text-[#79502A]" />
+                        Imagen de portada
                     </label>
+
+                    <AnimatePresence mode="wait">
+                        {coverImagePreview ? (
+                            <motion.div
+                                key="preview"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="relative w-full aspect-video bg-gray-50 rounded-lg overflow-hidden shadow-sm"
+                            >
+                                <Image
+                                    src={coverImagePreview}
+                                    alt="Preview"
+                                    fill
+                                    className="object-cover"
+                                />
+                                <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    type="button"
+                                    onClick={() => {
+                                        setCoverImage(null);
+                                        setCoverImagePreview(null);
+                                    }}
+                                    disabled={isUploading}
+                                    className="absolute top-4 right-4 p-2 bg-white/90 hover:bg-white rounded-full 
+                                        transition-colors shadow-lg disabled:opacity-50"
+                                >
+                                    <X size={20} className="text-black" />
+                                </motion.button>
+                            </motion.div>
+                        ) : (
+                            <motion.label
+                                key="upload"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className={`block w-full aspect-video border-2 border-dashed rounded-lg transition-all
+                                    ${isUploading
+                                        ? 'border-[#C6A97D] bg-gray-50'
+                                        : 'border-gray-300 hover:border-[#79502A] hover:bg-gray-50/50 cursor-pointer'
+                                    }`}
+                            >
+                                <div className="flex flex-col items-center justify-center h-full px-4">
+                                    {isUploading ? (
+                                        <>
+                                            <Loader2 size={48} className="text-[#79502A] animate-spin mb-4" strokeWidth={1.5} />
+                                            <p className="font-fira text-sm text-black/60 text-center">
+                                                Optimizando imagen...
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Upload size={48} className="text-black/30 mb-4" strokeWidth={1} />
+                                            <p className="font-fira text-sm text-black/60 text-center">
+                                                Click para subir imagen
+                                            </p>
+                                            <p className="font-fira text-xs text-black/40 mt-1 text-center">
+                                                JPG, PNG o WebP (máx. 10MB)
+                                            </p>
+                                            <p className="font-fira text-xs text-[#79502A] mt-2 text-center">
+                                                Se optimizará automáticamente
+                                            </p>
+                                        </>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                                    onChange={handleImageSelect}
+                                    disabled={isUploading}
+                                    className="hidden"
+                                />
+                            </motion.label>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
+
+                {/* Opciones básicas */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.35 }}
+                    className="space-y-3 sm:space-y-4"
+                >
+                    {/* Galería pública */}
+                    <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-300">
+                        <input
+                            type="checkbox"
+                            id="isPublic"
+                            {...register('isPublic')}
+                            className="mt-1 w-5 h-5 accent-[#79502A] cursor-pointer flex-shrink-0"
+                        />
+                        <label htmlFor="isPublic" className="flex-1 cursor-pointer">
+                            <p className="font-fira text-sm font-medium text-black">
+                                Galería pública
+                            </p>
+                            <p className="font-fira text-xs text-black/60 mt-1">
+                                Aparecerá en tu portafolio público
+                            </p>
+                        </label>
+                    </div>
+
+                    {/* Permitir descargas */}
+                    <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-300">
+                        <input
+                            type="checkbox"
+                            id="allowDownloads"
+                            {...register('allowDownloads')}
+                            className="mt-1 w-5 h-5 accent-[#79502A] cursor-pointer flex-shrink-0"
+                        />
+                        <label htmlFor="allowDownloads" className="flex-1 cursor-pointer">
+                            <p className="font-fira text-sm font-medium text-black">
+                                Permitir descargas
+                            </p>
+                            <p className="font-fira text-xs text-black/60 mt-1">
+                                Los clientes podrán descargar las fotos
+                            </p>
+                        </label>
+                    </div>
+
+                    {/* Permitir comentarios */}
+                    <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-300">
+                        <input
+                            type="checkbox"
+                            id="allowComments"
+                            {...register('allowComments')}
+                            className="mt-1 w-5 h-5 accent-[#79502A] cursor-pointer flex-shrink-0"
+                        />
+                        <label htmlFor="allowComments" className="flex-1 cursor-pointer">
+                            <p className="font-fira text-sm font-medium text-black">
+                                Permitir comentarios
+                            </p>
+                            <p className="font-fira text-xs text-black/60 mt-1">
+                                Los clientes podrán comentar cada foto
+                            </p>
+                        </label>
+                    </div>
+                </motion.div>
+
+                {/* Notificaciones por email */}
+                <div className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-300">
+                    <div className="flex items-center gap-2 mb-2">
+                        <Bell size={16} className="text-[#79502A]" />
+                        <h4 className="font-fira text-sm font-medium text-black">
+                            Notificaciones por email
+                        </h4>
+                    </div>
+
+                    {/* Notificar al ver */}
+                    <div className="flex items-start gap-3">
+                        <input
+                            type="checkbox"
+                            id="notifyOnView"
+                            {...register('notifyOnView')}
+                            className="mt-1 w-4 h-4 accent-[#79502A] cursor-pointer flex-shrink-0"
+                        />
+                        <label htmlFor="notifyOnView" className="flex-1 cursor-pointer">
+                            <p className="font-fira text-sm text-black">
+                                Cuando un cliente vea la galería
+                            </p>
+                            <p className="font-fira text-xs text-black/60 mt-0.5">
+                                Recibirás un email cada vez que alguien abra el link
+                            </p>
+                        </label>
+                    </div>
+
+                    {/* Notificar al seleccionar favoritos */}
+                    <div className="flex items-start gap-3">
+                        <input
+                            type="checkbox"
+                            id="notifyOnFavorites"
+                            {...register('notifyOnFavorites')}
+                            className="mt-1 w-4 h-4 accent-[#79502A] cursor-pointer flex-shrink-0"
+                        />
+                        <label htmlFor="notifyOnFavorites" className="flex-1 cursor-pointer">
+                            <p className="font-fira text-sm text-black">
+                                Cuando seleccione favoritos
+                            </p>
+                            <p className="font-fira text-xs text-black/60 mt-0.5">
+                                Recibirás un email cuando finalice su selección
+                            </p>
+                        </label>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-4 pt-6 border-t border-black/10">
+                {/* Opciones avanzadas (colapsables) */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                >
                     <button
+                        type="button"
+                        onClick={() => setShowAdvanced(!showAdvanced)}
+                        className="flex items-center gap-2 text-[#79502A] hover:text-[#79502A]/80 transition-colors font-fira text-sm font-medium"
+                    >
+                        <motion.div
+                            animate={{ rotate: showAdvanced ? 90 : 0 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            ▶
+                        </motion.div>
+                        Opciones avanzadas
+                    </button>
+
+                    <AnimatePresence>
+                        {showAdvanced && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="overflow-hidden"
+                            >
+                                <div className="mt-4 space-y-6 p-4 sm:p-6 bg-gray-50 rounded-lg border border-gray-300">
+
+                                    {/* Contraseña */}
+                                    <div>
+                                        <label className="block font-fira text-sm font-medium text-black mb-2 flex items-center gap-2">
+                                            <Lock size={16} className="text-[#79502A]" />
+                                            Proteger con contraseña
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type={showPassword ? 'text' : 'password'}
+                                                {...register('password')}
+                                                placeholder="Dejar vacío para sin contraseña"
+                                                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg font-fira text-sm text-black 
+                                                    focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all
+                                                    hover:border-gray-400"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-black/40 hover:text-black transition-colors"
+                                            >
+                                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
+                                        </div>
+                                        {errors.password && (
+                                            <p className="mt-2 font-fira text-sm text-red-600">{errors.password.message}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Fecha de expiración */}
+                                    <div>
+                                        <label className="block font-fira text-sm font-medium text-black mb-2 flex items-center gap-2">
+                                            <Clock size={16} className="text-[#79502A]" />
+                                            Fecha de expiración
+                                        </label>
+                                        <input
+                                            type="datetime-local"
+                                            {...register('expirationDate')}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm text-black 
+                                                focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all
+                                                hover:border-gray-400"
+                                        />
+                                        <p className="mt-1 font-fira text-xs text-black/50">
+                                            La galería dejará de ser accesible después de esta fecha
+                                        </p>
+                                    </div>
+
+                                    {/* Límite de favoritos */}
+                                    <div>
+                                        <label className="block font-fira text-sm font-medium text-black mb-2">
+                                            Límite de favoritos
+                                        </label>
+                                        <input
+                                            type="number"
+                                            {...register('maxFavorites', { valueAsNumber: true })}
+                                            min="0"
+                                            max="500"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm text-black 
+                                                focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all
+                                                hover:border-gray-400"
+                                        />
+                                        <p className="mt-1 font-fira text-xs text-black/50">
+                                            Máximo de fotos que el cliente puede marcar como favoritas
+                                        </p>
+                                        {errors.maxFavorites && (
+                                            <p className="mt-2 font-fira text-sm text-red-600">{errors.maxFavorites.message}</p>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
+
+                {/* Botones de acción */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.45 }}
+                    className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-6 border-t border-gray-300"
+                >
+                    {/* Botón Cancelar */}
+                    <motion.button
                         type="button"
                         onClick={() => router.back()}
                         disabled={isSubmitting || isUploading}
-                        className="px-6 py-3 border-2 border-black/20 text-black hover:bg-black/5 rounded-lg transition-colors font-fira text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        whileHover={{ scale: 1.02, x: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="px-6 py-3 border-2 border-gray-400 text-black font-fira text-sm font-medium
+                            rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                            hover:border-black hover:bg-black/5 active:bg-black/10
+                            flex items-center justify-center gap-2"
                     >
-                        Cancelar
-                    </button>
+                        <X size={18} strokeWidth={2} />
+                        <span>Cancelar</span>
+                    </motion.button>
 
-                    <button
+                    {/* Botón Crear */}
+                    <motion.button
                         type="submit"
                         disabled={isSubmitting || isUploading}
-                        className="flex-1 px-6 py-3 bg-brown hover:bg-brown/90 disabled:bg-black/20 text-white rounded-lg transition-colors font-fira text-sm font-medium disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="flex-1 sm:flex-[2] px-6 py-3 bg-[#79502A] font-fira text-sm font-medium
+                            rounded-lg transition-all shadow-sm
+                            disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400
+                            hover:bg-[#8B5A2F] hover:shadow-md
+                            active:bg-[#6A4522] active:shadow-sm
+                            flex items-center justify-center gap-2 relative overflow-hidden group"
                     >
-                        {isSubmitting ? (
-                            <>
-                                <Loader2 size={18} className="animate-spin" />
-                                <span>Creando galería...</span>
-                            </>
-                        ) : isUploading ? (
-                            <>
-                                <Loader2 size={18} className="animate-spin" />
-                                <span>Procesando imagen...</span>
-                            </>
-                        ) : (
-                            <>
-                                <Check size={18} />
-                                <span>Crear galería</span>
-                            </>
-                        )}
-                    </button>
-                </div>
+                        {/* Efecto de brillo al hover */}
+                        <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                            initial={{ x: '-100%' }}
+                            whileHover={{ x: '100%' }}
+                            transition={{ duration: 0.6 }}
+                        />
+
+                        {/* Contenido del botón - ✅ SIEMPRE BLANCO */}
+                        <div className="relative z-10 flex items-center gap-2 text-white">
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 size={18} className="animate-spin" strokeWidth={2.5} />
+                                    <span className="font-medium">Creando galería...</span>
+                                </>
+                            ) : isUploading ? (
+                                <>
+                                    <Loader2 size={18} className="animate-spin" strokeWidth={2.5} />
+                                    <span className="font-medium">Procesando imagen...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <motion.div
+                                        animate={{
+                                            scale: [1, 1.2, 1],
+                                            rotate: [0, 5, -5, 0]
+                                        }}
+                                        transition={{
+                                            duration: 2,
+                                            repeat: Infinity,
+                                            repeatDelay: 3
+                                        }}
+                                    >
+                                        <Check size={18} strokeWidth={2.5} />
+                                    </motion.div>
+                                    <span className="font-medium">Crear galería</span>
+                                </>
+                            )}
+                        </div>
+                    </motion.button>
+                </motion.div>
             </form>
-        </div>
+
+            {/* Modal */}
+            <Modal
+                isOpen={modalState.isOpen}
+                onClose={closeModal}
+                title={modalState.title}
+                message={modalState.message}
+                type={modalState.type}
+                confirmText={modalState.confirmText}
+                cancelText={modalState.cancelText}
+                onConfirm={modalState.onConfirm}
+                onCancel={modalState.onCancel}
+            />
+        </motion.div>
     );
 }

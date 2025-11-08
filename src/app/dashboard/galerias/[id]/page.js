@@ -104,7 +104,7 @@ export default async function GalleryDetailPage({ params }) {
         subtitle="Gestiona las fotos y configuración de esta sesión"
       />
 
-      <div className="p-8 lg:p-12">
+      <div className="">
         <Suspense fallback={<GalleryDetailSkeleton />}>
           <GalleryContent galleryId={id} />
         </Suspense>

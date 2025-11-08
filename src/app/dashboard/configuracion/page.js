@@ -1,22 +1,34 @@
+import { Suspense } from 'react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import PageTransition from '@/components/dashboard/PageTransition';
-import AnimatedSection from '@/components/dashboard/AnimatedSection';
+import ConfigMenu from '@/components/dashboard/configuracion/ConfigMenu';
+import { Loader2 } from 'lucide-react';
+
+export const metadata = {
+  title: 'Configuración | Alma Fotografía',
+  description: 'Configura tu cuenta y servicios',
+};
+
+function LoadingSkeleton() {
+  return (
+    <div className="p-4 sm:p-6 lg:p-12 max-w-4xl mx-auto space-y-4 animate-pulse">
+      <div className="h-32 bg-gray-100 rounded-lg" />
+      <div className="h-32 bg-gray-100 rounded-lg" />
+      <div className="h-32 bg-gray-100 rounded-lg" />
+    </div>
+  );
+}
 
 export default function ConfiguracionPage() {
   return (
-    <PageTransition>
+    <>
       <DashboardHeader
         title="Configuración"
-        subtitle="Configuracion de tu cuenta y preferencias"
+        subtitle="Administra tus servicios y preferencias"
       />
 
-      <AnimatedSection>
-        <div className="bg-white rounded-2xl p-8 border border-[#C6A97D]/20">
-          <p className="font-fira text-[#79502A]">
-            Opciones básicas de cuenta o ajustes.
-          </p>
-        </div>
-      </AnimatedSection>
-    </PageTransition>
+      <Suspense fallback={<LoadingSkeleton />}>
+        <ConfigMenu />
+      </Suspense>
+    </>
   );
 }

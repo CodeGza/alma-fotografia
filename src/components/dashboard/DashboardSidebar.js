@@ -1,185 +1,135 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, Images, MessageSquare, Settings, LogOut, Menu, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { memo, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import {
+  LayoutDashboard,
+  Image as ImageIcon,
+  MessageSquare,
+  Settings,
+  LogOut,
+} from 'lucide-react';
+import { createClient } from '@/lib/supabaseClient';
 
 /**
- * DashboardSidebar - Navegación lateral del dashboard
- * 
- * Componente que muestra la barra lateral de navegación con:
- * - Logo y branding
- * - Enlaces a las diferentes secciones
- * - Indicador visual de ruta activa
- * - Botón de cerrar sesión
- * - Comportamiento responsivo (colapsable en mobile)
+ * DashboardSidebar - Navegación lateral con tema oscuro
  */
-const DashboardSidebar = memo(function DashboardSidebar({ onLogout }) {
-  // Estado para controlar el sidebar en mobile
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  // Hook para obtener la ruta actual y marcar el item activo
+export default function DashboardSidebar({ user }) {
   const pathname = usePathname();
+  const router = useRouter();
 
-  // Configuración de los items de navegación
   const navItems = [
     {
+      name: 'Inicio',
       href: '/dashboard',
-      icon: Home,
-      label: 'Inicio',
-      description: 'Vista general',
+      icon: LayoutDashboard,
     },
     {
+      name: 'Galerías',
       href: '/dashboard/galerias',
-      icon: Images,
-      label: 'Galerías',
-      description: 'Gestionar colecciones',
+      icon: ImageIcon,
     },
     {
+      name: 'Testimonios',
       href: '/dashboard/testimonios',
       icon: MessageSquare,
-      label: 'Testimonios',
-      description: 'Opiniones de clientes',
     },
     {
+      name: 'Configuración',
       href: '/dashboard/configuracion',
       icon: Settings,
-      label: 'Configuración',
-      description: 'Ajustes del sistema',
     },
   ];
 
-  // Variantes de animación para Framer Motion
-  const sidebarVariants = {
-    hidden: { x: -20, opacity: 0 },
-    visible: { 
-      x: 0, 
-      opacity: 1,
-      transition: { 
-        duration: 0.4,
-        ease: 'easeOut',
-      },
-    },
+  const handleLogout = async () => {
+    const supabase = await createClient();
+    await supabase.auth.signOut();
+    router.push('/auth/login');
   };
 
-  const itemVariants = {
-    hidden: { x: -10, opacity: 0 },
-    visible: (i) => ({
-      x: 0,
-      opacity: 1,
-      transition: {
-        delay: i * 0.1,
-        duration: 0.3,
-      },
-    }),
+  const isActive = (href) => {
+    if (href === '/dashboard') {
+      return pathname === '/dashboard';
+    }
+    return pathname.startsWith(href);
   };
 
   return (
-    <>
-      {/* Botón hamburguesa para mobile */}
-      <button
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[#FFF8E2] rounded-lg shadow-lg border border-[#C6A97D]/20"
-        aria-label="Toggle menu"
-      >
-        {isMobileMenuOpen ? (
-          <X size={24} className="text-[#79502A]" />
-        ) : (
-          <Menu size={24} className="text-[#79502A]" />
-        )}
-      </button>
+    <aside className="w-64 bg-black border-r border-white/10 flex flex-col">
+      {/* Logo/Header */}
+      <div className="p-6 border-b border-white/10">
+        <h1 className="font-voga text-2xl text-white">
+          ALMA
+        </h1>
+        <p className="font-fira text-xs text-white/50 mt-1">
+          FOTOGRAFÍA
+        </p>
+      </div>
 
-      {/* Overlay para mobile */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="lg:hidden fixed inset-0 bg-black/50 z-40"
-          />
-        )}
-      </AnimatePresence>
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-1">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const active = isActive(item.href);
 
-      {/* Sidebar principal */}
-      <motion.aside
-        variants={sidebarVariants}
-        initial="hidden"
-        animate="visible"
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-72 bg-[#FFF8E2] border-r border-[#C6A97D]/20 flex flex-col shadow-xl lg:shadow-none transform transition-transform duration-300 lg:transform-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
-      >
-        {/* Header del sidebar - Logo y branding */}
-        <div className="p-6 border-b border-[#C6A97D]/20">
-          <h1 className="font-voga text-3xl text-[#79502A] mb-1">
-            Alma
-          </h1>
-          <p className="font-fira text-sm text-[#79502A]/60 font-light">
-            Panel de administración
+          return (
+            <Link key={item.href} href={item.href}>
+              <motion.div
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.98 }}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group
+                  ${active
+                    ? 'bg-white text-black'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                  }`}
+              >
+                <Icon
+                  size={20}
+                  className={`transition-colors ${
+                    active ? 'text-black' : 'text-white/70 group-hover:text-white'
+                  }`}
+                  strokeWidth={active ? 2.5 : 2}
+                />
+                <span className={`font-fira text-sm font-medium ${
+                  active ? 'text-black' : 'text-white/70 group-hover:text-white'
+                }`}>
+                  {item.name}
+                </span>
+              </motion.div>
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* User section */}
+      <div className="p-4 border-t border-white/10">
+        <div className="mb-3">
+          <p className="font-fira text-xs text-white/40 uppercase tracking-wide mb-1">
+            Usuario
+          </p>
+          <p className="font-fira text-sm text-white font-medium truncate">
+            {user?.email || 'admin'}
           </p>
         </div>
 
-        {/* Navegación principal */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {navItems.map((item, index) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-
-            return (
-              <motion.div
-                key={item.href}
-                custom={index}
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                <Link
-                  href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`group flex items-start gap-3 px-4 py-3 rounded-xl transition-all duration-300 ease-out ${isActive ? 'bg-[#79502A] text-white shadow-md' : 'text-[#79502A] hover:bg-[#C6A97D]/10 hover:translate-x-1'}`}
-                >
-                  {/* Icono del item */}
-                  <Icon size={22} className={`mt-0.5 transition-transform duration-300 ${isActive ? '' : 'group-hover:scale-110'}`} />
-                  
-                  {/* Texto del item */}
-                  <div className="flex-1">
-                    <div className={`font-fira font-medium text-base ${isActive ? 'text-white' : 'text-[#79502A]'}`}>
-                      {item.label}
-                    </div>
-                    <div className={`font-fira text-xs mt-0.5 ${isActive ? 'text-white/80' : 'text-[#79502A]/50'}`}>
-                      {item.description}
-                    </div>
-                  </div>
-
-                  {/* Indicador visual de item activo */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeIndicator"
-                      className="w-1 h-8 bg-white/30 rounded-full"
-                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    />
-                  )}
-                </Link>
-              </motion.div>
-            );
-          })}
-        </nav>
-
-        {/* Footer del sidebar - Botón de cerrar sesión */}
-        <div className="p-4 border-t border-[#C6A97D]/20">
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#79502A] hover:bg-red-50 hover:text-red-600 transition-all duration-300 group"
-          >
-            <LogOut size={22} className="transition-transform duration-300 group-hover:-translate-x-1" />
-            <span className="font-fira font-medium">Cerrar sesión</span>
-          </button>
-        </div>
-      </motion.aside>
-    </>
+        <motion.button
+          whileHover={{ x: 4 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg
+            text-white/70 hover:bg-white/10 hover:text-white transition-all group"
+        >
+          <LogOut
+            size={20}
+            className="text-white/70 group-hover:text-white transition-colors"
+            strokeWidth={2}
+          />
+          <span className="font-fira text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+            Cerrar sesión
+          </span>
+        </motion.button>
+      </div>
+    </aside>
   );
-});
-
-export default DashboardSidebar;
+}

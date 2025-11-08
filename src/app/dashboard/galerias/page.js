@@ -87,7 +87,7 @@ export default function GaleriasPage() {
         action={<CreateGalleryButton />}
       />
 
-      <div className="p-8 lg:p-12">
+      <div className="p-0 lg:p-12">
         <Suspense fallback={<GalleryGridSkeleton />}>
           <GalleriesGrid />
         </Suspense>

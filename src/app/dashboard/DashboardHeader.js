@@ -15,10 +15,9 @@ export default function DashboardHeader({ title, subtitle, backButton, backHref 
             whileHover={{ x: -4 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => backHref ? router.push(backHref) : router.back()}
-            className="flex items-center gap-2 text-black/60 hover:text-black transition-colors 
-              mb-4 font-fira text-sm font-medium"
+            className="flex items-center gap-2 text-black/60 hover:text-black transition-colors mb-4 font-fira text-sm"
           >
-            <ArrowLeft size={18} strokeWidth={2} />
+            <ArrowLeft size={18} />
             <span>Volver</span>
           </motion.button>
         )}

@@ -65,14 +65,16 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 999 : 1,
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative mb-0.5 sm:mb-2 break-inside-avoid ${isReorderMode ? 'cursor-move' : 'cursor-pointer'
-        }`}
+      className={`group relative mb-0.5 sm:mb-2 break-inside-avoid ${
+        isReorderMode ? 'cursor-move' : 'cursor-pointer'
+      } ${isDragging ? 'ring-4 ring-[#79502A] shadow-2xl scale-105' : ''}`}
     >
       <div className="relative w-full bg-gray-100 overflow-hidden">
         <Image
@@ -84,14 +86,20 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
         />
 
-        {/* Drag handle - solo en modo reordenar */}
+        {/* Drag handle - MEJORADO para mobile: toda la imagen es arrastrable */}
         {isReorderMode && (
           <div
             {...attributes}
             {...listeners}
-            className="absolute top-2 left-2 p-2 bg-black/70 backdrop-blur-sm rounded-lg cursor-grab active:cursor-grabbing z-10"
+            className="absolute inset-0 cursor-grab active:cursor-grabbing z-10 touch-none"
           >
-            <GripVertical size={20} className="text-white" />
+            {/* Overlay con hint visual */}
+            <div className="absolute inset-0 bg-[#79502A]/10 border-2 border-[#79502A]/50 sm:border-none sm:bg-transparent">
+              {/* Icono de agarre - siempre visible en mobile */}
+              <div className="absolute top-2 left-2 p-2 sm:p-3 bg-[#79502A] backdrop-blur-sm rounded-lg shadow-lg">
+                <GripVertical size={24} className="sm:w-5 sm:h-5 text-white" />
+              </div>
+            </div>
           </div>
         )}
 
@@ -157,7 +165,7 @@ export default function GalleryDetailView({ gallery }) {
   const [coverImageSize, setCoverImageSize] = useState(0);
   const { modalState, showModal, closeModal } = useModal();
 
-  // Sensores para drag & drop (desktop + mobile)
+  // Sensores para drag & drop (desktop + mobile) - OPTIMIZADO PARA MOBILE
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -166,8 +174,8 @@ export default function GalleryDetailView({ gallery }) {
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 200,
-        tolerance: 8,
+        delay: 100, // Reducido de 200 a 100ms para respuesta más rápida
+        tolerance: 5, // Reducido de 8 a 5px para mayor sensibilidad
       },
     })
   );
@@ -308,7 +316,7 @@ export default function GalleryDetailView({ gallery }) {
       const supabase = await createClient();
 
       // Crear array de promesas - se ejecutan en paralelo
-      const updatePromises = workingPhotos.map((photo, index) =>
+      const updatePromises = workingPhotos.map((photo, index) => 
         supabase
           .from('photos')
           .update({ display_order: index + 1 })
@@ -387,7 +395,7 @@ export default function GalleryDetailView({ gallery }) {
 
         if (!deleteFolderResponse.ok) {
           console.warn('⚠️ No se pudo eliminar carpeta, eliminando archivos individualmente...');
-
+          
           // Fallback: eliminar archivos uno por uno
           const deletePromises = workingPhotos.map(photo => {
             const publicId = extractPublicIdFromUrl(photo.file_path);
@@ -417,14 +425,14 @@ export default function GalleryDetailView({ gallery }) {
       if (cover_image) {
         const isGalleryPhoto = workingPhotos.some(p => p.file_path === cover_image);
         const isInGalleryFolder = cover_image.includes(`galleries/${id}`);
-
+        
         console.log('🖼️ Portada es foto de galería?', isGalleryPhoto);
         console.log('🖼️ Portada está en carpeta de galería?', isInGalleryFolder);
-
+        
         if (!isGalleryPhoto && !isInGalleryFolder) {
           const publicId = extractPublicIdFromUrl(cover_image);
           console.log('🔍 Portada independiente → PublicID:', publicId);
-
+          
           if (publicId) {
             try {
               await fetch('/api/cloudinary/delete', {
@@ -868,25 +876,25 @@ export default function GalleryDetailView({ gallery }) {
                   {(allow_downloads || allow_comments || password || max_favorites !== 150) && (
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {allow_downloads && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full font-fira text-[10px] font-medium">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#af7c4b] text-black rounded-full font-fira text-[10px] font-medium">
                           <Download size={10} />
                           Descargas
                         </span>
                       )}
                       {allow_comments && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full font-fira text-[10px] font-medium">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#89613B] text-black rounded-full font-fira text-[10px] font-medium">
                           <MessageSquare size={10} />
                           Comentarios
                         </span>
                       )}
                       {password && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full font-fira text-[10px] font-medium">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#d5975b] text-black rounded-full font-fira text-[10px] font-medium">
                           <Lock size={10} />
                           Protegida
                         </span>
                       )}
                       {max_favorites && max_favorites !== 151 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-pink-500/20 text-pink-300 rounded-full font-fira text-[10px] font-medium">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#a27145] text-black rounded-full font-fira text-[10px] font-medium">
                           <Star size={10} />
                           Máx {max_favorites} favoritos
                         </span>
@@ -931,7 +939,7 @@ export default function GalleryDetailView({ gallery }) {
                 <div className="flex gap-2 flex-shrink-0">
                   <button
                     onClick={() => setShowShareModal(true)}
-                    className="!text-white flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 bg-[#79502A] hover:bg-[#8B5A2F] rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+                    className="!text-white flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 bg-[#1a1a1a] hover:bg-[#3a3a3a] rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
                   >
                     <Share2 size={16} />
                     <span>Compartir</span>
@@ -948,7 +956,7 @@ export default function GalleryDetailView({ gallery }) {
                     className="!text-white flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
                   >
                     <Trash2 size={16} />
-                    <span className="hidden sm:inline">Eliminar</span>
+                    <span className="hidden sm:inline ">Eliminar</span>
                   </button>
                 </div>
               </div>
@@ -957,7 +965,7 @@ export default function GalleryDetailView({ gallery }) {
             <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:gap-6 pt-4 border-t border-white/10">
               <div className="flex items-center gap-2">
                 <div className="p-2 bg-white/10 rounded-lg">
-                  <ImageIcon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#79502A]" />
+                  <ImageIcon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#d5975b]" />
                 </div>
                 <div>
                   <p className="font-fira text-base sm:text-lg font-semibold">{workingPhotos.length}</p>
@@ -967,7 +975,7 @@ export default function GalleryDetailView({ gallery }) {
 
               <div className="flex items-center gap-2">
                 <div className="p-2 bg-white/10 rounded-lg">
-                  <Eye className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-blue-400" />
+                  <Eye className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#d5975b]" />
                 </div>
                 <div>
                   <p className="font-fira text-base sm:text-lg font-semibold">{views_count || 0}</p>
@@ -977,7 +985,7 @@ export default function GalleryDetailView({ gallery }) {
 
               <div className="flex items-center gap-2">
                 <div className="p-2 bg-white/10 rounded-lg">
-                  <Download className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-purple-400" />
+                  <Download className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#d5975b]" />
                 </div>
                 <div>
                   <p className="font-fira text-base sm:text-lg font-semibold">{totalSizeMB} MB</p>
@@ -991,9 +999,9 @@ export default function GalleryDetailView({ gallery }) {
                     {(() => {
                       if (serviceIcon && iconMap[serviceIcon]) {
                         const IconComponent = iconMap[serviceIcon];
-                        return <IconComponent size={18} className="text-[#79502A]" />;
+                        return <IconComponent size={18} className="text-[#d5975b]" />;
                       }
-                      return <Briefcase className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#79502A]" />;
+                      return <Briefcase className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#d5975b]" />;
                     })()}
                   </div>
                   <div>
@@ -1020,7 +1028,7 @@ export default function GalleryDetailView({ gallery }) {
               {max_favorites !== undefined && (
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-white/10 rounded-lg">
-                    <Heart className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-pink-400" />
+                    <Heart className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#d5975b]" />
                   </div>
                   <div>
                     <p className="font-fira text-base sm:text-lg font-semibold">{max_favorites}</p>
@@ -1033,7 +1041,7 @@ export default function GalleryDetailView({ gallery }) {
               {password && (
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-white/10 rounded-lg">
-                    <Lock className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-amber-400" />
+                    <Lock className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#d5975b]" />
                   </div>
                   <div>
                     <p className="font-fira text-base sm:text-lg font-semibold">Protegida</p>
@@ -1046,14 +1054,14 @@ export default function GalleryDetailView({ gallery }) {
             {/* Mensaje personalizado */}
             {custom_message && (
               <div className="mt-4 pt-4 border-t border-white/10 ">
-                <div className="bg-[#fff]/90 border border-[#222] rounded-lg p-3 mb-3">
+                <div className="bg-[#fff]/20 border border-[#a27145] rounded-lg p-3 mb-3">
                   <div className="flex items-start gap-2">
-                    <MessageSquare size={14} className="text-[#222] flex-shrink-0 mt-0.5" />
+                    <MessageSquare size={14} className="text-[#d5975b] flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
-                      <p className="font-fira text-xs font-semibold text-[#222] mb-1">
+                      <p className="font-fira text-xs font-semibold text-[#d5975b] mb-1">
                         Mensaje para el cliente
                       </p>
-                      <p className="font-fira text-sm text-black leading-relaxed">
+                      <p className="font-fira text-sm text-[#fff] leading-relaxed">
                         {custom_message}
                       </p>
                     </div>
@@ -1081,7 +1089,7 @@ export default function GalleryDetailView({ gallery }) {
                 />
                 <div className="absolute top-2 sm:top-3 left-2 sm:left-3 px-2 sm:px-3 py-1 sm:py-1.5 bg-black/70 backdrop-blur-sm rounded-full">
                   <span className="font-fira text-xs font-bold text-white flex items-center gap-1.5">
-                    <Star size={12} className="fill-[#79502A] text-[#79502A]" />
+                    <Star size={12} className="fill-[#d5975b] text-[#d5975b]" />
                     Portada
                   </span>
                 </div>
@@ -1144,11 +1152,11 @@ export default function GalleryDetailView({ gallery }) {
                 Subir fotos
               </h2>
             </div>
-            <PhotoUploader
-              galleryId={id}
+            <PhotoUploader 
+              galleryId={id} 
               gallerySlug={slug}
               galleryTitle={title}
-              onUploadComplete={handleUploadComplete}
+              onUploadComplete={handleUploadComplete} 
             />
           </div>
 
@@ -1175,7 +1183,7 @@ export default function GalleryDetailView({ gallery }) {
                       {workingPhotos.length > 1 && (
                         <button
                           onClick={() => setReorderMode(true)}
-                          className="!text-white px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2"
+                          className="!text-white px-3 sm:px-4 py-2 bg-[#C6A97D] hover:bg-[#D7B98E] rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2"
                         >
                           <GripVertical size={16} />
                           <span>Reordenar</span>
@@ -1183,19 +1191,19 @@ export default function GalleryDetailView({ gallery }) {
                       )}
                     </>
                   )}
-
+                  
                   {selectionMode && (
                     <>
                       <button
                         onClick={toggleSelectAll}
-                        className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
+                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
                       >
-                        {selectedPhotos.size === photosToShow.length ? 'Deseleccionar' : 'Todo'}
+                        {selectedPhotos.size === photosToShow.length ? 'Deseleccionar' : 'Seleccionar todo'}
                       </button>
                       <button
                         onClick={handleDeleteSelected}
                         disabled={selectedPhotos.size === 0 || deletingPhotos}
-                        className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="!text-white px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {deletingPhotos ? (
                           <Loader2 size={14} className="animate-spin" />
@@ -1210,7 +1218,7 @@ export default function GalleryDetailView({ gallery }) {
                           setSelectionMode(false);
                           setSelectedPhotos(new Set());
                         }}
-                        className="px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
+                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
                       >
                         Cancelar
                       </button>
@@ -1234,7 +1242,7 @@ export default function GalleryDetailView({ gallery }) {
                       <button
                         onClick={cancelReorder}
                         disabled={savingOrder}
-                        className="px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium disabled:opacity-50"
+                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium disabled:opacity-50"
                       >
                         Cancelar
                       </button>
@@ -1316,8 +1324,9 @@ export default function GalleryDetailView({ gallery }) {
                       <div
                         key={photo.id}
                         onClick={() => togglePhotoSelection(photo.id)}
-                        className={`group relative mb-0.5 sm:mb-2 break-inside-avoid cursor-pointer transition-all hover:opacity-80 ${isSelected ? 'ring-2 sm:ring-4 ring-[#79502A]' : ''
-                          }`}
+                        className={`group relative mb-0.5 sm:mb-2 break-inside-avoid cursor-pointer transition-all hover:opacity-80 ${
+                          isSelected ? 'ring-2 sm:ring-4 ring-[#79502A]' : ''
+                        }`}
                       >
                         <div className="relative w-full bg-gray-100 overflow-hidden">
                           <Image
@@ -1330,10 +1339,11 @@ export default function GalleryDetailView({ gallery }) {
                           />
 
                           <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 z-10">
-                            <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-colors ${isSelected
+                            <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-colors ${
+                              isSelected
                                 ? 'bg-[#79502A] border-[#79502A]'
                                 : 'bg-white/90 border-gray-300'
-                              }`}>
+                            }`}>
                               {isSelected && <CheckSquare size={14} className="sm:w-4 sm:h-4 text-white" strokeWidth={3} />}
                             </div>
                           </div>

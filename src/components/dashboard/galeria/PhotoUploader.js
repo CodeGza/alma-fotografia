@@ -399,7 +399,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
                 <>
                   <button
                     onClick={() => setSelectionMode(true)}
-                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2"
+                    className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2"
                     type="button"
                   >
                     <CheckSquare size={14} />
@@ -407,7 +407,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
                   </button>
                   <button
                     onClick={handleUploadAll}
-                    className="px-4 sm:px-6 py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-colors font-fira text-sm font-semibold flex items-center gap-2"
+                    className="!text-white px-4 sm:px-6 py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-colors font-fira text-sm font-semibold flex items-center gap-2"
                     type="button"
                   >
                     <Upload size={16} />
@@ -420,15 +420,15 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
                 <>
                   <button
                     onClick={toggleSelectAll}
-                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
+                    className="px-3 py-2 !text-black/80 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
                     type="button"
                   >
-                    {selectedPreviews.size === previewsToShow.length ? 'Deseleccionar' : 'Todo'}
+                    {selectedPreviews.size === previewsToShow.length ? 'Deseleccionar' : 'Seleccionar todo'}
                   </button>
                   <button
                     onClick={removeSelectedPreviews}
                     disabled={selectedPreviews.size === 0}
-                    className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+                    className="!text-white px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50"
                     type="button"
                   >
                     <Trash2 size={14} />
@@ -439,7 +439,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
                       setSelectionMode(false);
                       setSelectedPreviews(new Set());
                     }}
-                    className="px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
+                    className="px-3 py-2 !text-black/80 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
                     type="button"
                   >
                     Cancelar

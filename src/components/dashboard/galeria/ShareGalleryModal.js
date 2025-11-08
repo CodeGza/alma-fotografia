@@ -87,7 +87,7 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
 
       const slugToUse = gallerySlug || galleryId;
       const link = `${window.location.origin}/galeria/${slugToUse}?token=${token}`;
-      
+
       setShareLink(link);
       setExistingShare(data);
 
@@ -161,7 +161,7 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
 
       {/* Modal - 100% Responsive con altura mínima */}
       <div className="fixed inset-2 sm:inset-4 md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl w-auto bg-white rounded-lg sm:rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] md:max-h-[90vh] md:min-h-[90vh]">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between p-3 sm:p-4 md:p-6 border-b border-gray-200 flex-shrink-0">
           <div className="flex-1 min-w-0 pr-2">
@@ -182,7 +182,7 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
 
         {/* Content - Con scroll pero sin cortar dropdowns */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5">
-          
+
           {/* Error message */}
           {errorMessage && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-2.5 sm:p-3 md:p-4 flex items-start gap-2 sm:gap-3">
@@ -209,37 +209,58 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Copy button */}
-              <button
-                onClick={copyToClipboard}
-                className="w-full py-2.5 sm:py-3 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
-              >
-                {isCopied ? (
-                  <>
-                    <Check size={16} className="sm:w-[18px] sm:h-[18px]" />
-                    <span>¡Copiado!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy size={16} className="sm:w-[18px] sm:h-[18px]" />
-                    <span>Copiar enlace</span>
-                  </>
-                )}
-              </button>
+                <div className='flex items-center justify-between mt-4'>
+                  {/* Copy button */}
+                  <button
+                    onClick={copyToClipboard}
+                    className="!text-white w-50 py-2.5 sm:py-3 my-3 m-auto bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check size={16} className="sm:w-[18px] sm:h-[18px]" />
+                        <span>¡Copiado!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={16} className="sm:w-[18px] sm:h-[18px]" />
+                        <span>Copiar enlace</span>
+                      </>
+                    )}
+                  </button>
+
+                  {/* Botón desactivar enlace */}
+                  <button
+                    onClick={deactivateLink}
+                    disabled={isLoading}
+                    className="!text-white w-50 my-3 m-auto ml-2 py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 size={16} className="sm:w-[18px] sm:h-[18px] animate-spin" />
+                        <span>Desactivando...</span>
+                      </>
+                    ) : (
+                      <>
+                        <X size={16} className="sm:w-[18px] sm:h-[18px]" />
+                        <span>Desactivar enlace</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
 
               {/* Info cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 {/* Vistas */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 sm:p-3">
+                <div className="bg-[#d5975b]/30 border border-[#79502A] rounded-lg p-2.5 sm:p-3">
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <Eye size={14} className="sm:w-4 sm:h-4 text-blue-600" />
+                    <Eye size={14} className="sm:w-4 sm:h-4 text-[#79502A]" />
                     <div>
-                      <p className="font-fira text-[10px] sm:text-xs text-blue-600 font-medium">
+                      <p className="font-fira text-[10px] sm:text-xs text-[#79502A] font-medium">
                         Vistas
                       </p>
-                      <p className="font-fira text-base sm:text-lg font-bold text-blue-900">
+                      <p className="font-fira text-base sm:text-lg font-bold text-[#79502A]">
                         {existingShare.views_count || 0}
                       </p>
                     </div>
@@ -247,14 +268,14 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
                 </div>
 
                 {/* Creado */}
-                <div className="bg-green-50 border border-green-200 rounded-lg p-2.5 sm:p-3">
+                <div className="bg-[#d5975b]/30 border border-[#79502A] rounded-lg p-2.5 sm:p-3">
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <Calendar size={14} className="sm:w-4 sm:h-4 text-green-600" />
+                    <Calendar size={14} className="sm:w-4 sm:h-4 text-[#79502A]" />
                     <div className="min-w-0">
-                      <p className="font-fira text-[10px] sm:text-xs text-green-600 font-medium">
+                      <p className="font-fira text-[10px] sm:text-xs text-[#79502A] font-medium">
                         Creado
                       </p>
-                      <p className="font-fira text-[10px] sm:text-xs font-semibold text-green-900 truncate">
+                      <p className="font-fira text-[10px] sm:text-xs font-semibold text-[#79502A] truncate">
                         {formatDate(existingShare.created_at)}
                       </p>
                     </div>
@@ -262,14 +283,14 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
                 </div>
 
                 {/* Expira */}
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 sm:p-3">
+                <div className="bg-[#d5975b]/30 border border-[#79502A] rounded-lg p-2.5 sm:p-3">
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <Calendar size={14} className="sm:w-4 sm:h-4 text-amber-600" />
+                    <Calendar size={14} className="sm:w-4 sm:h-4 text-[#79502A]" />
                     <div className="min-w-0">
-                      <p className="font-fira text-[10px] sm:text-xs text-amber-600 font-medium">
+                      <p className="font-fira text-[10px] sm:text-xs text-[#79502A] font-medium">
                         Expira
                       </p>
-                      <p className="font-fira text-[10px] sm:text-xs font-semibold text-amber-900 truncate">
+                      <p className="font-fira text-[10px] sm:text-xs font-semibold text-[#79502A] truncate">
                         {formatDate(existingShare.expires_at)}
                       </p>
                     </div>
@@ -277,31 +298,12 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
                 </div>
               </div>
 
-              {/* Botón desactivar enlace */}
-              <button
-                onClick={deactivateLink}
-                disabled={isLoading}
-                className="w-full py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 size={16} className="sm:w-[18px] sm:h-[18px] animate-spin" />
-                    <span>Desactivando...</span>
-                  </>
-                ) : (
-                  <>
-                    <X size={16} className="sm:w-[18px] sm:h-[18px]" />
-                    <span>Desactivar enlace</span>
-                  </>
-                )}
-              </button>
-
               {/* Info adicional */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 sm:p-3 md:p-4">
+              <div className="bg-[#d5975b]/30 border border-[#79502A] rounded-lg p-2.5 sm:p-3 md:p-4">
                 <div className="flex items-start gap-2">
-                  <AlertCircle size={14} className="sm:w-4 sm:h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle size={14} className="sm:w-4 sm:h-4 text-[#79502A] flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
-                    <p className="font-fira text-[10px] sm:text-xs text-blue-900 leading-relaxed">
+                    <p className="font-fira text-[10px] sm:text-xs text-[#79502A] leading-relaxed">
                       <strong className="font-semibold">Enlace privado:</strong> Solo las personas con este enlace podrán acceder a la galería.
                     </p>
                   </div>
@@ -324,8 +326,9 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
                   <option value={7}>7 días</option>
                   <option value={14}>14 días</option>
                   <option value={30}>30 días (recomendado)</option>
-                  <option value={60}>60 días</option>
-                  <option value={90}>90 días</option>
+                  <option value={90}>3 meses</option>
+                  <option value={180}>6 meses</option>
+                  <option value={360}>1 año</option>
                 </select>
               </div>
 
@@ -333,7 +336,7 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
               <button
                 onClick={generateShareLink}
                 disabled={isLoading}
-                className="w-full py-2.5 sm:py-3 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-300 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+                className="!text-white w-full py-2.5 sm:py-3 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-300 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <>
@@ -362,10 +365,10 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end p-3 sm:p-4 md:p-6 bg-gray-50 border-t border-gray-200 flex-shrink-0">
+        <div className="flex items-center justify-end p-3 sm:p-4 md:p-3 bg-gray-100 border-t border-gray-200 flex-shrink-0">
           <button
             onClick={onClose}
-            className="px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold text-gray-700"
+            className="!text-black/70 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 border border-black/20 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold text-gray-700"
           >
             Cerrar
           </button>

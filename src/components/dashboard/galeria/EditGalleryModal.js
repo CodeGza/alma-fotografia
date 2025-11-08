@@ -557,7 +557,7 @@ export default function EditGalleryModal({ gallery, onClose, onSuccess }) {
             <button
               type="submit"
               disabled={isSaving}
-              className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-300 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+              className="!text-white flex-1 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-300 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
             >
               {isSaving ? (
                 <>

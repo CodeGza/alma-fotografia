@@ -14,10 +14,16 @@ import {
   X,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabaseClient';
+import NotificationBell from '@/components/ui/NotificationBell';
 
 /**
  * DashboardLayoutClient - Layout del dashboard con sidebar oscuro
- * Maneja navegación, estado del sidebar mobile y logout
+ * 
+ * Maneja:
+ * - Navegación con animaciones
+ * - Sidebar mobile con framer-motion
+ * - Logout
+ * - Notificaciones (nuevo)
  */
 export default function DashboardLayoutClient({ children, userName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -54,7 +60,9 @@ export default function DashboardLayoutClient({ children, userName }) {
 
   return (
     <div className="min-h-screen bg-white flex">
-      {/* Sidebar Desktop */}
+      {/* ============================================ */}
+      {/* SIDEBAR DESKTOP */}
+      {/* ============================================ */}
       <aside className="hidden lg:flex lg:flex-col lg:w-[280px] lg:fixed lg:inset-y-0 border-r border-white/10 bg-[#1a1a1a]">
         {/* Logo */}
         <div className="p-8 border-b border-white/10 flex flex-col items-center justify-center gap-3">
@@ -133,8 +141,13 @@ export default function DashboardLayoutClient({ children, userName }) {
           })}
         </nav>
 
-        {/* Footer con usuario y logout */}
+        {/* Footer con notificaciones, usuario y logout */}
         <div className="p-6 border-t border-white/10 space-y-3">
+          {/* Notificaciones - Desktop */}
+          <div className="flex justify-center mb-2">
+            <NotificationBell />
+          </div>
+
           <div className="px-4 py-2">
             <p className="font-fira text-xs uppercase tracking-wider text-white/40 mb-1">
               Usuario
@@ -156,7 +169,9 @@ export default function DashboardLayoutClient({ children, userName }) {
         </div>
       </aside>
 
-      {/* Sidebar Mobile */}
+      {/* ============================================ */}
+      {/* SIDEBAR MOBILE */}
+      {/* ============================================ */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
@@ -291,7 +306,9 @@ export default function DashboardLayoutClient({ children, userName }) {
         )}
       </AnimatePresence>
 
-      {/* Área de contenido principal */}
+      {/* ============================================ */}
+      {/* ÁREA DE CONTENIDO PRINCIPAL */}
+      {/* ============================================ */}
       <main className="flex-1 lg:ml-[280px] bg-white">
         {/* Header mobile */}
         <header className="lg:hidden sticky top-0 z-30 bg-[#1a1a1a] border-b border-white/10 px-6 py-4">
@@ -303,12 +320,18 @@ export default function DashboardLayoutClient({ children, userName }) {
                 className="w-auto h-12 object-contain brightness-0 invert"
               />
             </div>
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="p-2 hover:bg-white/10 rounded-none transition-colors"
-            >
-              <Menu size={24} className="text-white" strokeWidth={1.5} />
-            </button>
+            
+            {/* Notificaciones + Menu - Mobile */}
+            <div className="flex items-center gap-2">
+              <NotificationBell isMobile />
+              
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 hover:bg-white/10 rounded-none transition-colors"
+              >
+                <Menu size={24} className="text-white" strokeWidth={1.5} />
+              </button>
+            </div>
           </div>
         </header>
 

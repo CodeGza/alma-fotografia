@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/expire-links",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/notify-expiring",
+      "schedule": "0 8 * * *"
+    }
+  ]
+}

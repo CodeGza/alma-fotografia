@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
-import { createClient } from '@/lib/server';
 import { notFound } from 'next/navigation';
 import PublicGalleryView from '@/components/public/PublicGalleryView';
 import PublicGallerySkeleton from '@/components/public/PublicGallerySkeleton';
+import { getGalleryWithToken } from '@/lib/validations/validate-share-token';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * Página pública de galería compartida
@@ -14,100 +15,36 @@ import PublicGallerySkeleton from '@/components/public/PublicGallerySkeleton';
  * - Suspense para streaming (UX)
  * 
  * Flujo:
- * 1. Validar token y permisos
+ * 1. Validar token con getGalleryWithToken()
  * 2. Obtener galería + fotos
- * 3. Trackear vista
+ * 3. Trackear vista automáticamente
  * 4. Renderizar vista pública
  */
 
 /**
  * ISR - Cachea la página por 5 minutos
- * 
- * Por qué 300 segundos:
- * - Las galerías no cambian frecuentemente
- * - Reduce carga en Supabase drásticamente
- * - Balance entre frescura y performance
  */
 export const revalidate = 300;
 
 /**
  * GalleryContent - Componente que carga los datos
- * 
- * Separado del page principal para usar Suspense.
- * Esto permite mostrar skeleton mientras carga.
  */
 async function GalleryContent({ slug, token }) {
-  const supabase = await createClient();
+  // ✅ Validar token y obtener galería (TODO en getGalleryWithToken)
+  const result = await getGalleryWithToken(slug, token);
 
-  // ✅ Paso 1: Validar token y permisos
-  const { data: shareData, error: shareError } = await supabase
-    .from('gallery_shares')
-    .select('id, gallery_id, views_count, last_viewed_at')
-    .eq('share_token', token)
-    .eq('is_active', true)
-    .single();
-
-  // Por qué notFound(): retorna 404 semántico (SEO + UX)
-  if (shareError || !shareData) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔒 Invalid/inactive token:', token);
-    }
+  if (!result.success) {
+    console.error('❌ Gallery access denied:', result.error);
     notFound();
   }
 
-  // ✅ Paso 2: Obtener galería con fotos en una sola query
-  const { data: gallery, error: galleryError } = await supabase
-    .from('galleries')
-    .select('*')
-    .eq('id', shareData.gallery_id) // Usar el ID del share
-    .single();
+  const { gallery, photos } = result;
 
-  if (galleryError || !gallery) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔒 Gallery not found:', shareData.gallery_id);
-    }
-    notFound();
-  }
-
-  // 🆕 PASO 2.5: Obtener fotos de la galería
-  const { data: photos, error: photosError } = await supabase
-    .from('photos')
-    .select('*')
-    .eq('gallery_id', gallery.id)
-    .order('display_order', { ascending: true });
-
-  // Agregar fotos a la galería
-  gallery.photos = photos || [];
-
-  // ✅ Paso 3: Incrementar vistas (no bloqueante)
-  // Por qué fire-and-forget: no queremos esperar a que termine
-  // para renderizar la página, mejora tiempo de respuesta
-  supabase
-    .from('gallery_shares')
-    .update({
-      views_count: (shareData.views_count || 0) + 1,
-      last_viewed_at: new Date().toISOString(),
-    })
-    .eq('id', shareData.id)
-    .then(() => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('✅ View tracked:', gallery.title);
-      }
-    })
-    .catch(err => {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('❌ Failed to track view:', err);
-      }
-    });
-
-  // ✅ Paso 4: Filtrar fotos válidas
-  // Por qué filtrar: datos de prueba pueden tener URLs inválidas
-  // que romperían next/image
-  const validPhotos = (gallery.photos || [])
+  // ✅ Filtrar fotos válidas
+  const validPhotos = (photos || [])
     .filter(photo => {
-      if (!photo.file_path) return false;
-      // Solo aceptar URLs HTTP(S) o paths absolutos
-      return photo.file_path.startsWith('http') || photo.file_path.startsWith('/');
+      if (!photo.cloudinary_url) return false;
+      return photo.cloudinary_url.startsWith('http');
     })
     .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
 
@@ -117,9 +54,12 @@ async function GalleryContent({ slug, token }) {
         id: gallery.id,
         title: gallery.title,
         slug: gallery.slug,
+        description: gallery.description,
         eventDate: gallery.event_date,
         clientEmail: gallery.client_email,
         coverImage: gallery.cover_image,
+        allowDownloads: gallery.allow_downloads,
+        watermarkEnabled: gallery.watermark_enabled,
         photos: validPhotos,
       }}
       token={token}
@@ -128,21 +68,17 @@ async function GalleryContent({ slug, token }) {
 }
 
 /**
- * Página principal - Renderizado inmediato con Suspense
- * 
- * Por qué estructura así:
- * - El componente page se renderiza inmediatamente
- * - GalleryContent carga en segundo plano
- * - Usuario ve skeleton mientras tanto (mejor UX)
+ * Página principal con Suspense
  */
 export default async function PublicGalleryPage({ params, searchParams }) {
   const { slug } = await params;
   const resolvedSearchParams = await searchParams;
   const token = resolvedSearchParams.token;
 
-  // Validación básica antes de Suspense
+  // Validación básica
   if (!token) {
-    notFound();
+    console.log('🔒 No token provided for gallery:', slug);
+    return <ErrorPage message="Esta galería requiere un enlace válido para acceder." />;
   }
 
   return (
@@ -154,13 +90,9 @@ export default async function PublicGalleryPage({ params, searchParams }) {
 
 /**
  * Metadata dinámica para SEO
- * 
- * Por qué importante:
- * - Mejora SEO de enlaces compartidos
- * - Preview correcto en redes sociales
- * - Título descriptivo en pestañas del navegador
  */
 export async function generateMetadata({ params, searchParams }) {
+  const { slug } = await params;
   const resolvedSearchParams = await searchParams;
   const token = resolvedSearchParams.token;
 
@@ -168,46 +100,125 @@ export async function generateMetadata({ params, searchParams }) {
     return {
       title: 'Galería no encontrada | Alma Fotografía',
       description: 'Esta galería no está disponible o el enlace no es válido.',
+      robots: 'noindex, nofollow',
     };
   }
 
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: shareData } = await supabase
-    .from('gallery_shares')
-    .select('gallery_id')
-    .eq('share_token', token)
-    .eq('is_active', true)
-    .single();
+    // Obtener share
+    const { data: shareData } = await supabase
+      .from('gallery_shares')
+      .select('gallery_id, is_active')
+      .eq('share_token', token)
+      .single();
 
-  if (!shareData) {
+    if (!shareData || !shareData.is_active) {
+      return {
+        title: 'Galería no encontrada | Alma Fotografía',
+        description: 'Esta galería no está disponible.',
+        robots: 'noindex, nofollow',
+      };
+    }
+
+    // Obtener galería
+    const { data: gallery } = await supabase
+      .from('galleries')
+      .select('title, description, event_date, cover_image')
+      .eq('id', shareData.gallery_id)
+      .single();
+
+    if (!gallery) {
+      return {
+        title: 'Galería | Alma Fotografía',
+        robots: 'noindex, nofollow',
+      };
+    }
+
+    const formattedDate = gallery.event_date
+      ? new Date(gallery.event_date).toLocaleDateString('es-ES', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : '';
+
     return {
-      title: 'Galería no encontrada | Alma Fotografía',
-      description: 'Esta galería no está disponible.',
+      title: `${gallery.title} | Alma Fotografía`,
+      description: gallery.description || `Galería de fotos${formattedDate ? ` - ${formattedDate}` : ''}. Ve y descarga tus fotos profesionales.`,
+      openGraph: {
+        title: gallery.title,
+        description: gallery.description || 'Galería de fotos profesionales',
+        images: gallery.cover_image ? [gallery.cover_image] : [],
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: gallery.title,
+        description: gallery.description || 'Galería de fotos profesionales',
+        images: gallery.cover_image ? [gallery.cover_image] : [],
+      },
+      robots: 'noindex, nofollow', // Galerías privadas no deben indexarse
     };
-  }
-
-  const { data: gallery } = await supabase
-    .from('galleries')
-    .select('title, event_date')
-    .eq('id', shareData.gallery_id)
-    .single();
-
-  if (!gallery) {
+  } catch (error) {
+    console.error('Error generating metadata:', error);
     return {
       title: 'Galería | Alma Fotografía',
+      robots: 'noindex, nofollow',
     };
   }
+}
 
-  const formattedDate = gallery.event_date
-    ? new Date(gallery.event_date).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-    })
-    : '';
-
-  return {
-    title: `${gallery.title} | Alma Fotografía`,
-    description: `Galería de fotos${formattedDate ? ` - ${formattedDate}` : ''}. Ve y descarga tus fotos profesionales.`,
-  };
+/**
+ * ErrorPage - Página de error para galerías
+ */
+function ErrorPage({ message }) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg
+            className="w-8 h-8 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+        </div>
+        
+        <h1 className="font-voga text-2xl text-black mb-2">
+          Galería no disponible
+        </h1>
+        
+        <p className="font-fira text-sm text-gray-600 leading-relaxed mb-6">
+          {message || 'Esta galería no está disponible o el enlace no es válido.'}
+        </p>
+        
+        <div className="space-y-3">
+          <p className="font-fira text-xs text-gray-500">
+            Posibles razones:
+          </p>
+          <ul className="font-fira text-xs text-gray-600 text-left space-y-1">
+            <li>• El enlace ha expirado</li>
+            <li>• El enlace fue desactivado</li>
+            <li>• La galería fue archivada</li>
+            <li>• El enlace es incorrecto</li>
+          </ul>
+        </div>
+        
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <p className="font-fira text-xs text-gray-500">
+            Si crees que es un error, contacta al fotógrafo
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }

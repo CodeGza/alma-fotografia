@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Copy, Check, Link as LinkIcon, Loader2, Eye, Calendar, AlertCircle } from 'lucide-react';
+import { X, Copy, Check, Link as LinkIcon, Loader2, Eye, Calendar, AlertCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import Modal from '@/components/ui/Modal';
 
@@ -13,6 +13,7 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [expirationDays, setExpirationDays] = useState(30);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [expirationStatus, setExpirationStatus] = useState(null); // 'expired' | 'soon' | 'ok'
 
   useEffect(() => {
     if (galleryId) {
@@ -20,6 +21,47 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
       checkExistingShare();
     }
   }, [galleryId]);
+
+  // Verificar estado de vencimiento
+  useEffect(() => {
+    if (existingShare?.expires_at) {
+      checkExpirationStatus();
+    }
+  }, [existingShare]);
+
+  const checkExpirationStatus = () => {
+    if (!existingShare?.expires_at) return;
+
+    const now = new Date();
+    const expiresAt = new Date(existingShare.expires_at);
+    const daysUntilExpiration = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+
+    if (daysUntilExpiration <= 0) {
+      setExpirationStatus('expired');
+      // Auto-desactivar si ya venció
+      autoDeactivateExpiredLink();
+    } else if (daysUntilExpiration <= 7) {
+      setExpirationStatus('soon');
+    } else {
+      setExpirationStatus('ok');
+    }
+  };
+
+  const autoDeactivateExpiredLink = async () => {
+    try {
+      const { error } = await supabase
+        .from('gallery_shares')
+        .update({ is_active: false })
+        .eq('id', existingShare.id);
+
+      if (!error) {
+        // Actualizar estado local
+        setExistingShare({ ...existingShare, is_active: false });
+      }
+    } catch (error) {
+      console.error('Error auto-deactivating expired link:', error);
+    }
+  };
 
   const checkExistingShare = async () => {
     try {
@@ -36,6 +78,23 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
       }
 
       if (data) {
+        // Verificar si está vencido ANTES de mostrarlo
+        const now = new Date();
+        const expiresAt = new Date(data.expires_at);
+        
+        if (expiresAt <= now) {
+          // Ya venció - desactivar automáticamente
+          await supabase
+            .from('gallery_shares')
+            .update({ is_active: false })
+            .eq('id', data.id);
+          
+          // No mostrar nada, como si no hubiera enlace
+          setExistingShare(null);
+          setShareLink('');
+          return;
+        }
+
         setExistingShare(data);
         const slugToUse = gallerySlug || galleryId;
         const link = `${window.location.origin}/galeria/${slugToUse}?token=${data.share_token}`;
@@ -151,6 +210,23 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
     });
   };
 
+  const getDaysUntilExpiration = () => {
+    if (!existingShare?.expires_at) return null;
+    const now = new Date();
+    const expiresAt = new Date(existingShare.expires_at);
+    return Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+  };
+
+  const getExpirationMessage = () => {
+    const days = getDaysUntilExpiration();
+    if (days === null) return '';
+    
+    if (days <= 0) return 'Este enlace ha vencido';
+    if (days === 1) return 'Vence mañana';
+    if (days <= 7) return `Vence en ${days} días`;
+    return `Válido por ${days} días más`;
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -191,17 +267,54 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
             </div>
           )}
 
+          {/* Alerta de vencimiento */}
+          {existingShare && expirationStatus === 'soon' && (
+            <div className="bg-amber-50 border-2 border-amber-300 rounded-lg p-2.5 sm:p-3 md:p-4 flex items-start gap-2 sm:gap-3">
+              <AlertTriangle size={16} className="sm:w-5 sm:h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-fira text-[11px] sm:text-xs md:text-sm text-amber-900 font-semibold">
+                  ⏰ {getExpirationMessage()}
+                </p>
+                <p className="font-fira text-[10px] sm:text-xs text-amber-700 mt-1">
+                  Considera generar un nuevo enlace con más duración.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Enlace vencido */}
+          {existingShare && expirationStatus === 'expired' && (
+            <div className="bg-red-50 border-2 border-red-300 rounded-lg p-2.5 sm:p-3 md:p-4 flex items-start gap-2 sm:gap-3">
+              <AlertCircle size={16} className="sm:w-5 sm:h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-fira text-[11px] sm:text-xs md:text-sm text-red-900 font-semibold">
+                  ❌ Este enlace ha vencido
+                </p>
+                <p className="font-fira text-[10px] sm:text-xs text-red-700 mt-1">
+                  Genera un nuevo enlace para compartir esta galería.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Enlace existente */}
-          {existingShare && shareLink ? (
+          {existingShare && shareLink && expirationStatus !== 'expired' ? (
             <div className="space-y-3 sm:space-y-4">
               {/* Link box */}
               <div className="bg-gray-50 border-2 border-gray-200 rounded-lg p-2.5 sm:p-3 md:p-4">
                 <div className="flex items-start gap-2 sm:gap-3">
                   <LinkIcon size={16} className="sm:w-5 sm:h-5 text-[#79502A] flex-shrink-0 mt-1" />
                   <div className="flex-1 min-w-0">
-                    <p className="font-fira text-[11px] sm:text-xs font-semibold text-black mb-1.5 sm:mb-2">
-                      Enlace privado
-                    </p>
+                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                      <p className="font-fira text-[11px] sm:text-xs font-semibold text-black">
+                        Enlace privado
+                      </p>
+                      {expirationStatus === 'soon' && (
+                        <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-fira text-[9px] sm:text-[10px] font-semibold">
+                          ⚠️ Vence pronto
+                        </span>
+                      )}
+                    </div>
                     <div className="bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 md:p-3 break-all">
                       <p className="font-fira text-[10px] sm:text-xs text-gray-700 leading-snug">
                         {shareLink}
@@ -283,16 +396,31 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
                 </div>
 
                 {/* Expira */}
-                <div className="bg-[#d5975b]/30 border border-[#79502A] rounded-lg p-2.5 sm:p-3">
+                <div className={`rounded-lg p-2.5 sm:p-3 border ${
+                  expirationStatus === 'soon' 
+                    ? 'bg-amber-50 border-amber-300' 
+                    : 'bg-[#d5975b]/30 border-[#79502A]'
+                }`}>
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <Calendar size={14} className="sm:w-4 sm:h-4 text-[#79502A]" />
+                    <Calendar size={14} className={`sm:w-4 sm:h-4 ${
+                      expirationStatus === 'soon' ? 'text-amber-600' : 'text-[#79502A]'
+                    }`} />
                     <div className="min-w-0">
-                      <p className="font-fira text-[10px] sm:text-xs text-[#79502A] font-medium">
+                      <p className={`font-fira text-[10px] sm:text-xs font-medium ${
+                        expirationStatus === 'soon' ? 'text-amber-700' : 'text-[#79502A]'
+                      }`}>
                         Expira
                       </p>
-                      <p className="font-fira text-[10px] sm:text-xs font-semibold text-[#79502A] truncate">
+                      <p className={`font-fira text-[10px] sm:text-xs font-semibold truncate ${
+                        expirationStatus === 'soon' ? 'text-amber-800' : 'text-[#79502A]'
+                      }`}>
                         {formatDate(existingShare.expires_at)}
                       </p>
+                      {expirationStatus === 'soon' && (
+                        <p className="font-fira text-[9px] text-amber-600 font-semibold mt-0.5">
+                          {getExpirationMessage()}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -305,6 +433,7 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
                   <div className="flex-1">
                     <p className="font-fira text-[10px] sm:text-xs text-[#79502A] leading-relaxed">
                       <strong className="font-semibold">Enlace privado:</strong> Solo las personas con este enlace podrán acceder a la galería.
+                      El enlace se desactivará automáticamente cuando expire.
                     </p>
                   </div>
                 </div>
@@ -356,7 +485,7 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
                 <div className="flex items-start gap-2">
                   <AlertCircle size={14} className="sm:w-4 sm:h-4 text-gray-600 flex-shrink-0 mt-0.5" />
                   <p className="font-fira text-[10px] sm:text-xs text-gray-700 leading-relaxed">
-                    El enlace será válido por el período seleccionado. Podrás compartirlo con tus clientes por WhatsApp, email, etc.
+                    El enlace será válido por el período seleccionado y se desactivará automáticamente al vencer. Podrás compartirlo con tus clientes por WhatsApp, email, etc.
                   </p>
                 </div>
               </div>

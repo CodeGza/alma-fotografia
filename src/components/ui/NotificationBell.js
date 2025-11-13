@@ -48,12 +48,18 @@ export default function NotificationBell({ className = '', isMobile = false }) {
     }
   }, []);
 
-  // Suscripción en tiempo real
+  // Suscripción en tiempo real + polling
   useEffect(() => {
     loadNotifications();
 
+    // Polling cada 10 segundos como backup
+    const pollingInterval = setInterval(() => {
+      loadNotifications();
+    }, 10000);
+
+    // Realtime subscription
     const channel = supabase
-      .channel('notifications-realtime')
+      .channel('notifications-realtime-bell')
       .on(
         'postgres_changes',
         {
@@ -61,13 +67,17 @@ export default function NotificationBell({ className = '', isMobile = false }) {
           schema: 'public',
           table: 'notifications',
         },
-        () => {
+        (payload) => {
+          console.log('📬 Notificación recibida en tiempo real:', payload);
           loadNotifications();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('🔔 Estado de suscripción:', status);
+      });
 
     return () => {
+      clearInterval(pollingInterval);
       supabase.removeChannel(channel);
     };
   }, [loadNotifications]);
@@ -194,12 +204,12 @@ export default function NotificationBell({ className = '', isMobile = false }) {
           {/* Backdrop */}
           <div
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-in fade-in duration-200"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] animate-in fade-in duration-200"
           />
 
           {/* Modal centrado - IGUAL en Desktop y Mobile */}
           <div
-            className="fixed z-[60] flex flex-col bg-white shadow-2xl border border-gray-200 rounded-2xl
+            className="fixed z-[9999] flex flex-col bg-white shadow-2xl border border-gray-200 rounded-2xl
               inset-4 sm:inset-6 md:inset-x-auto md:inset-y-6
               md:left-1/2 md:-translate-x-1/2
               md:w-full md:max-w-lg md:h-[90vh]

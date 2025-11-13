@@ -15,7 +15,10 @@ export async function POST(request) {
   try {
     const { galleryId } = await request.json();
 
+    console.log('📊 [API View] Recibiendo solicitud para galería:', galleryId);
+
     if (!galleryId) {
+      console.error('❌ [API View] Gallery ID no proporcionado');
       return NextResponse.json(
         { error: 'Gallery ID is required' },
         { status: 400 }
@@ -23,22 +26,30 @@ export async function POST(request) {
     }
 
     // Crear notificación (solo si está habilitado en preferencias)
+    console.log('🔔 [API View] Intentando crear notificación...');
     const result = await notifyGalleryView(galleryId);
 
+    console.log('✅ [API View] Resultado:', result);
+
     if (!result.success && !result.skipped) {
-      console.error('Error notifying gallery view:', result.error);
+      console.error('❌ [API View] Error al notificar:', result.error);
       // No fallar la request, solo loguear
+    }
+
+    if (result.skipped) {
+      console.log('⏭️ [API View] Notificación saltada:', result.skipped);
     }
 
     return NextResponse.json({
       success: true,
-      notified: result.success && !result.skipped
+      notified: result.success && !result.skipped,
+      debug: result
     });
 
   } catch (error) {
-    console.error('Error in gallery view API:', error);
+    console.error('💥 [API View] Error crítico:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     );
   }

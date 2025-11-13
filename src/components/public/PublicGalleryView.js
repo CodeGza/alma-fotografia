@@ -74,14 +74,18 @@ export default function PublicGalleryView({ gallery, token }) {
   useEffect(() => {
     const registerView = async () => {
       try {
-        await fetch('/api/galleries/view', {
+        console.log('👁️ [PublicGalleryView] Registrando vista de galería:', gallery.id);
+        const response = await fetch('/api/galleries/view', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ galleryId: gallery.id }),
         });
+
+        const data = await response.json();
+        console.log('📥 [PublicGalleryView] Respuesta del API:', data);
       } catch (error) {
         // Error silencioso - no afectar UX del cliente
-        console.error('Error registering gallery view:', error);
+        console.error('❌ [PublicGalleryView] Error registering gallery view:', error);
       }
     };
 

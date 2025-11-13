@@ -206,6 +206,7 @@ export async function cleanupOldNotifications() {
  */
 export async function notifyGalleryView(galleryId, clientInfo = null) {
   try {
+    console.log('🔍 [notifyGalleryView] Buscando galería:', galleryId);
     const supabase = await createClient();
 
     const { data: gallery, error } = await supabase
@@ -215,34 +216,65 @@ export async function notifyGalleryView(galleryId, clientInfo = null) {
       .single();
 
     if (error || !gallery) {
-      console.error('[notifyGalleryView] Gallery not found:', galleryId);
+      console.error('❌ [notifyGalleryView] Gallery not found:', galleryId, error);
       return { success: false, error: 'Gallery not found' };
     }
 
+    console.log('✅ [notifyGalleryView] Galería encontrada:', gallery.title, 'User:', gallery.user_id);
+
     // Verificar si el usuario tiene habilitadas las notificaciones de vistas
-    const { data: prefs } = await supabase
+    const { data: prefs, error: prefsError } = await supabase
       .from('notification_preferences')
       .select('inapp_enabled, email_on_gallery_view')
       .eq('user_id', gallery.user_id)
       .maybeSingle();
 
-    // Si no tiene preferencias o tiene deshabilitadas las notificaciones in-app, no crear
-    if (!prefs || !prefs.inapp_enabled) {
+    console.log('⚙️ [notifyGalleryView] Preferencias:', prefs, 'Error:', prefsError);
+
+    // Si no tiene preferencias, crear con defaults
+    if (!prefs) {
+      console.log('📝 [notifyGalleryView] No hay preferencias, creando defaults...');
+      const { error: insertError } = await supabase
+        .from('notification_preferences')
+        .insert({
+          user_id: gallery.user_id,
+          inapp_enabled: true,
+          email_on_gallery_view: false,
+          email_on_favorites: false,
+          email_on_link_expiring: true,
+          email_on_link_expired: true,
+          email_on_new_gallery: false,
+        });
+
+      if (insertError) {
+        console.error('❌ [notifyGalleryView] Error creando preferencias:', insertError);
+      }
+    }
+
+    // Si tiene deshabilitadas las notificaciones in-app, no crear
+    if (prefs && !prefs.inapp_enabled) {
+      console.log('⏭️ [notifyGalleryView] Notificaciones in-app deshabilitadas');
       return { success: true, skipped: 'Notifications disabled' };
     }
 
     const clientName = gallery.client_email ? gallery.client_email.split('@')[0] : 'Un cliente';
     const message = `${clientName} acaba de ver la galería "${gallery.title}"`;
 
-    return await createNotification({
+    console.log('💬 [notifyGalleryView] Creando notificación:', message);
+
+    const result = await createNotification({
       userId: gallery.user_id,
       type: 'gallery_view',
       message,
       galleryId: gallery.id,
       actionUrl: `/dashboard/galerias/${gallery.id}`,
     });
+
+    console.log('🎉 [notifyGalleryView] Notificación creada:', result);
+
+    return result;
   } catch (error) {
-    console.error('[notifyGalleryView] Error:', error);
+    console.error('💥 [notifyGalleryView] Error:', error);
     return { success: false, error: error.message };
   }
 }

@@ -70,6 +70,24 @@ export default function PublicGalleryView({ gallery, token }) {
     })
     : null;
 
+  // Registrar vista de galería (una sola vez al montar)
+  useEffect(() => {
+    const registerView = async () => {
+      try {
+        await fetch('/api/galleries/view', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ galleryId: gallery.id }),
+        });
+      } catch (error) {
+        // Error silencioso - no afectar UX del cliente
+        console.error('Error registering gallery view:', error);
+      }
+    };
+
+    registerView();
+  }, [gallery.id]);
+
   // ✅ Callbacks para lightbox
   const openLightbox = useCallback((photo, index) => {
     setSelectedPhoto({ ...photo, index });

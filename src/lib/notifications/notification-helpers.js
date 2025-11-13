@@ -177,7 +177,7 @@ export async function notifyExpiringLinks() {
 
 /**
  * CRON JOB: Limpiar notificaciones antiguas
- * 
+ *
  * Ejecutar semanalmente.
  * Elimina notificaciones leídas mayores a 30 días.
  */
@@ -194,6 +194,103 @@ export async function cleanupOldNotifications() {
     return { success: true, deleted: data };
   } catch (error) {
     console.error('[cleanupOldNotifications] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Notificar cuando un cliente ve una galería
+ *
+ * @param {string} galleryId - ID de la galería vista
+ * @param {string} clientInfo - Info del cliente (IP, navegador, etc.) - opcional
+ */
+export async function notifyGalleryView(galleryId, clientInfo = null) {
+  try {
+    const supabase = await createClient();
+
+    const { data: gallery, error } = await supabase
+      .from('galleries')
+      .select('id, title, user_id, client_email')
+      .eq('id', galleryId)
+      .single();
+
+    if (error || !gallery) {
+      console.error('[notifyGalleryView] Gallery not found:', galleryId);
+      return { success: false, error: 'Gallery not found' };
+    }
+
+    // Verificar si el usuario tiene habilitadas las notificaciones de vistas
+    const { data: prefs } = await supabase
+      .from('notification_preferences')
+      .select('inapp_enabled, email_on_gallery_view')
+      .eq('user_id', gallery.user_id)
+      .maybeSingle();
+
+    // Si no tiene preferencias o tiene deshabilitadas las notificaciones in-app, no crear
+    if (!prefs || !prefs.inapp_enabled) {
+      return { success: true, skipped: 'Notifications disabled' };
+    }
+
+    const clientName = gallery.client_email ? gallery.client_email.split('@')[0] : 'Un cliente';
+    const message = `${clientName} acaba de ver la galería "${gallery.title}"`;
+
+    return await createNotification({
+      userId: gallery.user_id,
+      type: 'gallery_view',
+      message,
+      galleryId: gallery.id,
+      actionUrl: `/dashboard/galerias/${gallery.id}`,
+    });
+  } catch (error) {
+    console.error('[notifyGalleryView] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Notificar cuando un cliente selecciona favoritos
+ *
+ * @param {string} galleryId - ID de la galería
+ * @param {number} favoritesCount - Cantidad de favoritos seleccionados
+ */
+export async function notifyFavoritesSelected(galleryId, favoritesCount) {
+  try {
+    const supabase = await createClient();
+
+    const { data: gallery, error } = await supabase
+      .from('galleries')
+      .select('id, title, user_id, client_email')
+      .eq('id', galleryId)
+      .single();
+
+    if (error || !gallery) {
+      console.error('[notifyFavoritesSelected] Gallery not found:', galleryId);
+      return { success: false, error: 'Gallery not found' };
+    }
+
+    // Verificar preferencias
+    const { data: prefs } = await supabase
+      .from('notification_preferences')
+      .select('inapp_enabled, email_on_favorites')
+      .eq('user_id', gallery.user_id)
+      .maybeSingle();
+
+    if (!prefs || !prefs.inapp_enabled) {
+      return { success: true, skipped: 'Notifications disabled' };
+    }
+
+    const clientName = gallery.client_email ? gallery.client_email.split('@')[0] : 'El cliente';
+    const message = `${clientName} seleccionó ${favoritesCount} foto${favoritesCount > 1 ? 's' : ''} favorita${favoritesCount > 1 ? 's' : ''} en "${gallery.title}"`;
+
+    return await createNotification({
+      userId: gallery.user_id,
+      type: 'favorites_selected',
+      message,
+      galleryId: gallery.id,
+      actionUrl: `/dashboard/galerias/${gallery.id}`,
+    });
+  } catch (error) {
+    console.error('[notifyFavoritesSelected] Error:', error);
     return { success: false, error: error.message };
   }
 }

@@ -45,7 +45,7 @@ const quickActions = [
     iconBg: 'bg-gradient-to-br from-[#8B5A2F] to-[#A0713E]',
     iconColor: 'text-white',
     accentColor: 'text-[#79502A]',
-    disabled: true
+    disabled: false
   },
   {
     icon: Palette,

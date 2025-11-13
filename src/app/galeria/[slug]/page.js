@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import PublicGalleryView from '@/components/public/PublicGalleryView';
 import PublicGallerySkeleton from '@/components/public/PublicGallerySkeleton';
 import { getGalleryWithToken } from '@/lib/validations/validate-share-token';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/server';
 
 /**
  * Página pública de galería compartida

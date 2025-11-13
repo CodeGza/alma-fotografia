@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/server';
 
 /**
  * Validar token de galería compartida
@@ -207,4 +207,5 @@ export async function deactivateExpiredLinks() {
       error: error.message 
     };
   }
+// 
 }

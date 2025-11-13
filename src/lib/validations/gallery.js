@@ -131,9 +131,25 @@ export function generateSlug(title) {
  * Servicios por defecto (fallback si no hay conexión)
  */
 export const defaultServiceTypes = [
-  { slug: 'boda', name: 'Boda', icon_name: 'Heart', is_default: true },
-  { slug: 'cumpleanos', name: 'Cumpleaños', icon_name: 'Cake', is_default: true },
-  { slug: 'evento-corporativo', name: 'Evento Corporativo', icon_name: 'Briefcase', is_default: true },
-  { slug: 'sesion-familia', name: 'Sesión Familiar', icon_name: 'Users', is_default: true },
-  { slug: 'sesion-individual', name: 'Sesión Individual', icon_name: 'User', is_default: true },
+  {
+    slug: 'quinceaneras',
+    name: 'Quinceañeras / Sweet 15',
+    icon_name: 'Sparkles',
+    description: 'Fotografía y Video para tu día más especial',
+    is_default: true
+  },
+  {
+    slug: 'bodas',
+    name: 'Bodas',
+    icon_name: 'Heart',
+    description: 'Capturamos la historia de tu amor',
+    is_default: true
+  },
+  {
+    slug: 'empresariales',
+    name: 'Empresariales',
+    icon_name: 'Briefcase',
+    description: 'Imagen profesional para tu marca o evento',
+    is_default: true
+  },
 ];

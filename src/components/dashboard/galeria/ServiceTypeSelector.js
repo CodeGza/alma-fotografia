@@ -115,9 +115,9 @@ export default function ServiceTypeSelector({ value, onChange, isPublic, error }
   }
 
   return (
-    <div className="space-y-3">
-      {/* Grid de servicios */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+    <div className="space-y-4">
+      {/* Grid de servicios - Mejorado con descripciones */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {services.map((service) => {
           const IconComponent = iconMap[service.icon_name] || iconMap['Camera'];
           const isSelected = value === service.slug;
@@ -127,10 +127,10 @@ export default function ServiceTypeSelector({ value, onChange, isPublic, error }
               key={service.slug}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`relative flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all
+              className={`relative flex flex-col p-4 sm:p-5 border-2 rounded-xl cursor-pointer transition-all group
                     ${isSelected
-                  ? 'border-[#79502A] bg-white shadow-sm'
-                  : 'border-gray-300 bg-white hover:border-gray-400 hover:shadow-sm'
+                  ? 'border-[#79502A] bg-gradient-to-br from-[#79502A]/5 to-[#C6A97D]/5 shadow-lg'
+                  : 'border-gray-200 bg-white hover:border-[#79502A]/40 hover:shadow-md'
                 }`}
             >
               <input
@@ -140,40 +140,65 @@ export default function ServiceTypeSelector({ value, onChange, isPublic, error }
                 onChange={(e) => onChange(e.target.value)}
                 className="sr-only"
               />
-              <IconComponent
-                size={24}
-                className={isSelected ? 'text-[#79502A]' : 'text-black/60'}
-                strokeWidth={1.5}
-              />
-              <span className={`font-fira text-xs sm:text-sm font-medium text-center transition-colors leading-tight
-                    ${isSelected ? 'text-[#79502A]' : 'text-black'}`}>
-                {service.name}
-              </span>
+
+              {/* Icon */}
+              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl mb-3 flex items-center justify-center transition-all
+                ${isSelected
+                  ? 'bg-gradient-to-br from-[#79502A] to-[#8B5A2F]'
+                  : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-[#79502A]/10 group-hover:to-[#C6A97D]/10'
+                }`}>
+                <IconComponent
+                  size={28}
+                  className={isSelected ? 'text-white' : 'text-[#79502A]/70 group-hover:text-[#79502A]'}
+                  strokeWidth={1.5}
+                />
+              </div>
+
+              {/* Content */}
+              <div className="flex-1">
+                <h4 className={`font-fira text-sm sm:text-base font-semibold mb-1.5 transition-colors
+                  ${isSelected ? 'text-[#79502A]' : 'text-black group-hover:text-[#79502A]'}`}>
+                  {service.name}
+                </h4>
+                {service.description && (
+                  <p className="font-fira text-xs sm:text-sm text-black/60 leading-relaxed line-clamp-2">
+                    {service.description}
+                  </p>
+                )}
+              </div>
+
+              {/* Check mark */}
               {isSelected && (
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 w-4 h-4 sm:w-5 sm:h-5 bg-[#79502A] rounded-full flex items-center justify-center"
+                  className="absolute top-3 right-3 w-6 h-6 bg-[#79502A] rounded-full flex items-center justify-center shadow-lg"
                 >
-                  <Check size={12} className="text-white" strokeWidth={3} />
+                  <Check size={14} className="text-white" strokeWidth={3} />
                 </motion.div>
               )}
             </motion.label>
           );
         })}
 
-        {/* Botón agregar nuevo */}
+        {/* Botón agregar nuevo - Mejorado */}
         <motion.button
           type="button"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowAddNew(true)}
-          className="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 border-2 border-dashed border-gray-300
-            rounded-lg cursor-pointer transition-all hover:border-[#79502A] hover:bg-gray-50"
+          className="flex flex-col items-center justify-center p-4 sm:p-5 border-2 border-dashed border-gray-300
+            rounded-xl cursor-pointer transition-all hover:border-[#79502A] hover:bg-[#79502A]/5 group"
         >
-          <Plus size={24} className="text-black/40" strokeWidth={1.5} />
-          <span className="font-fira text-xs sm:text-sm font-medium text-black/60 text-center leading-tight">
-            Agregar
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl mb-3 flex items-center justify-center
+            bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-[#79502A]/10 group-hover:to-[#C6A97D]/10 transition-all">
+            <Plus size={28} className="text-black/40 group-hover:text-[#79502A] transition-colors" strokeWidth={2} />
+          </div>
+          <span className="font-fira text-sm sm:text-base font-semibold text-black/60 group-hover:text-[#79502A] transition-colors">
+            Crear servicio nuevo
+          </span>
+          <span className="font-fira text-xs text-black/40 mt-1">
+            Personaliza tu portafolio
           </span>
         </motion.button>
       </div>

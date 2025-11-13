@@ -48,7 +48,7 @@ export default function ServiceEditor() {
   const [loading, setLoading] = useState(true);
   const [editingService, setEditingService] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [formData, setFormData] = useState({ name: '', icon: 'Camera' });
+  const [formData, setFormData] = useState({ name: '', icon: 'Camera', description: '' });
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
   const { modalState, showModal, closeModal } = useModal();
@@ -79,13 +79,17 @@ export default function ServiceEditor() {
 
   const handleEdit = (service) => {
     setEditingService(service);
-    setFormData({ name: service.name, icon: service.icon_name });
+    setFormData({
+      name: service.name,
+      icon: service.icon_name,
+      description: service.description || ''
+    });
   };
 
   const handleCancelEdit = () => {
     setEditingService(null);
     setShowCreateForm(false);
-    setFormData({ name: '', icon: '' });
+    setFormData({ name: '', icon: 'Camera', description: '' });
   };
 
   const handleSave = async () => {
@@ -111,6 +115,7 @@ export default function ServiceEditor() {
           .update({
             name: formData.name.trim(),
             icon_name: formData.icon,
+            description: formData.description.trim() || null,
           })
           .eq('id', editingService.id);
 
@@ -119,7 +124,12 @@ export default function ServiceEditor() {
         setServices(prev =>
           prev.map(s =>
             s.id === editingService.id
-              ? { ...s, name: formData.name.trim(), icon_name: formData.icon }
+              ? {
+                  ...s,
+                  name: formData.name.trim(),
+                  icon_name: formData.icon,
+                  description: formData.description.trim() || null
+                }
               : s
           )
         );
@@ -139,6 +149,7 @@ export default function ServiceEditor() {
             name: formData.name.trim(),
             slug,
             icon_name: formData.icon,
+            description: formData.description.trim() || null,
             is_default: false,
             created_by: user.id
           })
@@ -168,7 +179,7 @@ export default function ServiceEditor() {
 
       setEditingService(null);
       setShowCreateForm(false);
-      setFormData({ name: '', icon: 'Camera' });
+      setFormData({ name: '', icon: 'Camera', description: '' });
     } catch (error) {
       console.error('Error saving service:', error);
       showModal({
@@ -354,6 +365,26 @@ export default function ServiceEditor() {
                 />
               </div>
 
+              {/* Descripción */}
+              <div>
+                <label className="block font-fira text-sm font-medium text-black mb-2">
+                  Descripción (opcional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Ej: Fotografía y video para tu día más especial"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm
+                    focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all !text-black"
+                  disabled={saving}
+                  maxLength={150}
+                />
+                <p className="font-fira text-xs text-black/40 mt-1">
+                  Breve descripción que aparecerá en las cards de selección
+                </p>
+              </div>
+
               {/* Selector de icono */}
               <div>
                 <label className="block font-fira text-sm font-medium text-black mb-3">
@@ -442,9 +473,9 @@ export default function ServiceEditor() {
         )}
       </AnimatePresence>
 
-      {/* Lista de servicios */}
+      {/* Lista de servicios - Mejorado */}
       {!isEditing && (
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <AnimatePresence>
             {services.map((service, index) => {
               const IconComponent = iconMap[service.icon_name] || iconMap['Camera'];
@@ -458,60 +489,66 @@ export default function ServiceEditor() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ delay: index * 0.05 }}
-                  className="relative group bg-white border-2 border-gray-200 rounded-lg md:rounded-xl 
-              p-3 md:p-6 hover:border-[#79502A] hover:shadow-lg transition-all"
+                  className="relative group bg-white border-2 border-gray-200 rounded-xl
+                    p-5 hover:border-[#79502A] hover:shadow-lg transition-all"
                 >
-                  {/* Icon - Centrado en mobile, izquierda en desktop */}
-                  <div className="w-10 h-10 md:w-16 md:h-16 rounded-lg md:rounded-xl 
-              bg-gradient-to-br from-gray-50 to-gray-100 
-              flex items-center justify-center mb-2 md:mb-4 
-              group-hover:scale-110 transition-transform 
-              mx-auto md:mx-0">
+                  {/* Icon */}
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl
+                    bg-gradient-to-br from-[#79502A]/10 to-[#C6A97D]/10
+                    flex items-center justify-center mb-4
+                    group-hover:scale-110 group-hover:from-[#79502A]/20 group-hover:to-[#C6A97D]/20
+                    transition-all">
                     <IconComponent
-                      size={20}
-                      className="text-[#79502A] md:w-8 md:h-8"
+                      size={28}
+                      className="text-[#79502A]"
                       strokeWidth={1.5}
                     />
                   </div>
 
-                  {/* Info - Centrado en mobile, izquierda en desktop */}
-                  <h4 className="font-fira text-xs md:text-base font-semibold text-black 
-              mb-1 text-center md:text-left leading-tight">
-                    {service.name}
-                  </h4>
-                  <p className="font-fira text-[9px] md:text-xs text-black/50 
-              mb-3 md:mb-4 leading-tight text-center md:text-left line-clamp-2">
-                    {service.is_default ? 'Servicio predeterminado del sistema' : 'Servicio personalizado'}
-                  </p>
+                  {/* Info */}
+                  <div className="mb-4">
+                    <h4 className="font-fira text-base md:text-lg font-semibold text-black mb-2 leading-tight">
+                      {service.name}
+                    </h4>
+                    {service.description ? (
+                      <p className="font-fira text-sm text-black/60 leading-relaxed line-clamp-2">
+                        {service.description}
+                      </p>
+                    ) : (
+                      <p className="font-fira text-xs text-black/40 italic">
+                        {service.is_default ? 'Servicio predeterminado del sistema' : 'Servicio personalizado'}
+                      </p>
+                    )}
+                  </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-1.5 md:gap-2">
+                  <div className="flex items-center gap-2">
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleEdit(service)}
-                      className="flex-1 px-2 py-1.5 md:px-3 md:py-2 bg-gray-100 text-black 
-                  rounded-md md:rounded-lg font-fira text-[10px] md:text-xs font-medium
-                  hover:bg-gray-200 transition-colors flex items-center justify-center gap-1 md:gap-1.5"
+                      className="flex-1 px-4 py-2 bg-[#79502A] text-white
+                        rounded-lg font-fira text-sm font-medium
+                        hover:bg-[#8B5A2F] transition-colors flex items-center justify-center gap-2 shadow-sm"
                     >
-                      <Pencil className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                      <span className="hidden sm:inline">Editar</span>
+                      <Pencil size={16} />
+                      <span>Editar</span>
                     </motion.button>
                     {!service.is_default && (
                       <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => handleDelete(service)}
                         disabled={isDeleting}
-                        className="px-2 py-1.5 md:px-3 md:py-2 bg-red-50 text-red-600 
-                    rounded-md md:rounded-lg font-fira text-[10px] md:text-xs font-medium
-                    hover:bg-red-100 transition-colors disabled:opacity-50 
-                    flex items-center justify-center"
+                        className="px-4 py-2 bg-red-500 text-white
+                          rounded-lg font-fira text-sm font-medium
+                          hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+                          flex items-center justify-center shadow-sm"
                       >
                         {isDeleting ? (
-                          <Loader2 className="w-3 h-3 md:w-3.5 md:h-3.5 animate-spin" />
+                          <Loader2 size={16} className="animate-spin" />
                         ) : (
-                          <Trash2 className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                          <Trash2 size={16} />
                         )}
                       </motion.button>
                     )}

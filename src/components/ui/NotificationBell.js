@@ -57,28 +57,50 @@ export default function NotificationBell({ className = '', isMobile = false }) {
       loadNotifications();
     }, 10000);
 
-    // Realtime subscription
-    const channel = supabase
-      .channel('notifications-realtime-bell')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-        },
-        (payload) => {
-          console.log('📬 Notificación recibida en tiempo real:', payload);
-          loadNotifications();
-        }
-      )
-      .subscribe((status) => {
-        console.log('🔔 Estado de suscripción:', status);
-      });
+    // Intentar Realtime subscription (puede fallar si no está habilitado)
+    let channel = null;
+
+    const setupRealtime = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        channel = supabase
+          .channel(`notifications-user-${user.id}`)
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'notifications',
+              filter: `user_id=eq.${user.id}`,
+            },
+            (payload) => {
+              console.log('📬 Notificación recibida en tiempo real:', payload);
+              loadNotifications();
+            }
+          )
+          .subscribe((status, err) => {
+            if (status === 'SUBSCRIBED') {
+              console.log('✅ Realtime conectado correctamente');
+            } else if (status === 'CHANNEL_ERROR') {
+              console.warn('⚠️ Error de canal Realtime (usando polling):', err);
+            } else if (status === 'CLOSED') {
+              console.log('📪 Canal Realtime cerrado (usando polling)');
+            }
+          });
+      } catch (error) {
+        console.warn('⚠️ Realtime no disponible, usando polling:', error);
+      }
+    };
+
+    setupRealtime();
 
     return () => {
       clearInterval(pollingInterval);
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel).catch(() => {});
+      }
     };
   }, [loadNotifications]);
 

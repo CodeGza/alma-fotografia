@@ -211,7 +211,7 @@ export async function notifyGalleryView(galleryId, clientInfo = null) {
 
     const { data: gallery, error } = await supabase
       .from('galleries')
-      .select('id, title, user_id, client_email')
+      .select('id, title, created_by, client_email')
       .eq('id', galleryId)
       .single();
 
@@ -220,13 +220,13 @@ export async function notifyGalleryView(galleryId, clientInfo = null) {
       return { success: false, error: 'Gallery not found' };
     }
 
-    console.log('✅ [notifyGalleryView] Galería encontrada:', gallery.title, 'User:', gallery.user_id);
+    console.log('✅ [notifyGalleryView] Galería encontrada:', gallery.title, 'User:', gallery.created_by);
 
     // Verificar si el usuario tiene habilitadas las notificaciones de vistas
     const { data: prefs, error: prefsError } = await supabase
       .from('notification_preferences')
       .select('inapp_enabled, email_on_gallery_view')
-      .eq('user_id', gallery.user_id)
+      .eq('user_id', gallery.created_by)
       .maybeSingle();
 
     console.log('⚙️ [notifyGalleryView] Preferencias:', prefs, 'Error:', prefsError);
@@ -237,7 +237,7 @@ export async function notifyGalleryView(galleryId, clientInfo = null) {
       const { error: insertError } = await supabase
         .from('notification_preferences')
         .insert({
-          user_id: gallery.user_id,
+          user_id: gallery.created_by,
           inapp_enabled: true,
           email_on_gallery_view: false,
           email_on_favorites: false,
@@ -263,7 +263,7 @@ export async function notifyGalleryView(galleryId, clientInfo = null) {
     console.log('💬 [notifyGalleryView] Creando notificación:', message);
 
     const result = await createNotification({
-      userId: gallery.user_id,
+      userId: gallery.created_by,
       type: 'gallery_view',
       message,
       galleryId: gallery.id,
@@ -291,7 +291,7 @@ export async function notifyFavoritesSelected(galleryId, favoritesCount) {
 
     const { data: gallery, error } = await supabase
       .from('galleries')
-      .select('id, title, user_id, client_email')
+      .select('id, title, created_by, client_email')
       .eq('id', galleryId)
       .single();
 
@@ -304,7 +304,7 @@ export async function notifyFavoritesSelected(galleryId, favoritesCount) {
     const { data: prefs } = await supabase
       .from('notification_preferences')
       .select('inapp_enabled, email_on_favorites')
-      .eq('user_id', gallery.user_id)
+      .eq('user_id', gallery.created_by)
       .maybeSingle();
 
     if (!prefs || !prefs.inapp_enabled) {
@@ -315,7 +315,7 @@ export async function notifyFavoritesSelected(galleryId, favoritesCount) {
     const message = `${clientName} seleccionó ${favoritesCount} foto${favoritesCount > 1 ? 's' : ''} favorita${favoritesCount > 1 ? 's' : ''} en "${gallery.title}"`;
 
     return await createNotification({
-      userId: gallery.user_id,
+      userId: gallery.created_by,
       type: 'favorites_selected',
       message,
       galleryId: gallery.id,

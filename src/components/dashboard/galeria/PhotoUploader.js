@@ -430,12 +430,12 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
               )}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
               {!uploading && !selectionMode && (
                 <>
                   <button
                     onClick={() => setSelectionMode(true)}
-                    className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2"
+                    className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 whitespace-nowrap flex-shrink-0"
                     type="button"
                   >
                     <CheckSquare size={14} />
@@ -443,7 +443,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
                   </button>
                   <button
                     onClick={handleUploadAll}
-                    className="!text-white px-4 sm:px-6 py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-colors font-fira text-sm font-semibold flex items-center gap-2"
+                    className="!text-white px-4 sm:px-6 py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-colors font-fira text-sm font-semibold flex items-center gap-2 whitespace-nowrap flex-shrink-0"
                     type="button"
                   >
                     <Upload size={16} />
@@ -456,15 +456,15 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
                 <>
                   <button
                     onClick={toggleSelectAll}
-                    className="px-3 py-2 !text-black/80 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
+                    className="px-3 py-2 !text-black/80 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0"
                     type="button"
                   >
-                    {selectedPreviews.size === previewsToShow.length ? 'Deseleccionar' : 'Seleccionar todo'}
+                    {selectedPreviews.size === previewsToShow.length ? 'Deseleccionar' : 'Todo'}
                   </button>
                   <button
                     onClick={removeSelectedPreviews}
                     disabled={selectedPreviews.size === 0}
-                    className="!text-white px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+                    className="!text-white px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 whitespace-nowrap flex-shrink-0"
                     type="button"
                   >
                     <Trash2 size={14} />
@@ -475,7 +475,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
                       setSelectionMode(false);
                       setSelectedPreviews(new Set());
                     }}
-                    className="px-3 py-2 !text-black/80 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
+                    className="px-3 py-2 !text-black/80 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0"
                     type="button"
                   >
                     Cancelar
@@ -485,8 +485,8 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
             </div>
           </div>
 
-          {/* Grid previews más pequeños */}
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-1 sm:gap-2">
+          {/* Grid previews - 3 columnas en móvil para mejor visualización */}
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-1.5 sm:gap-2">
             {/* Card de "Agregar más" como primer elemento */}
             {!uploading && !selectionMode && (
               <label className="relative group aspect-square bg-gradient-to-br from-[#C6A97D]/20 to-[#79502A]/20 rounded overflow-hidden cursor-pointer border-2 border-dashed border-[#C6A97D] hover:border-[#79502A] hover:from-[#C6A97D]/30 hover:to-[#79502A]/30 transition-all">

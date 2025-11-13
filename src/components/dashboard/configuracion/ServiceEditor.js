@@ -299,28 +299,22 @@ export default function ServiceEditor() {
   const isEditing = editingService || showCreateForm;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-12 max-w-7xl mx-auto">
-      {/* Header con botón crear */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <div>
-          <p className="font-fira text-sm text-black/60 max-w-2xl">
-            Los tipos de servicio te permiten categorizar tus galerías y mostrar tu portafolio
-            organizado por especialidad en tu página principal.
-          </p>
-        </div>
-        {!isEditing && (
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
+      {/* Action button */}
+      {!isEditing && (
+        <div className="mb-4 sm:mb-6">
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowCreateForm(true)}
-            className="px-6 py-3 bg-[#79502A] !text-white rounded-lg font-fira text-sm font-medium
-              flex items-center justify-center gap-2 whitespace-nowrap hover:bg-[#8B5A2F] shadow-sm"
+            className="px-4 py-2.5 bg-[#79502A] !text-white rounded-lg font-fira text-sm font-semibold
+              inline-flex items-center gap-2 hover:bg-[#8B5A2F] shadow-sm transition-colors"
           >
-            <Plus size={20} strokeWidth={2.5} />
+            <Plus size={18} strokeWidth={2.5} />
             <span>Crear servicio</span>
           </motion.button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Form de creación/edición */}
       <AnimatePresence mode="wait">
@@ -329,28 +323,35 @@ export default function ServiceEditor() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="mb-8 p-6 bg-gradient-to-br from-gray-50 to-white border-2 border-[#79502A] rounded-xl shadow-lg"
+            className="mb-4 sm:mb-6 p-4 sm:p-5 bg-white border-2 border-[#79502A]/30 rounded-xl shadow-md"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-fira text-lg font-semibold text-black flex items-center gap-2">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+              <h3 className="font-fira text-sm sm:text-base font-semibold text-[#79502A] flex items-center gap-2">
                 {editingService ? (
                   <>
-                    <Pencil size={20} className="text-[#79502A]" />
+                    <Pencil size={16} />
                     Editar servicio
                   </>
                 ) : (
                   <>
-                    <Plus size={20} className="text-[#79502A]" />
+                    <Plus size={16} />
                     Nuevo servicio
                   </>
                 )}
               </h3>
+              <button
+                onClick={handleCancelEdit}
+                disabled={saving}
+                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={18} className="text-black/40 hover:text-black" />
+              </button>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Nombre */}
               <div>
-                <label className="block font-fira text-sm font-medium text-black mb-2">
+                <label className="block font-fira text-xs sm:text-sm font-semibold text-black mb-1.5">
                   Nombre del servicio *
                 </label>
                 <input
@@ -358,8 +359,9 @@ export default function ServiceEditor() {
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ej: Sesión de Mascotas"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm
-                    focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all !text-black"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg font-fira text-sm
+                    focus:outline-none focus:border-[#79502A] focus:ring-2 focus:ring-[#79502A]/10
+                    transition-all !text-black"
                   disabled={saving}
                   autoFocus
                 />
@@ -367,7 +369,7 @@ export default function ServiceEditor() {
 
               {/* Descripción */}
               <div>
-                <label className="block font-fira text-sm font-medium text-black mb-2">
+                <label className="block font-fira text-xs sm:text-sm font-semibold text-black mb-1.5">
                   Descripción (opcional)
                 </label>
                 <input
@@ -375,22 +377,23 @@ export default function ServiceEditor() {
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Ej: Fotografía y video para tu día más especial"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm
-                    focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all !text-black"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg font-fira text-sm
+                    focus:outline-none focus:border-[#79502A] focus:ring-2 focus:ring-[#79502A]/10
+                    transition-all !text-black"
                   disabled={saving}
                   maxLength={150}
                 />
-                <p className="font-fira text-xs text-black/40 mt-1">
-                  Breve descripción que aparecerá en las cards de selección
+                <p className="font-fira text-[10px] sm:text-xs text-black/50 mt-1">
+                  Breve descripción que aparecerá en las cards
                 </p>
               </div>
 
               {/* Selector de icono */}
               <div>
-                <label className="block font-fira text-sm font-medium text-black mb-3">
+                <label className="block font-fira text-xs sm:text-sm font-semibold text-black mb-2">
                   Icono del servicio *
                 </label>
-                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
+                <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2">
                   {availableIcons.map((icon) => {
                     const IconComponent = iconMap[icon.name];
                     const isSelected = formData.icon === icon.name;
@@ -399,31 +402,29 @@ export default function ServiceEditor() {
                       <motion.button
                         key={icon.name}
                         type="button"
-                        whileHover={{ scale: 1.08 }}
+                        whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setFormData(prev => ({ ...prev, icon: icon.name }))}
-                        className={`relative flex flex-col items-center gap-2 p-4 border-2 rounded-lg transition-all
+                        className={`relative p-2.5 border-2 rounded-lg transition-all
                           ${isSelected
-                            ? 'border-[#79502A] bg-white shadow-md'
-                            : 'border-gray-300 bg-white hover:border-gray-400 hover:shadow-sm'
+                            ? 'border-[#79502A] bg-[#79502A]/5'
+                            : 'border-gray-200 bg-white hover:border-gray-300'
                           }`}
+                        title={icon.label}
                       >
                         <IconComponent
-                          size={28}
+                          size={20}
                           className={isSelected ? 'text-[#79502A]' : 'text-black/60'}
-                          strokeWidth={1.5}
+                          strokeWidth={1.8}
                         />
-                        <span className="font-fira text-[10px] text-black/60 text-center leading-tight">
-                          {icon.label}
-                        </span>
                         {isSelected && (
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="absolute -top-1 -right-1 w-6 h-6 bg-[#79502A] rounded-full 
-                              flex items-center justify-center shadow-md"
+                            className="absolute -top-1 -right-1 w-4 h-4 bg-[#79502A] rounded-full
+                              flex items-center justify-center"
                           >
-                            <Check size={14} className="text-white" strokeWidth={3} />
+                            <Check size={10} className="text-white" strokeWidth={3} />
                           </motion.div>
                         )}
                       </motion.button>
@@ -433,38 +434,38 @@ export default function ServiceEditor() {
               </div>
 
               {/* Botones de acción */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <div className="flex gap-2 pt-3 border-t border-gray-200">
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
                   onClick={handleSave}
                   disabled={saving || !formData.name.trim()}
-                  className="flex-1 px-6 py-3 bg-[#79502A] !text-white rounded-lg font-fira text-sm font-medium
-                    disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2
-                    hover:bg-[#8B5A2F] shadow-sm"
+                  className="flex-1 px-4 py-2 bg-[#79502A] !text-white rounded-lg font-fira text-xs sm:text-sm font-semibold
+                    disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5
+                    hover:bg-[#8B5A2F] shadow-sm transition-colors"
                 >
                   {saving ? (
                     <>
-                      <Loader2 size={18} className="animate-spin" />
-                      <span>Guardando...</span>
+                      <Loader2 size={14} className="animate-spin" />
+                      <span className="hidden sm:inline">Guardando...</span>
+                      <span className="sm:hidden">...</span>
                     </>
                   ) : (
                     <>
-                      <Check size={18} strokeWidth={2.5} />
-                      <span>{editingService ? 'Guardar cambios' : 'Crear servicio'}</span>
+                      <Check size={14} strokeWidth={2.5} />
+                      <span>{editingService ? 'Guardar' : 'Crear'}</span>
                     </>
                   )}
                 </motion.button>
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
                   onClick={handleCancelEdit}
                   disabled={saving}
-                  className="px-6 py-3 border-2 border-gray-300 text-black rounded-lg font-fira text-sm font-medium
-                    hover:border-gray-400 hover:bg-gray-50 transition-all
-                    flex items-center justify-center gap-2"
+                  className="px-4 py-2 border-2 border-gray-200 text-black rounded-lg font-fira text-xs sm:text-sm font-semibold
+                    hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5"
                 >
-                  <X size={18} strokeWidth={2.5} />
+                  <X size={14} strokeWidth={2.5} />
                   <span>Cancelar</span>
                 </motion.button>
               </div>
@@ -473,9 +474,9 @@ export default function ServiceEditor() {
         )}
       </AnimatePresence>
 
-      {/* Lista de servicios - Compacto */}
+      {/* Lista de servicios - Diseño mejorado */}
       {!isEditing && (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           <AnimatePresence>
             {services.map((service, index) => {
               const IconComponent = iconMap[service.icon_name] || iconMap['Camera'];
@@ -485,74 +486,113 @@ export default function ServiceEditor() {
                 <motion.div
                   key={service.id || service.slug}
                   layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="relative group bg-white border-2 border-gray-200 rounded-lg
-                    p-4 hover:border-[#79502A] hover:shadow-md transition-all"
+                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8, y: -30 }}
+                  transition={{
+                    delay: index * 0.05,
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20
+                  }}
+                  whileHover={{ y: -5 }}
+                  className="relative group bg-gradient-to-br from-white to-gray-50
+                    border-2 border-gray-200 rounded-2xl overflow-hidden
+                    hover:border-[#79502A] hover:shadow-2xl transition-all
+                    flex flex-col min-h-[200px]"
                 >
-                  {/* Icon */}
-                  <div className="w-12 h-12 rounded-lg
-                    bg-[#79502A]/10
-                    flex items-center justify-center mb-3
-                    group-hover:scale-105 group-hover:bg-[#79502A]/15
-                    transition-all">
-                    <IconComponent
-                      size={22}
-                      className="text-[#79502A]"
-                      strokeWidth={1.8}
-                    />
-                  </div>
+                  {/* Patrón decorativo sutil */}
+                  <div className="absolute inset-0 opacity-[0.02]"
+                    style={{
+                      backgroundImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
+                      backgroundSize: '20px 20px'
+                    }}
+                  />
 
-                  {/* Info */}
-                  <div className="mb-3">
-                    <h4 className="font-fira text-sm font-semibold text-black mb-1.5 leading-tight">
-                      {service.name}
-                    </h4>
-                    {service.description ? (
-                      <p className="font-fira text-xs text-black/60 leading-snug line-clamp-2">
-                        {service.description}
-                      </p>
-                    ) : (
-                      <p className="font-fira text-[10px] text-black/40 italic">
-                        {service.is_default ? 'Predeterminado' : 'Personalizado'}
-                      </p>
+                  {/* Contenido */}
+                  <div className="relative p-5 flex flex-col h-full">
+                    {/* Badge para predeterminados */}
+                    {service.is_default && (
+                      <div className="absolute top-4 right-4">
+                        <div className="px-2.5 py-1 bg-gradient-to-r from-[#79502A] to-[#8B5A2F] rounded-lg shadow-md">
+                          <span className="text-[10px] font-fira font-bold text-white tracking-wide">
+                            PREDETERMINADO
+                          </span>
+                        </div>
+                      </div>
                     )}
-                  </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-1.5">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleEdit(service)}
-                      className="flex-1 px-3 py-2 bg-[#79502A] text-white
-                        rounded-lg font-fira text-xs font-semibold
-                        hover:bg-[#8B5A2F] transition-colors flex items-center justify-center gap-1.5"
-                    >
-                      <Pencil size={14} />
-                      <span>Editar</span>
-                    </motion.button>
-                    {!service.is_default && (
+                    {/* Icon con efecto */}
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl
+                      bg-gradient-to-br from-[#79502A] to-[#8B5A2F]
+                      flex items-center justify-center mb-4 shadow-lg
+                      group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                      <IconComponent
+                        size={24}
+                        className="text-white"
+                        strokeWidth={2}
+                      />
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 mb-4">
+                      <h4 className="font-fira text-base sm:text-lg font-bold text-[#79502A] mb-2 leading-tight
+                        group-hover:text-[#8B5A2F] transition-colors">
+                        {service.name}
+                      </h4>
+                      {service.description ? (
+                        <p className="font-fira text-xs sm:text-sm text-black/70 leading-relaxed line-clamp-2">
+                          {service.description}
+                        </p>
+                      ) : (
+                        <p className="font-fira text-xs text-black/40 italic">
+                          {service.is_default ? 'Servicio predeterminado del sistema' : 'Servicio personalizado'}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Actions - Siempre al fondo */}
+                    <div className="flex items-center gap-2 mt-auto">
                       <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleDelete(service)}
-                        disabled={isDeleting}
-                        className="px-3 py-2 bg-red-500 text-white
-                          rounded-lg font-fira text-xs font-semibold
-                          hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-                          flex items-center justify-center"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => handleEdit(service)}
+                        className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#79502A] to-[#8B5A2F] text-white
+                          rounded-lg font-fira text-xs sm:text-sm font-bold
+                          hover:shadow-lg transition-all flex items-center justify-center gap-2
+                          shadow-md"
                       >
-                        {isDeleting ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                          <Trash2 size={14} />
-                        )}
+                        <Pencil size={14} strokeWidth={2.5} />
+                        <span>Editar</span>
                       </motion.button>
-                    )}
+                      {!service.is_default && (
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleDelete(service)}
+                          disabled={isDeleting}
+                          className="px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white
+                            rounded-lg font-fira text-xs sm:text-sm font-bold
+                            hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                            flex items-center justify-center shadow-md"
+                        >
+                          {isDeleting ? (
+                            <Loader2 size={14} className="animate-spin" strokeWidth={2.5} />
+                          ) : (
+                            <Trash2 size={14} strokeWidth={2.5} />
+                          )}
+                        </motion.button>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Shimmer effect on hover */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: '100%' }}
+                    transition={{ duration: 0.6 }}
+                  />
                 </motion.div>
               );
             })}

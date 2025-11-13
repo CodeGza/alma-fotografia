@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar,
   Mail,
@@ -74,8 +75,8 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
       ref={setNodeRef}
       style={style}
       className={`group relative mb-0.5 sm:mb-2 break-inside-avoid ${
-        isReorderMode ? 'cursor-move' : 'cursor-pointer'
-      } ${isDragging ? 'ring-4 ring-[#79502A] shadow-2xl scale-105' : ''}`}
+        isDragging ? 'ring-4 ring-[#79502A] shadow-2xl scale-105' : ''
+      }`}
     >
       <div className="relative w-full bg-gray-100 overflow-hidden">
         <Image
@@ -87,21 +88,22 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
         />
 
-        {/* Drag handle - MEJORADO para mobile: toda la imagen es arrastrable */}
+        {/* Drag handle - SOLO desde el icono para permitir scroll */}
         {isReorderMode && (
-          <div
-            {...attributes}
-            {...listeners}
-            className="absolute inset-0 cursor-grab active:cursor-grabbing z-10 touch-none"
-          >
-            {/* Overlay con hint visual */}
-            <div className="absolute inset-0 bg-[#79502A]/10 border-2 border-[#79502A]/50 sm:border-none sm:bg-transparent">
-              {/* Icono de agarre - siempre visible en mobile */}
-              <div className="absolute top-2 left-2 p-2 sm:p-3 bg-[#79502A] backdrop-blur-sm rounded-lg shadow-lg">
-                <GripVertical size={24} className="sm:w-5 sm:h-5 text-white" />
-              </div>
+          <>
+            {/* Overlay visual (sin drag) */}
+            <div className="absolute inset-0 bg-[#79502A]/10 border-2 border-[#79502A]/50 sm:border-none sm:bg-transparent pointer-events-none">
             </div>
-          </div>
+
+            {/* Icono de agarre - ÚNICO punto draggable */}
+            <div
+              {...attributes}
+              {...listeners}
+              className="absolute top-2 left-2 p-3 sm:p-3.5 bg-[#79502A] backdrop-blur-sm rounded-lg shadow-lg cursor-grab active:cursor-grabbing z-20 touch-none hover:bg-[#8B5A2F] transition-colors"
+            >
+              <GripVertical size={28} className="sm:w-6 sm:h-6 text-white" />
+            </div>
+          </>
         )}
 
         {/* Badge de portada */}
@@ -887,63 +889,93 @@ export default function GalleryDetailView({ gallery }) {
                 </div>
 
                 <div className="flex gap-2 flex-shrink-0">
-                  <button
+                  <motion.button
                     onClick={() => setShowShareModal(true)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     className="!text-white flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 bg-[#1a1a1a] hover:bg-[#3a3a3a] rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
                   >
                     <Share2 size={16} />
                     <span>Compartir</span>
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     onClick={() => setShowEditModal(true)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     className="!text-white flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
                   >
                     <Edit size={16} />
                     <span>Editar</span>
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     onClick={handleDeleteGallery}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     className="!text-white flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
                   >
                     <Trash2 size={16} />
                     <span className="hidden sm:inline ">Eliminar</span>
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:gap-6 pt-4 border-t border-white/10">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-white/10 rounded-lg">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-wrap gap-3 sm:gap-4 md:gap-6 pt-4 border-t border-white/10">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.05 }}
+                className="flex items-center gap-2"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="p-2 bg-white/10 rounded-lg"
+                >
                   <ImageIcon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#d5975b]" />
-                </div>
+                </motion.div>
                 <div>
                   <p className="font-fira text-base sm:text-lg font-semibold">{workingPhotos.length}</p>
                   <p className="font-fira text-xs text-white/60">Fotos</p>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-white/10 rounded-lg">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+                className="flex items-center gap-2"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="p-2 bg-white/10 rounded-lg"
+                >
                   <Eye className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#d5975b]" />
-                </div>
+                </motion.div>
                 <div>
                   <p className="font-fira text-base sm:text-lg font-semibold">
                     {has_active_link ? (views_count || 0) : 'Sin enlace'}
                   </p>
                   <p className="font-fira text-xs text-white/60">Vistas</p>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-white/10 rounded-lg">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.15 }}
+                className="flex items-center gap-2"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="p-2 bg-white/10 rounded-lg"
+                >
                   <Download className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#d5975b]" />
-                </div>
+                </motion.div>
                 <div>
                   <p className="font-fira text-base sm:text-lg font-semibold">{totalSizeMB} MB</p>
                   <p className="font-fira text-xs text-white/60">Tamaño</p>
                 </div>
-              </div>
+              </motion.div>
 
               {serviceName && (
                 <div className="flex items-center gap-2">
@@ -1122,12 +1154,12 @@ export default function GalleryDetailView({ gallery }) {
                   {workingPhotos.length} {workingPhotos.length === 1 ? 'foto' : 'fotos'}
                 </h2>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   {!selectionMode && !reorderMode && (
                     <>
                       <button
                         onClick={() => setSelectionMode(true)}
-                        className="!text-white px-3 sm:px-4 py-2 bg-[#8b5a2fff] hover:bg-[#9c6b3fff] rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2"
+                        className="!text-white px-3 sm:px-4 py-2 bg-[#8b5a2fff] hover:bg-[#9c6b3fff] rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 whitespace-nowrap flex-shrink-0"
                       >
                         <CheckSquare size={16} />
                         <span>Seleccionar</span>
@@ -1135,7 +1167,7 @@ export default function GalleryDetailView({ gallery }) {
                       {workingPhotos.length > 1 && (
                         <button
                           onClick={() => setReorderMode(true)}
-                          className="!text-white px-3 sm:px-4 py-2 bg-[#C6A97D] hover:bg-[#D7B98E] rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2"
+                          className="!text-white px-3 sm:px-4 py-2 bg-[#C6A97D] hover:bg-[#D7B98E] rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 whitespace-nowrap flex-shrink-0"
                         >
                           <GripVertical size={16} />
                           <span>Reordenar</span>
@@ -1143,19 +1175,19 @@ export default function GalleryDetailView({ gallery }) {
                       )}
                     </>
                   )}
-                  
+
                   {selectionMode && (
                     <>
                       <button
                         onClick={toggleSelectAll}
-                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
+                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0"
                       >
-                        {selectedPhotos.size === photosToShow.length ? 'Deseleccionar' : 'Seleccionar todo'}
+                        {selectedPhotos.size === photosToShow.length ? 'Deseleccionar' : 'Todo'}
                       </button>
                       <button
                         onClick={handleDeleteSelected}
                         disabled={selectedPhotos.size === 0 || deletingPhotos}
-                        className="!text-white px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="!text-white px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex-shrink-0"
                       >
                         {deletingPhotos ? (
                           <Loader2 size={14} className="animate-spin" />
@@ -1170,7 +1202,7 @@ export default function GalleryDetailView({ gallery }) {
                           setSelectionMode(false);
                           setSelectedPhotos(new Set());
                         }}
-                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium"
+                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0"
                       >
                         Cancelar
                       </button>
@@ -1182,38 +1214,38 @@ export default function GalleryDetailView({ gallery }) {
                       <button
                         onClick={saveNewOrder}
                         disabled={savingOrder}
-                        className="!text-white px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+                        className="!text-white px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 whitespace-nowrap flex-shrink-0"
                       >
                         {savingOrder ? (
                           <Loader2 size={14} className="animate-spin" />
                         ) : (
                           <CheckSquare size={14} />
                         )}
-                        <span>Guardar orden</span>
+                        <span>Guardar</span>
                       </button>
                       <button
                         onClick={cancelReorder}
                         disabled={savingOrder}
-                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium disabled:opacity-50"
+                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium disabled:opacity-50 whitespace-nowrap flex-shrink-0"
                       >
                         Cancelar
                       </button>
-                      <span className="font-fira text-xs text-gray-500 ml-2">
+                      <span className="font-fira text-xs text-gray-500 ml-2 hidden md:inline whitespace-nowrap">
                         Arrastra las fotos para cambiar el orden
                       </span>
                     </>
                   )}
 
                   {workingPhotos.length > PHOTOS_PER_PAGE && !reorderMode && (
-                    <div className="flex items-center gap-2 ml-auto">
+                    <div className="flex items-center gap-2 ml-auto flex-shrink-0">
                       <button
                         onClick={() => setPhotosPage(p => Math.max(0, p - 1))}
                         disabled={photosPage === 0}
                         className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       >
-                        <ChevronLeft size={16} />
+                        <ChevronLeft size={18} />
                       </button>
-                      <span className="font-fira text-xs sm:text-sm text-gray-600 px-1">
+                      <span className="font-fira text-xs sm:text-sm text-gray-600 px-1 whitespace-nowrap">
                         {photosPage + 1}/{totalPages}
                       </span>
                       <button
@@ -1221,7 +1253,7 @@ export default function GalleryDetailView({ gallery }) {
                         disabled={photosPage === totalPages - 1}
                         className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       >
-                        <ChevronRight size={16} />
+                        <ChevronRight size={18} />
                       </button>
                     </div>
                   )}
@@ -1247,7 +1279,7 @@ export default function GalleryDetailView({ gallery }) {
                     items={workingPhotos.map(p => p.id)}
                     strategy={rectSortingStrategy}
                   >
-                    <div className="columns-2 sm:columns-3 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-0.5 sm:gap-2">
+                    <div className="columns-3 sm:columns-4 md:columns-5 lg:columns-6 xl:columns-7 2xl:columns-8 gap-1.5 sm:gap-2">
                       {workingPhotos.map((photo, index) => (
                         <SortablePhoto
                           key={photo.id}
@@ -1266,7 +1298,7 @@ export default function GalleryDetailView({ gallery }) {
             ) : selectionMode ? (
               /* Modo selección: checkboxes */
               <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4">
-                <div className="columns-2 sm:columns-3 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-0.5 sm:gap-2">
+                <div className="columns-3 sm:columns-4 md:columns-5 lg:columns-6 xl:columns-7 2xl:columns-8 gap-1.5 sm:gap-2">
                   {photosToShow.map((photo, index) => {
                     const photoIndex = startIdx + index;
                     const isSelected = selectedPhotos.has(photo.id);
@@ -1317,7 +1349,7 @@ export default function GalleryDetailView({ gallery }) {
             ) : (
               /* Modo normal: solo visualización con paginación */
               <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4">
-                <div className="columns-2 sm:columns-3 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-0.5 sm:gap-2">
+                <div className="columns-3 sm:columns-4 md:columns-5 lg:columns-6 xl:columns-7 2xl:columns-8 gap-1.5 sm:gap-2">
                   {photosToShow.map((photo, index) => (
                     <SortablePhoto
                       key={photo.id}

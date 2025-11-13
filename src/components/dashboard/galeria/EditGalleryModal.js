@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, Save, Globe, Lock, Bell, MessageSquare, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabaseClient';
 
@@ -168,15 +169,24 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
   };
 
   return (
-    <>
+    <AnimatePresence>
       {/* Backdrop */}
-      <div
+      <motion.div
         onClick={handleClose}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-in fade-in duration-200"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
       />
 
-      {/* Modal - 100% Responsive */}
-      <div className="min-h-[90vh] fixed inset-2 sm:inset-4 md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-3xl w-auto bg-white rounded-lg sm:rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] md:max-h-[85vh]">
+      {/* Modal - 100% Responsive sin altura mínima fija */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.2, type: "spring", damping: 25, stiffness: 300 }}
+        className="fixed inset-2 sm:inset-4 md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-3xl w-auto bg-white rounded-lg sm:rounded-xl shadow-2xl z-50 flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] md:max-h-[85vh]">
         
         {/* Header */}
         <div className="flex items-center justify-between p-3 sm:p-4 md:p-6 border-b border-gray-200 flex-shrink-0">
@@ -339,7 +349,7 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
                     name="is_public"
                     checked={formData.is_public}
                     onChange={handleChange}
-                    className="mt-0.5 sm:mt-1 w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
+                    className="mt-0.5 sm:mt-1 w-5 h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 sm:gap-2">
@@ -376,7 +386,7 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
                     name="allow_downloads"
                     checked={formData.allow_downloads}
                     onChange={handleChange}
-                    className="mt-0.5 sm:mt-1 w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
+                    className="mt-0.5 sm:mt-1 w-5 h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
                   />
                   <div className="flex-1">
                     <span className="font-fira text-[11px] sm:text-xs md:text-sm font-medium text-black">
@@ -397,7 +407,7 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
                     name="allow_comments"
                     checked={formData.allow_comments}
                     onChange={handleChange}
-                    className="mt-0.5 sm:mt-1 w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
+                    className="mt-0.5 sm:mt-1 w-5 h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
                   />
                   <div className="flex-1">
                     <span className="font-fira text-[11px] sm:text-xs md:text-sm font-medium text-black">
@@ -426,7 +436,7 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
                   name="notify_on_view"
                   checked={formData.notify_on_view}
                   onChange={handleChange}
-                  className="mt-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
+                  className="mt-0.5 w-4.5 h-4.5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
                 />
                 <div className="flex-1">
                   <span className="font-fira text-[10px] sm:text-xs text-black">
@@ -444,7 +454,7 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
                   name="notify_on_favorites"
                   checked={formData.notify_on_favorites}
                   onChange={handleChange}
-                  className="mt-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
+                  className="mt-0.5 w-4.5 h-4.5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
                 />
                 <div className="flex-1">
                   <span className="font-fira text-[10px] sm:text-xs text-black">
@@ -533,17 +543,21 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
 
           {/* Footer - Botones fijos */}
           <div className="flex flex-col sm:flex-row gap-2 p-3 sm:p-4 md:p-6 bg-gray-50 border-t border-gray-200 flex-shrink-0">
-            <button
+            <motion.button
               type="button"
               onClick={handleClose}
               disabled={isSaving}
+              whileHover={{ scale: isSaving ? 1 : 1.02 }}
+              whileTap={{ scale: isSaving ? 1 : 0.98 }}
               className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-gray-300 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold disabled:opacity-50"
             >
               Cancelar
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               type="submit"
               disabled={isSaving}
+              whileHover={{ scale: isSaving ? 1 : 1.02 }}
+              whileTap={{ scale: isSaving ? 1 : 0.98 }}
               className="!text-white flex-1 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-300 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
             >
               {isSaving ? (
@@ -557,10 +571,10 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
                   <span>Guardar cambios</span>
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
         </form>
-      </div>
-    </>
+      </motion.div>
+    </AnimatePresence>
   );
 }

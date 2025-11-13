@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check, Link as LinkIcon, Loader2, Eye, Calendar, AlertCircle, AlertTriangle, ExternalLink, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import Modal from '@/components/ui/Modal';
@@ -228,15 +229,24 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
   };
 
   return (
-    <>
+    <AnimatePresence>
       {/* Backdrop */}
-      <div
+      <motion.div
         onClick={onClose}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-in fade-in duration-200"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
       />
 
-      {/* Modal - 100% Responsive con altura mínima */}
-      <div className="fixed inset-2 sm:inset-4 md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl w-auto bg-white rounded-lg sm:rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] md:max-h-[90vh] md:min-h-[90vh]">
+      {/* Modal - 100% Responsive sin altura mínima fija */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.2, type: "spring", damping: 25, stiffness: 300 }}
+        className="fixed inset-2 sm:inset-4 md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl w-auto bg-white rounded-lg sm:rounded-xl shadow-2xl z-50 flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] md:max-h-[85vh]">
 
         {/* Header */}
         <div className="flex items-center justify-between p-3 sm:p-4 md:p-6 border-b border-gray-200 flex-shrink-0">
@@ -327,7 +337,7 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
                 </div>
 
                 {/* Botones de acción - Rediseñados */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   {/* Copiar */}
                   <button
                     onClick={copyToClipboard}
@@ -377,7 +387,7 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
               </div>
 
               {/* Estadísticas - Rediseñadas */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 xs:grid-cols-3 gap-3">
                 {/* Vistas */}
                 <div className="bg-white border border-[#79502A]/20 rounded-lg p-3 hover:border-[#79502A]/40 transition-all hover:shadow-md">
                   <div className="flex flex-col items-center text-center">
@@ -519,14 +529,16 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
 
         {/* Footer */}
         <div className="flex items-center justify-end p-3 sm:p-4 md:p-3 bg-gray-100 border-t border-gray-200 flex-shrink-0">
-          <button
+          <motion.button
             onClick={onClose}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="!text-black/70 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 border border-black/20 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold text-gray-700"
           >
             Cerrar
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Modal de confirmación para desactivar */}
       <Modal
@@ -539,6 +551,6 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
         cancelText="Cancelar"
         onConfirm={confirmDeactivate}
       />
-    </>
+    </AnimatePresence>
   );
 }

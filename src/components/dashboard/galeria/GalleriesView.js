@@ -3,9 +3,10 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { archiveGalleries, deleteGalleries, restoreGalleries } from '@/app/actions/gallery-actions';
-import { 
-  Search, Grid3x3, List, X, ImageIcon, Trash2, Archive, 
+import {
+  Search, Grid3x3, List, X, ImageIcon, Trash2, Archive,
   CheckSquare, ArchiveRestore, SlidersHorizontal
 } from 'lucide-react';
 import GalleryCard from './GalleryCard';
@@ -514,25 +515,38 @@ export default function GalleriesView({ galleries, serviceTypes }) {
         </div>
       </div>
 
-      {showSidebar && (
-        <>
-          <div 
-            onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-          />
-          <div className="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-voga text-xl text-black">Filtros</h3>
-                <button 
-                  onClick={() => setShowSidebar(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  <X size={20} />
-                </button>
-              </div>
+      <AnimatePresence>
+        {showSidebar && (
+          <>
+            <motion.div
+              onClick={() => setShowSidebar(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.3, type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 overflow-y-auto"
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-voga text-xl text-black">Filtros</h3>
+                  <motion.button
+                    onClick={() => setShowSidebar(false)}
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="p-2 hover:bg-gray-100 rounded-lg"
+                  >
+                    <X size={20} />
+                  </motion.button>
+                </div>
 
-              <GalleriesSidebar
+                <GalleriesSidebar
                 serviceTypes={serviceTypes}
                 selectedService={selectedService}
                 setSelectedService={setSelectedService}
@@ -553,10 +567,11 @@ export default function GalleriesView({ galleries, serviceTypes }) {
                 setSortBy={setSortBy}
                 stats={stats}
               />
-            </div>
-          </div>
-        </>
-      )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {previewGallery && (
         <GalleryPreviewModal

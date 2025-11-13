@@ -591,9 +591,9 @@ export default function CreateGalleryForm() {
                     <textarea
                         {...register('description')}
                         placeholder="Breve descripción de la sesión..."
-                        rows={4}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm text-black 
-                            focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all resize-none
+                        rows={3}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm text-black
+                            focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all resize-y
                             hover:border-gray-400"
                     />
                     {errors.description && (

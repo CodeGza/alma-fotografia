@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import ConfigMenu from '@/components/dashboard/configuracion/ConfigMenu';
+import ConfigOverview from '@/components/dashboard/configuracion/ConfigOverview';
 import { Loader2 } from 'lucide-react';
 
 export const metadata = {
@@ -10,10 +10,10 @@ export const metadata = {
 
 function LoadingSkeleton() {
   return (
-    <div className="p-4 sm:p-6 lg:p-12 max-w-4xl mx-auto space-y-4 animate-pulse">
-      <div className="h-32 bg-gray-100 rounded-lg" />
-      <div className="h-32 bg-gray-100 rounded-lg" />
-      <div className="h-32 bg-gray-100 rounded-lg" />
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-4 animate-pulse">
+      <div className="h-32 bg-white rounded-xl" />
+      <div className="h-32 bg-white rounded-xl" />
+      <div className="h-32 bg-white rounded-xl" />
     </div>
   );
 }
@@ -25,9 +25,8 @@ export default function ConfiguracionPage() {
         title="Configuración"
         subtitle="Administra tus servicios y preferencias"
       />
-
       <Suspense fallback={<LoadingSkeleton />}>
-        <ConfigMenu />
+        <ConfigOverview />
       </Suspense>
     </>
   );

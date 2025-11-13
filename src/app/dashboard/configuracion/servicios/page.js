@@ -10,8 +10,8 @@ export const metadata = {
 
 function LoadingSkeleton() {
   return (
-    <div className="p-4 sm:p-6 lg:p-12 max-w-7xl mx-auto">
-      <div className="h-96 bg-gray-100 rounded-lg animate-pulse" />
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
+      <div className="h-96 bg-white rounded-xl animate-pulse" />
     </div>
   );
 }
@@ -22,10 +22,9 @@ export default function ServiciosPage() {
       <DashboardHeader
         title="Tipos de Servicio"
         subtitle="Gestiona los servicios que ofreces a tus clientes"
-        backButton={true} 
+        backButton={true}
         backHref="/dashboard/configuracion"
       />
-
       <Suspense fallback={<LoadingSkeleton />}>
         <ServiceEditor />
       </Suspense>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Copy, Check, Link as LinkIcon, Loader2, Eye, Calendar, AlertCircle, AlertTriangle } from 'lucide-react';
+import { X, Copy, Check, Link as LinkIcon, Loader2, Eye, Calendar, AlertCircle, AlertTriangle, ExternalLink, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import Modal from '@/components/ui/Modal';
 
@@ -299,192 +299,216 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
 
           {/* Enlace existente */}
           {existingShare && shareLink && expirationStatus !== 'expired' ? (
-            <div className="space-y-3 sm:space-y-4">
-              {/* Link box */}
-              <div className="bg-gray-50 border-2 border-gray-200 rounded-lg p-2.5 sm:p-3 md:p-4">
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <LinkIcon size={16} className="sm:w-5 sm:h-5 text-[#79502A] flex-shrink-0 mt-1" />
+            <div className="space-y-4">
+              {/* Link box - Rediseñado */}
+              <div className="bg-gradient-to-br from-[#79502A]/5 to-[#C6A97D]/5 border border-[#79502A]/20 rounded-xl p-4 md:p-5">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="p-2.5 bg-[#79502A]/10 rounded-lg">
+                    <LinkIcon size={20} className="text-[#79502A]" />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                      <p className="font-fira text-[11px] sm:text-xs font-semibold text-black">
-                        Enlace privado
-                      </p>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-fira text-sm font-semibold text-black">
+                        Enlace privado activo
+                      </h3>
                       {expirationStatus === 'soon' && (
-                        <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-fira text-[9px] sm:text-[10px] font-semibold">
-                          ⚠️ Vence pronto
+                        <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full font-fira text-[10px] font-semibold flex items-center gap-1">
+                          <AlertTriangle size={12} />
+                          Vence pronto
                         </span>
                       )}
                     </div>
-                    <div className="bg-white border border-gray-300 rounded-lg p-2 sm:p-2.5 md:p-3 break-all">
-                      <p className="font-fira text-[10px] sm:text-xs text-gray-700 leading-snug">
+                    <div className="bg-white border border-[#79502A]/20 rounded-lg p-3 break-all group hover:border-[#79502A]/40 transition-colors">
+                      <p className="font-fira text-xs text-gray-700 leading-relaxed">
                         {shareLink}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className='flex items-center justify-between mt-4'>
-                  {/* Copy button */}
+                {/* Botones de acción - Rediseñados */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {/* Copiar */}
                   <button
                     onClick={copyToClipboard}
-                    className="!text-white w-50 py-2.5 sm:py-3 my-3 m-auto bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+                    className="!text-white px-4 py-2.5 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-all hover:scale-105 active:scale-95 font-fira text-sm font-semibold flex items-center justify-center gap-2 shadow-sm"
                   >
                     {isCopied ? (
                       <>
-                        <Check size={16} className="sm:w-[18px] sm:h-[18px]" />
+                        <Check size={16} />
                         <span>¡Copiado!</span>
                       </>
                     ) : (
                       <>
-                        <Copy size={16} className="sm:w-[18px] sm:h-[18px]" />
-                        <span>Copiar enlace</span>
+                        <Copy size={16} />
+                        <span>Copiar</span>
                       </>
                     )}
                   </button>
 
-                  {/* Botón desactivar enlace */}
+                  {/* Abrir */}
+                  <button
+                    onClick={() => window.open(shareLink, '_blank')}
+                    className="!text-[#79502A] px-4 py-2.5 bg-white border-2 border-[#79502A] hover:bg-[#79502A]/5 text-[#79502A] rounded-lg transition-all hover:scale-105 active:scale-95 font-fira text-sm font-semibold flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <ExternalLink size={16} />
+                    <span>Abrir</span>
+                  </button>
+
+                  {/* Desactivar */}
                   <button
                     onClick={deactivateLink}
                     disabled={isLoading}
-                    className="!text-white w-50 my-3 m-auto ml-2 py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+                    className="!text-white px-4 py-2.5 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-all hover:scale-105 active:scale-95 font-fira text-sm font-semibold flex items-center justify-center gap-2 shadow-sm"
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 size={16} className="sm:w-[18px] sm:h-[18px] animate-spin" />
-                        <span>Desactivando...</span>
+                        <Loader2 size={16} className="animate-spin" />
+                        <span>...</span>
                       </>
                     ) : (
                       <>
-                        <X size={16} className="sm:w-[18px] sm:h-[18px]" />
-                        <span>Desactivar enlace</span>
+                        <Trash2 size={16} />
+                        <span>Desactivar</span>
                       </>
                     )}
                   </button>
                 </div>
               </div>
 
-              {/* Info cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+              {/* Estadísticas - Rediseñadas */}
+              <div className="grid grid-cols-3 gap-3">
                 {/* Vistas */}
-                <div className="bg-[#d5975b]/30 border border-[#79502A] rounded-lg p-2.5 sm:p-3">
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <Eye size={14} className="sm:w-4 sm:h-4 text-[#79502A]" />
-                    <div>
-                      <p className="font-fira text-[10px] sm:text-xs text-[#79502A] font-medium">
-                        Vistas
-                      </p>
-                      <p className="font-fira text-base sm:text-lg font-bold text-[#79502A]">
-                        {existingShare.views_count || 0}
-                      </p>
+                <div className="bg-white border border-[#79502A]/20 rounded-lg p-3 hover:border-[#79502A]/40 transition-all hover:shadow-md">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="p-2 bg-[#79502A]/10 rounded-lg mb-2">
+                      <Eye size={18} className="text-[#79502A]" />
                     </div>
+                    <p className="font-fira text-2xl font-bold text-[#79502A]">
+                      {existingShare.views_count || 0}
+                    </p>
+                    <p className="font-fira text-xs text-gray-600 mt-1">
+                      Vistas
+                    </p>
                   </div>
                 </div>
 
                 {/* Creado */}
-                <div className="bg-[#d5975b]/30 border border-[#79502A] rounded-lg p-2.5 sm:p-3">
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <Calendar size={14} className="sm:w-4 sm:h-4 text-[#79502A]" />
-                    <div className="min-w-0">
-                      <p className="font-fira text-[10px] sm:text-xs text-[#79502A] font-medium">
-                        Creado
-                      </p>
-                      <p className="font-fira text-[10px] sm:text-xs font-semibold text-[#79502A] truncate">
-                        {formatDate(existingShare.created_at)}
-                      </p>
+                <div className="bg-white border border-[#79502A]/20 rounded-lg p-3 hover:border-[#79502A]/40 transition-all hover:shadow-md">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="p-2 bg-blue-500/10 rounded-lg mb-2">
+                      <Calendar size={18} className="text-blue-600" />
                     </div>
+                    <p className="font-fira text-xs font-semibold text-gray-700 truncate w-full">
+                      {formatDate(existingShare.created_at)}
+                    </p>
+                    <p className="font-fira text-xs text-gray-600 mt-1">
+                      Creado
+                    </p>
                   </div>
                 </div>
 
                 {/* Expira */}
-                <div className={`rounded-lg p-2.5 sm:p-3 border ${
-                  expirationStatus === 'soon' 
-                    ? 'bg-amber-50 border-amber-300' 
-                    : 'bg-[#d5975b]/30 border-[#79502A]'
+                <div className={`rounded-lg p-3 transition-all hover:shadow-md ${
+                  expirationStatus === 'soon'
+                    ? 'bg-amber-50 border-2 border-amber-300'
+                    : 'bg-white border border-[#79502A]/20 hover:border-[#79502A]/40'
                 }`}>
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <Calendar size={14} className={`sm:w-4 sm:h-4 ${
-                      expirationStatus === 'soon' ? 'text-amber-600' : 'text-[#79502A]'
-                    }`} />
-                    <div className="min-w-0">
-                      <p className={`font-fira text-[10px] sm:text-xs font-medium ${
-                        expirationStatus === 'soon' ? 'text-amber-700' : 'text-[#79502A]'
-                      }`}>
-                        Expira
-                      </p>
-                      <p className={`font-fira text-[10px] sm:text-xs font-semibold truncate ${
-                        expirationStatus === 'soon' ? 'text-amber-800' : 'text-[#79502A]'
-                      }`}>
-                        {formatDate(existingShare.expires_at)}
-                      </p>
-                      {expirationStatus === 'soon' && (
-                        <p className="font-fira text-[9px] text-amber-600 font-semibold mt-0.5">
-                          {getExpirationMessage()}
-                        </p>
-                      )}
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`p-2 rounded-lg mb-2 ${
+                      expirationStatus === 'soon' ? 'bg-amber-100' : 'bg-green-500/10'
+                    }`}>
+                      <Calendar size={18} className={
+                        expirationStatus === 'soon' ? 'text-amber-600' : 'text-green-600'
+                      } />
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Info adicional */}
-              <div className="bg-[#d5975b]/30 border border-[#79502A] rounded-lg p-2.5 sm:p-3 md:p-4">
-                <div className="flex items-start gap-2">
-                  <AlertCircle size={14} className="sm:w-4 sm:h-4 text-[#79502A] flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="font-fira text-[10px] sm:text-xs text-[#79502A] leading-relaxed">
-                      <strong className="font-semibold">Enlace privado:</strong> Solo las personas con este enlace podrán acceder a la galería.
-                      El enlace se desactivará automáticamente cuando expire.
+                    <p className={`font-fira text-xs font-semibold truncate w-full ${
+                      expirationStatus === 'soon' ? 'text-amber-800' : 'text-gray-700'
+                    }`}>
+                      {formatDate(existingShare.expires_at)}
+                    </p>
+                    <p className={`font-fira text-xs mt-1 ${
+                      expirationStatus === 'soon' ? 'text-amber-600' : 'text-gray-600'
+                    }`}>
+                      {expirationStatus === 'soon' ? getExpirationMessage() : 'Expira'}
                     </p>
                   </div>
                 </div>
               </div>
+
+              {/* Info adicional - Rediseñada */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
+                <div className="flex items-start gap-2">
+                  <AlertCircle size={16} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <p className="font-fira text-xs text-blue-800 leading-relaxed">
+                    <strong className="font-semibold">Enlace privado:</strong> Solo las personas con este enlace podrán acceder a la galería. El enlace se desactivará automáticamente cuando expire.
+                  </p>
+                </div>
+              </div>
             </div>
           ) : (
-            /* No hay enlace - Generar nuevo */
-            <div className="space-y-3 sm:space-y-4 pb-32">
-              {/* Duración */}
-              <div className="relative z-10">
-                <label className="block font-fira text-[11px] sm:text-xs md:text-sm font-semibold text-black mb-1.5 sm:mb-2">
-                  Duración del enlace
-                </label>
-                <select
-                  value={expirationDays}
-                  onChange={(e) => setExpirationDays(Number(e.target.value))}
-                  className="w-full px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 border border-gray-300 rounded-lg font-fira text-xs sm:text-sm text-black focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent bg-white"
+            /* No hay enlace - Generar nuevo - Rediseñado */
+            <div className="space-y-4">
+              <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-5">
+                {/* Icon y título */}
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="p-2.5 bg-[#79502A]/10 rounded-lg">
+                    <LinkIcon size={20} className="text-[#79502A]" />
+                  </div>
+                  <div>
+                    <h3 className="font-fira text-sm font-semibold text-black mb-1">
+                      Generar enlace para compartir
+                    </h3>
+                    <p className="font-fira text-xs text-gray-600">
+                      Crea un enlace privado con fecha de expiración
+                    </p>
+                  </div>
+                </div>
+
+                {/* Duración */}
+                <div>
+                  <label className="block font-fira text-sm font-medium text-black mb-2">
+                    Duración del enlace
+                  </label>
+                  <select
+                    value={expirationDays}
+                    onChange={(e) => setExpirationDays(Number(e.target.value))}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-black focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent bg-white hover:border-[#79502A]/40 transition-colors"
+                  >
+                    <option value={7}>7 días</option>
+                    <option value={14}>14 días</option>
+                    <option value={30}>30 días (recomendado)</option>
+                    <option value={90}>3 meses</option>
+                    <option value={180}>6 meses</option>
+                    <option value={360}>1 año</option>
+                  </select>
+                </div>
+
+                {/* Generar button */}
+                <button
+                  onClick={generateShareLink}
+                  disabled={isLoading}
+                  className="!text-white w-full mt-4 py-3 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-all hover:scale-105 active:scale-95 font-fira text-sm font-semibold flex items-center justify-center gap-2 shadow-sm"
                 >
-                  <option value={7}>7 días</option>
-                  <option value={14}>14 días</option>
-                  <option value={30}>30 días (recomendado)</option>
-                  <option value={90}>3 meses</option>
-                  <option value={180}>6 meses</option>
-                  <option value={360}>1 año</option>
-                </select>
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>Generando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <LinkIcon size={18} />
+                      <span>Generar enlace privado</span>
+                    </>
+                  )}
+                </button>
               </div>
 
-              {/* Generar button */}
-              <button
-                onClick={generateShareLink}
-                disabled={isLoading}
-                className="!text-white w-full py-2.5 sm:py-3 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-300 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 size={16} className="sm:w-[18px] sm:h-[18px] animate-spin" />
-                    <span>Generando...</span>
-                  </>
-                ) : (
-                  <>
-                    <LinkIcon size={16} className="sm:w-[18px] sm:h-[18px]" />
-                    <span>Generar enlace</span>
-                  </>
-                )}
-              </button>
-
               {/* Info */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-2.5 sm:p-3 md:p-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start gap-2">
-                  <AlertCircle size={14} className="sm:w-4 sm:h-4 text-gray-600 flex-shrink-0 mt-0.5" />
-                  <p className="font-fira text-[10px] sm:text-xs text-gray-700 leading-relaxed">
+                  <AlertCircle size={16} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <p className="font-fira text-xs text-blue-800 leading-relaxed">
                     El enlace será válido por el período seleccionado y se desactivará automáticamente al vencer. Podrás compartirlo con tus clientes por WhatsApp, email, etc.
                   </p>
                 </div>

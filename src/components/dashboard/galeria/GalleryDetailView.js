@@ -1352,13 +1352,17 @@ export default function GalleryDetailView({ gallery }) {
         <ShareGalleryModal
           galleryId={id}
           gallerySlug={slug}
-          onClose={() => setShowShareModal(false)}
+          onClose={() => {
+            setShowShareModal(false);
+            router.refresh(); // Actualizar vistas y has_active_link
+          }}
         />
       )}
 
       {showEditModal && (
         <EditGalleryModal
           gallery={gallery}
+          hasActiveLink={has_active_link}
           onClose={() => setShowEditModal(false)}
           onSuccess={() => router.refresh()}
         />

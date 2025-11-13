@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Loader2, Save, Globe, Lock, Bell, MessageSquare, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabaseClient';
 
-export default function EditGalleryModal({ gallery, onClose, onSuccess }) {
+export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -485,17 +485,25 @@ export default function EditGalleryModal({ gallery, onClose, onSuccess }) {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        placeholder="Dejar vacío para sin contraseña"
-                        className="w-full px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 pr-10 sm:pr-12 border border-gray-300 rounded-lg font-fira text-xs sm:text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent"
+                        placeholder={hasActiveLink ? "No se puede cambiar con enlace activo" : "Dejar vacío para sin contraseña"}
+                        disabled={hasActiveLink}
+                        className="w-full px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 pr-10 sm:pr-12 border border-gray-300 rounded-lg font-fira text-xs sm:text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                        disabled={hasActiveLink}
+                        className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
+                    {hasActiveLink && (
+                      <p className="font-fira text-[10px] sm:text-xs text-amber-600 mt-1 flex items-center gap-1">
+                        <Lock size={12} />
+                        Desactiva el enlace compartido para modificar la contraseña
+                      </p>
+                    )}
                   </div>
 
                   {/* Límite de favoritos */}

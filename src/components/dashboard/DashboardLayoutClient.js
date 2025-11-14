@@ -148,18 +148,17 @@ export default function DashboardLayoutClient({ children, userName }) {
 
         {/* Footer con notificaciones, usuario y logout */}
         <div className="p-6 border-t border-white/10 space-y-3">
-          {/* Notificaciones - Desktop */}
-          <div className="flex justify-center mb-2">
+          {/* Notificaciones y Usuario - Desktop */}
+          <div className="flex items-center justify-center gap-3 mb-2">
             <NotificationBell />
-          </div>
-
-          <div className="px-4 py-2">
-            <p className="font-fira text-xs uppercase tracking-wider text-white/40 mb-1">
-              Usuario
-            </p>
-            <p className="font-fira font-medium text-sm text-white truncate">
-              {userName}
-            </p>
+            <div className="flex flex-col">
+              <p className="font-fira text-xs uppercase tracking-wider text-white/40">
+                Usuario
+              </p>
+              <p className="font-fira font-medium text-sm text-white truncate">
+                {userName}
+              </p>
+            </div>
           </div>
 
           <button

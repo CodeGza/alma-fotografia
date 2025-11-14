@@ -91,7 +91,12 @@ const baseStyles = `
 `;
 
 function wrapTemplate(content, title) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  // Usar URL absoluta para que funcione en emails
+  // Prioridad: 1) NEXT_PUBLIC_SITE_URL, 2) VERCEL_URL, 3) localhost
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
+    || 'http://localhost:3000';
+
   const logoUrl = `${siteUrl}/img/logos/logo_BN_SF.png`;
 
   return `
@@ -106,7 +111,7 @@ function wrapTemplate(content, title) {
     <body>
       <div class="container">
         <div class="header">
-          <img src="${logoUrl}" alt="Alma Fotografía" style="max-width: 200px; height: auto; margin: 0 auto; display: block;" />
+          <img src="${logoUrl}" alt="Alma Fotografía" style="max-width: 200px; height: auto; margin: 0 auto; display: block;" onerror="this.style.display='none'" />
         </div>
         <div class="content">
           ${content}

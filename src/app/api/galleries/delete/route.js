@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
+import { notifyGalleryDeleted } from '@/lib/notifications/notification-helpers';
 
 // Configurar Cloudinary
 cloudinary.config({
@@ -133,7 +134,11 @@ export async function DELETE(request) {
       .delete()
       .eq('gallery_id', galleryId);
 
-    // 6. Eliminar galería de BD
+    // 6. Notificar antes de eliminar
+    console.log('🔔 Enviando notificación de eliminación...');
+    await notifyGalleryDeleted(gallery.title, gallery.created_by);
+
+    // 7. Eliminar galería de BD
     console.log('🗑️ Eliminando galería de la BD...');
     const { error: deleteError } = await supabase
       .from('galleries')

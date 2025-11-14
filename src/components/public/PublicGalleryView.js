@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, memo } from 'react';
+import { useState, useCallback, useEffect, memo, useRef } from 'react';
 import Image from 'next/image';
 import { Download, X, ChevronLeft, ChevronRight, Grid3x3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -58,6 +58,7 @@ PhotoGrid.displayName = 'PhotoGrid';
  */
 export default function PublicGalleryView({ gallery, token }) {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const hasRegisteredView = useRef(false);
 
   const { title, eventDate, photos, coverImage } = gallery;
 
@@ -73,6 +74,27 @@ export default function PublicGalleryView({ gallery, token }) {
   // Registrar vista de galería (una sola vez al montar)
   useEffect(() => {
     const registerView = async () => {
+      // Crear key único para esta galería
+      const storageKey = `gallery_view_${gallery.id}`;
+
+      // Prevenir duplicados usando useRef + sessionStorage
+      if (hasRegisteredView.current) {
+        console.log('⏭️ [PublicGalleryView] Vista ya registrada (ref), saltando...');
+        return;
+      }
+
+      // Verificar si ya se registró en esta sesión del navegador
+      const alreadyRegistered = sessionStorage.getItem(storageKey);
+      if (alreadyRegistered) {
+        console.log('⏭️ [PublicGalleryView] Vista ya registrada (session), saltando...');
+        hasRegisteredView.current = true;
+        return;
+      }
+
+      // Marcar como registrada inmediatamente
+      hasRegisteredView.current = true;
+      sessionStorage.setItem(storageKey, 'true');
+
       try {
         console.log('👁️ [PublicGalleryView] Registrando vista de galería:', gallery.id);
         const response = await fetch('/api/galleries/view', {
@@ -86,6 +108,9 @@ export default function PublicGalleryView({ gallery, token }) {
       } catch (error) {
         // Error silencioso - no afectar UX del cliente
         console.error('❌ [PublicGalleryView] Error registering gallery view:', error);
+        // Si falla, limpiar el flag para permitir reintentos
+        sessionStorage.removeItem(storageKey);
+        hasRegisteredView.current = false;
       }
     };
 

@@ -123,6 +123,27 @@ export default function NotificationsView() {
     const iconProps = { size: 20, strokeWidth: 2 };
 
     switch (type) {
+      case 'gallery_created':
+        return {
+          icon: <CheckCircle {...iconProps} />,
+          bgColor: 'bg-green-100',
+          textColor: 'text-green-700',
+          borderColor: 'border-green-300',
+        };
+      case 'gallery_view':
+        return {
+          icon: <Info {...iconProps} />,
+          bgColor: 'bg-blue-100',
+          textColor: 'text-blue-700',
+          borderColor: 'border-blue-300',
+        };
+      case 'favorites_selected':
+        return {
+          icon: <CheckCircle {...iconProps} />,
+          bgColor: 'bg-purple-100',
+          textColor: 'text-purple-700',
+          borderColor: 'border-purple-300',
+        };
       case 'link_expired':
       case 'link_expiring_soon':
         return {
@@ -151,20 +172,6 @@ export default function NotificationsView() {
           bgColor: 'bg-orange-100',
           textColor: 'text-orange-700',
           borderColor: 'border-orange-300',
-        };
-      case 'gallery_view':
-        return {
-          icon: <Info {...iconProps} />,
-          bgColor: 'bg-blue-100',
-          textColor: 'text-blue-700',
-          borderColor: 'border-blue-300',
-        };
-      case 'favorites_selected':
-        return {
-          icon: <CheckCircle {...iconProps} />,
-          bgColor: 'bg-green-100',
-          textColor: 'text-green-700',
-          borderColor: 'border-green-300',
         };
       case 'warning':
         return {

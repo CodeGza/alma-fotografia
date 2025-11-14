@@ -14,6 +14,9 @@ import {
   Loader2,
   CheckCircle,
   AlertCircle,
+  Archive,
+  Trash2,
+  XCircle,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
@@ -26,7 +29,11 @@ export default function NotificationSettings() {
     email_on_link_expiring: true,
     email_on_link_expired: true,
     email_on_new_gallery: false,
+    email_on_link_deactivated: false,
+    email_on_gallery_archived: false,
+    email_on_gallery_deleted: true,
     inapp_enabled: true,
+    notification_email: '',
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,12 +66,16 @@ export default function NotificationSettings() {
 
       if (data) {
         setPreferences({
-          email_on_gallery_view: data.email_on_gallery_view,
-          email_on_favorites: data.email_on_favorites,
-          email_on_link_expiring: data.email_on_link_expiring,
-          email_on_link_expired: data.email_on_link_expired,
-          email_on_new_gallery: data.email_on_new_gallery,
-          inapp_enabled: data.inapp_enabled,
+          email_on_gallery_view: data.email_on_gallery_view || false,
+          email_on_favorites: data.email_on_favorites || false,
+          email_on_link_expiring: data.email_on_link_expiring ?? true,
+          email_on_link_expired: data.email_on_link_expired ?? true,
+          email_on_new_gallery: data.email_on_new_gallery || false,
+          email_on_link_deactivated: data.email_on_link_deactivated || false,
+          email_on_gallery_archived: data.email_on_gallery_archived || false,
+          email_on_gallery_deleted: data.email_on_gallery_deleted ?? true,
+          inapp_enabled: data.inapp_enabled ?? true,
+          notification_email: data.notification_email || '',
         });
       } else {
         // Crear preferencias por defecto
@@ -111,10 +122,10 @@ export default function NotificationSettings() {
         text: 'Preferencias guardadas correctamente',
       });
 
-      // Limpiar mensaje después de 3 segundos
+      // Volver atrás después de 1 segundo
       setTimeout(() => {
-        setMessage({ type: '', text: '' });
-      }, 3000);
+        router.back();
+      }, 1000);
     } catch (err) {
       console.error('Error saving preferences:', err);
       setMessage({
@@ -126,10 +137,10 @@ export default function NotificationSettings() {
     }
   };
 
-  const handleChange = (field) => {
+  const handleChange = (field, value) => {
     setPreferences((prev) => ({
       ...prev,
-      [field]: !prev[field],
+      [field]: value !== undefined ? value : !prev[field],
     }));
   };
 
@@ -142,6 +153,12 @@ export default function NotificationSettings() {
   }
 
   const emailNotifications = [
+    {
+      key: 'email_on_new_gallery',
+      icon: ImagePlus,
+      title: 'Cuando crees una nueva galería',
+      description: 'Confirmación cada vez que subas una nueva galería',
+    },
     {
       key: 'email_on_gallery_view',
       icon: Eye,
@@ -164,13 +181,25 @@ export default function NotificationSettings() {
       key: 'email_on_link_expired',
       icon: LinkIcon,
       title: 'Cuando un enlace expire',
-      description: 'Te avisaremos cuando un enlace compartido haya vencido y se desactive',
+      description: 'Te avisaremos cuando un enlace compartido haya vencido y se desactive automáticamente',
     },
     {
-      key: 'email_on_new_gallery',
-      icon: ImagePlus,
-      title: 'Cuando crees una nueva galería',
-      description: 'Confirmación cada vez que subas una nueva galería',
+      key: 'email_on_link_deactivated',
+      icon: XCircle,
+      title: 'Cuando desactives un enlace manualmente',
+      description: 'Te confirmaremos cuando desactives un enlace compartido',
+    },
+    {
+      key: 'email_on_gallery_archived',
+      icon: Archive,
+      title: 'Cuando archives una galería',
+      description: 'Te avisaremos cuando una galería sea archivada',
+    },
+    {
+      key: 'email_on_gallery_deleted',
+      icon: Trash2,
+      title: 'Cuando elimines una galería',
+      description: 'Te confirmaremos cuando elimines permanentemente una galería',
     },
   ];
 
@@ -207,7 +236,7 @@ export default function NotificationSettings() {
           <div className="p-2.5 bg-[#79502A]/10 rounded-lg">
             <Mail size={20} className="text-[#79502A]" />
           </div>
-          <div>
+          <div className="flex-1">
             <h3 className="font-voga text-lg sm:text-xl text-black mb-1">
               Notificaciones por Email
             </h3>
@@ -217,31 +246,52 @@ export default function NotificationSettings() {
           </div>
         </div>
 
-        <div className="space-y-4 pt-2">
+        {/* Campo de email para notificaciones */}
+        <div className="space-y-2 pt-1">
+          <label className="block font-fira text-sm font-medium text-black">
+            Email para recibir notificaciones
+          </label>
+          <input
+            type="email"
+            value={preferences.notification_email}
+            onChange={(e) => handleChange('notification_email', e.target.value)}
+            placeholder="tu-email@ejemplo.com"
+            className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg font-fira text-sm text-black
+              focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 focus:border-[#79502A] transition-all
+              hover:border-gray-300"
+          />
+          <p className="font-fira text-xs text-gray-500">
+            Todas las notificaciones por email seleccionadas abajo se enviarán a este correo
+          </p>
+        </div>
+
+        <div className="border-t border-gray-200 my-4"></div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {emailNotifications.map((item) => {
             const IconComponent = item.icon;
             return (
               <label
                 key={item.key}
-                className="flex items-start gap-3 sm:gap-4 cursor-pointer group p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-start gap-3 cursor-pointer group p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
               >
                 <input
                   type="checkbox"
                   checked={preferences[item.key]}
                   onChange={() => handleChange(item.key)}
-                  className="mt-1 w-5 h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer"
+                  className="mt-1 w-5 h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer flex-shrink-0"
                 />
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <IconComponent
                       size={16}
                       className="text-[#79502A] flex-shrink-0"
                     />
-                    <span className="font-fira text-sm sm:text-base font-medium text-black">
+                    <span className="font-fira text-sm font-medium text-black">
                       {item.title}
                     </span>
                   </div>
-                  <p className="font-fira text-xs sm:text-sm text-gray-600 leading-relaxed">
+                  <p className="font-fira text-xs text-gray-600 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -302,7 +352,7 @@ export default function NotificationSettings() {
           disabled={isSaving}
           whileHover={{ scale: isSaving ? 1 : 1.02 }}
           whileTap={{ scale: isSaving ? 1 : 0.98 }}
-          className="px-6 py-3 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-fira text-sm font-semibold flex items-center gap-2 shadow-lg transition-all"
+          className="px-6 py-3 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-300 disabled:cursor-not-allowed text-white hover:text-white rounded-lg font-fira text-sm font-semibold flex items-center gap-2 shadow-lg transition-all"
         >
           {isSaving ? (
             <>

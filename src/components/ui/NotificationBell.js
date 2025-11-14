@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, X, Check, AlertTriangle, Info, LinkIcon, Archive, Trash2, Calendar } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Bell, X, Check, AlertTriangle, Info, LinkIcon, Archive, Trash2, Calendar, CheckSquare, Square } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 
 /**
@@ -23,6 +24,14 @@ export default function NotificationBell({ className = '', isMobile = false }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+
+  // Para evitar errores de hydration con Portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Cargar notificaciones
   const loadNotifications = useCallback(async () => {
@@ -52,10 +61,10 @@ export default function NotificationBell({ className = '', isMobile = false }) {
   useEffect(() => {
     loadNotifications();
 
-    // Polling cada 10 segundos como backup
+    // Polling cada 3 segundos como backup (más rápido)
     const pollingInterval = setInterval(() => {
       loadNotifications();
-    }, 10000);
+    }, 3000);
 
     // Intentar Realtime subscription (puede fallar si no está habilitado)
     let channel = null;
@@ -155,7 +164,7 @@ export default function NotificationBell({ className = '', isMobile = false }) {
       if (error) throw error;
 
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
-      
+
       // Decrementar contador si era no leída
       const notification = notifications.find(n => n.id === notificationId);
       if (notification && !notification.is_read) {
@@ -166,11 +175,91 @@ export default function NotificationBell({ className = '', isMobile = false }) {
     }
   }, [notifications]);
 
+  // Toggle selección de notificación
+  const toggleSelection = useCallback((notificationId) => {
+    setSelectedIds(prev => {
+      if (prev.includes(notificationId)) {
+        return prev.filter(id => id !== notificationId);
+      } else {
+        return [...prev, notificationId];
+      }
+    });
+  }, []);
+
+  // Seleccionar todas
+  const selectAll = useCallback(() => {
+    setSelectedIds(notifications.map(n => n.id));
+  }, [notifications]);
+
+  // Deseleccionar todas
+  const deselectAll = useCallback(() => {
+    setSelectedIds([]);
+  }, []);
+
+  // Marcar seleccionadas como leídas
+  const markSelectedAsRead = useCallback(async () => {
+    if (selectedIds.length === 0) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true, read_at: new Date().toISOString() })
+        .in('id', selectedIds);
+
+      if (error) throw error;
+
+      setNotifications(prev =>
+        prev.map(n => selectedIds.includes(n.id) ? { ...n, is_read: true } : n)
+      );
+
+      const unreadSelected = notifications.filter(n =>
+        selectedIds.includes(n.id) && !n.is_read
+      ).length;
+      setUnreadCount(prev => Math.max(0, prev - unreadSelected));
+
+      setSelectedIds([]);
+      setIsSelectionMode(false);
+    } catch (error) {
+      console.error('Error marking selected as read:', error);
+    }
+  }, [selectedIds, notifications]);
+
+  // Eliminar seleccionadas
+  const deleteSelected = useCallback(async () => {
+    if (selectedIds.length === 0) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .in('id', selectedIds);
+
+      if (error) throw error;
+
+      const unreadDeleted = notifications.filter(n =>
+        selectedIds.includes(n.id) && !n.is_read
+      ).length;
+
+      setNotifications(prev => prev.filter(n => !selectedIds.includes(n.id)));
+      setUnreadCount(prev => Math.max(0, prev - unreadDeleted));
+      setSelectedIds([]);
+      setIsSelectionMode(false);
+    } catch (error) {
+      console.error('Error deleting selected:', error);
+    }
+  }, [selectedIds, notifications]);
+
   // Obtener ícono según tipo
   const getIcon = useCallback((type) => {
     const iconProps = { size: 16 };
-    
+
     switch (type) {
+      case 'gallery_created':
+        return <Check {...iconProps} className="text-green-600" />;
+      case 'gallery_view':
+        return <Info {...iconProps} className="text-blue-600" />;
+      case 'favorites_selected':
+        return <Check {...iconProps} className="text-purple-600" />;
       case 'link_expired':
       case 'link_expiring_soon':
         return <Calendar {...iconProps} className="text-amber-600" />;
@@ -220,18 +309,18 @@ export default function NotificationBell({ className = '', isMobile = false }) {
         )}
       </button>
 
-      {/* Panel de notificaciones */}
-      {isOpen && (
+      {/* Panel de notificaciones - Renderizado con Portal */}
+      {mounted && isOpen && createPortal(
         <>
           {/* Backdrop */}
           <div
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] animate-in fade-in duration-200"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[99998] animate-in fade-in duration-200"
           />
 
           {/* Modal centrado - IGUAL en Desktop y Mobile */}
           <div
-            className="fixed z-[9999] flex flex-col bg-white shadow-2xl border border-gray-200 rounded-2xl
+            className="fixed z-[99999] flex flex-col bg-white shadow-2xl border border-gray-200 rounded-2xl
               inset-4 sm:inset-6 md:inset-x-auto md:inset-y-6
               md:left-1/2 md:-translate-x-1/2
               md:w-full md:max-w-lg md:h-[90vh]
@@ -241,9 +330,22 @@ export default function NotificationBell({ className = '', isMobile = false }) {
             <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
               <h3 className="font-fira text-sm font-semibold text-black">
                 Notificaciones
+                {isSelectionMode && selectedIds.length > 0 && (
+                  <span className="ml-2 text-xs text-[#79502A]">
+                    ({selectedIds.length} seleccionada{selectedIds.length > 1 ? 's' : ''})
+                  </span>
+                )}
               </h3>
               <div className="flex items-center gap-2">
-                {unreadCount > 0 && (
+                {!isSelectionMode && notifications.length > 0 && (
+                  <button
+                    onClick={() => setIsSelectionMode(true)}
+                    className="px-2 py-1 text-xs font-fira font-semibold text-[#79502A] hover:bg-[#79502A]/10 rounded-lg transition-colors"
+                  >
+                    Seleccionar
+                  </button>
+                )}
+                {!isSelectionMode && unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
                     className="px-2 py-1 text-xs font-fira font-semibold text-[#79502A] hover:bg-[#79502A]/10 rounded-lg transition-colors"
@@ -251,8 +353,23 @@ export default function NotificationBell({ className = '', isMobile = false }) {
                     Marcar todas
                   </button>
                 )}
+                {isSelectionMode && (
+                  <button
+                    onClick={() => {
+                      setIsSelectionMode(false);
+                      setSelectedIds([]);
+                    }}
+                    className="px-2 py-1 text-xs font-fira font-semibold text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                )}
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsSelectionMode(false);
+                    setSelectedIds([]);
+                  }}
                   className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
                   aria-label="Cerrar"
                 >
@@ -260,6 +377,43 @@ export default function NotificationBell({ className = '', isMobile = false }) {
                 </button>
               </div>
             </div>
+
+            {/* Botones de acciones masivas - Solo en modo selección */}
+            {isSelectionMode && notifications.length > 0 && (
+              <div className="p-3 border-b border-gray-200 flex items-center gap-2 flex-shrink-0 bg-gray-50">
+                <button
+                  onClick={selectAll}
+                  className="px-3 py-1.5 text-xs font-fira font-semibold text-gray-700 hover:bg-white rounded-lg transition-colors border border-gray-200"
+                >
+                  Seleccionar todas
+                </button>
+                {selectedIds.length > 0 && (
+                  <>
+                    <button
+                      onClick={deselectAll}
+                      className="px-3 py-1.5 text-xs font-fira font-semibold text-gray-700 hover:bg-white rounded-lg transition-colors border border-gray-200"
+                    >
+                      Deseleccionar
+                    </button>
+                    <div className="flex-1"></div>
+                    <button
+                      onClick={markSelectedAsRead}
+                      className="px-3 py-1.5 text-xs font-fira font-semibold text-[#79502A] hover:bg-[#79502A]/10 rounded-lg transition-colors flex items-center gap-1"
+                    >
+                      <Check size={14} />
+                      <span>Marcar leídas</span>
+                    </button>
+                    <button
+                      onClick={deleteSelected}
+                      className="px-3 py-1.5 text-xs font-fira font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1"
+                    >
+                      <Trash2 size={14} />
+                      <span>Eliminar</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Lista de notificaciones */}
             <div className="flex-1 overflow-y-auto">
@@ -281,13 +435,30 @@ export default function NotificationBell({ className = '', isMobile = false }) {
                       key={notification.id}
                       className={`p-4 hover:bg-gray-50 transition-colors ${
                         !notification.is_read ? 'bg-blue-50/50' : ''
-                      }`}
+                      } ${isSelectionMode && selectedIds.includes(notification.id) ? 'bg-[#79502A]/5' : ''}`}
                     >
                       <div className="flex items-start gap-3">
+                        {/* Checkbox en modo selección */}
+                        {isSelectionMode && (
+                          <button
+                            onClick={() => toggleSelection(notification.id)}
+                            className="flex-shrink-0 mt-1 p-1 hover:bg-gray-200 rounded transition-colors"
+                            aria-label={selectedIds.includes(notification.id) ? 'Deseleccionar' : 'Seleccionar'}
+                          >
+                            {selectedIds.includes(notification.id) ? (
+                              <CheckSquare size={18} className="text-[#79502A]" />
+                            ) : (
+                              <Square size={18} className="text-gray-400" />
+                            )}
+                          </button>
+                        )}
+
                         {/* Ícono */}
-                        <div className="flex-shrink-0 mt-1">
-                          {getIcon(notification.type)}
-                        </div>
+                        {!isSelectionMode && (
+                          <div className="flex-shrink-0 mt-1">
+                            {getIcon(notification.type)}
+                          </div>
+                        )}
 
                         {/* Contenido */}
                         <div className="flex-1 min-w-0">
@@ -297,9 +468,9 @@ export default function NotificationBell({ className = '', isMobile = false }) {
                           <p className="font-fira text-xs text-gray-500">
                             {formatDate(notification.created_at)}
                           </p>
-                          
-                          {/* Link de acción */}
-                          {notification.action_url && (
+
+                          {/* Link de acción - solo en modo normal */}
+                          {!isSelectionMode && notification.action_url && (
                             <a
                               href={notification.action_url}
                               onClick={() => {
@@ -313,27 +484,29 @@ export default function NotificationBell({ className = '', isMobile = false }) {
                           )}
                         </div>
 
-                        {/* Acciones */}
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          {!notification.is_read && (
+                        {/* Acciones - solo en modo normal */}
+                        {!isSelectionMode && (
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            {!notification.is_read && (
+                              <button
+                                onClick={() => markAsRead(notification.id)}
+                                className="p-1 hover:bg-gray-200 rounded transition-colors"
+                                title="Marcar como leída"
+                                aria-label="Marcar como leída"
+                              >
+                                <Check size={14} className="text-gray-600" />
+                              </button>
+                            )}
                             <button
-                              onClick={() => markAsRead(notification.id)}
+                              onClick={() => deleteNotification(notification.id)}
                               className="p-1 hover:bg-gray-200 rounded transition-colors"
-                              title="Marcar como leída"
-                              aria-label="Marcar como leída"
+                              title="Eliminar"
+                              aria-label="Eliminar notificación"
                             >
-                              <Check size={14} className="text-gray-600" />
+                              <X size={14} className="text-gray-600" />
                             </button>
-                          )}
-                          <button
-                            onClick={() => deleteNotification(notification.id)}
-                            className="p-1 hover:bg-gray-200 rounded transition-colors"
-                            title="Eliminar"
-                            aria-label="Eliminar notificación"
-                          >
-                            <X size={14} className="text-gray-600" />
-                          </button>
-                        </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -341,7 +514,8 @@ export default function NotificationBell({ className = '', isMobile = false }) {
               )}
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );

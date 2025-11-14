@@ -2,10 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2, Save, Globe, Lock, Bell, MessageSquare, Eye, EyeOff } from 'lucide-react';
+import { X, Loader2, Save, Globe, Lock, MessageSquare, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabaseClient';
+import { useModal } from '@/hooks/useModal';
+import Modal from '@/components/ui/Modal';
+import { useRouter } from 'next/navigation';
 
 export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSuccess }) {
+  const router = useRouter();
+  const { modalState, showModal, closeModal } = useModal();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -15,8 +20,6 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
     is_public: false,
     allow_downloads: true,
     allow_comments: false,
-    notify_on_view: false,
-    notify_on_favorites: false,
     custom_message: '',
     password: '',
     max_favorites: 150,
@@ -43,8 +46,6 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
         is_public: gallery.is_public || false,
         allow_downloads: gallery.allow_downloads ?? true,
         allow_comments: gallery.allow_comments ?? false,
-        notify_on_view: gallery.notify_on_view ?? false,
-        notify_on_favorites: gallery.notify_on_favorites ?? false,
         custom_message: gallery.custom_message || '',
         password: gallery.password || '',
         max_favorites: gallery.max_favorites || 150,
@@ -92,7 +93,7 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
       }
 
       if (formData.client_email && !formData.client_email.includes('@')) {
-        throw new Error('Email inválido');
+        throw new Error('Email del cliente inválido');
       }
 
       if (formData.max_favorites < 0 || formData.max_favorites > 500) {
@@ -116,7 +117,36 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
         }
 
         if (existingPublic) {
-          throw new Error(`Ya existe una galería pública para este servicio: "${existingPublic.title}". Solo puede haber una galería pública por tipo de servicio.`);
+          console.log('⚠️ Ya existe galería pública con este servicio:', existingPublic.title);
+          setIsSaving(false);
+          showModal({
+            title: 'Ya existe una galería pública para este servicio',
+            message: `La galería "${existingPublic.title}" ya está configurada como pública para este tipo de servicio. Solo puede haber una galería pública por servicio.\n\n¿Qué deseas hacer?`,
+            type: 'warning',
+            confirmText: 'Mantener como privada',
+            cancelText: 'Ver galería existente',
+            onConfirm: () => {
+              // Cambiar a privada y continuar guardando
+              setFormData(prev => ({ ...prev, is_public: false }));
+              console.log('✅ Cambiando a galería privada');
+              closeModal();
+              // Trigger submit again with updated data
+              setTimeout(() => {
+                const form = document.querySelector('form');
+                if (form) {
+                  const event = new Event('submit', { bubbles: true, cancelable: true });
+                  form.dispatchEvent(event);
+                }
+              }, 100);
+            },
+            onCancel: () => {
+              // Cerrar el modal de edición y navegar a la galería existente
+              closeModal();
+              onClose(); // Cerrar el modal de edición
+              router.push(`/dashboard/galerias/${existingPublic.id}`);
+            }
+          });
+          return;
         }
       }
 
@@ -129,8 +159,6 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
         is_public: formData.is_public,
         allow_downloads: formData.allow_downloads,
         allow_comments: formData.allow_comments,
-        notify_on_view: formData.notify_on_view,
-        notify_on_favorites: formData.notify_on_favorites,
         custom_message: formData.custom_message.trim() || null,
         password: formData.password.trim() || null,
         max_favorites: formData.max_favorites,
@@ -169,20 +197,21 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
   };
 
   return (
-    <AnimatePresence>
-      {/* Backdrop */}
-      <motion.div
-        key="edit-backdrop"
-        onClick={handleClose}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
-      />
+    <>
+      <AnimatePresence>
+        {/* Backdrop */}
+        <motion.div
+          key="edit-backdrop"
+          onClick={handleClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+        />
 
-      {/* Modal - 100% Responsive */}
-      <motion.div
+        {/* Modal - 100% Responsive */}
+        <motion.div
         key="edit-modal"
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -423,52 +452,6 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
               </div>
             </div>
 
-            {/* Notificaciones */}
-            <div className="space-y-2 sm:space-y-3 p-2.5 sm:p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-                <Bell size={14} className="sm:w-4 sm:h-4 text-[#79502A]" />
-                <h4 className="font-fira text-[11px] sm:text-xs md:text-sm font-semibold text-black">
-                  Notificaciones por email
-                </h4>
-              </div>
-
-              <label className="flex items-start gap-2 sm:gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="notify_on_view"
-                  checked={formData.notify_on_view}
-                  onChange={handleChange}
-                  className="mt-0.5 w-4.5 h-4.5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
-                />
-                <div className="flex-1">
-                  <span className="font-fira text-[10px] sm:text-xs text-black">
-                    Cuando un cliente vea la galería
-                  </span>
-                  <p className="font-fira text-[9px] sm:text-[10px] text-gray-600 mt-0.5">
-                    Recibirás un email cada vez que alguien abra el link
-                  </p>
-                </div>
-              </label>
-
-              <label className="flex items-start gap-2 sm:gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="notify_on_favorites"
-                  checked={formData.notify_on_favorites}
-                  onChange={handleChange}
-                  className="mt-0.5 w-4.5 h-4.5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] flex-shrink-0"
-                />
-                <div className="flex-1">
-                  <span className="font-fira text-[10px] sm:text-xs text-black">
-                    Cuando seleccione favoritos
-                  </span>
-                  <p className="font-fira text-[9px] sm:text-[10px] text-gray-600 mt-0.5">
-                    Recibirás un email cuando finalice su selección
-                  </p>
-                </div>
-              </label>
-            </div>
-
             {/* Opciones avanzadas (colapsables) */}
             <div>
               <button
@@ -578,5 +561,19 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
         </form>
       </motion.div>
     </AnimatePresence>
+
+    {/* Modal de confirmación para galería pública duplicada */}
+    <Modal
+      isOpen={modalState.isOpen}
+      onClose={closeModal}
+      title={modalState.title}
+      message={modalState.message}
+      type={modalState.type}
+      confirmText={modalState.confirmText}
+      cancelText={modalState.cancelText}
+      onConfirm={modalState.onConfirm}
+      onCancel={modalState.onCancel}
+    />
+  </>
   );
 }

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { defaultServiceTypes } from '@/lib/validations/gallery';
-import { Bell, MessageSquare } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import ServiceTypeSelector from './ServiceTypeSelector';
 import { motion, AnimatePresence } from 'framer-motion';
 import Modal from '@/components/ui/Modal';
@@ -79,8 +79,6 @@ export default function CreateGalleryForm() {
             isPublic: false,
             serviceType: '',
             customMessage: '',
-            notifyOnView: false,
-            notifyOnFavorites: true,
             password: '',
             allowDownloads: true,
             allowComments: true,
@@ -305,11 +303,24 @@ export default function CreateGalleryForm() {
                 }
 
                 if (existing) {
-                    console.log('⚠️ Ya existe galería pública con este servicio');
+                    console.log('⚠️ Ya existe galería pública con este servicio:', existing.title);
                     showModal({
-                        title: 'Galería duplicada',
-                        message: `Ya existe una galería pública de este tipo de servicio. Solo puede haber una galería pública por servicio.`,
-                        type: 'warning'
+                        title: 'Ya existe una galería pública para este servicio',
+                        message: `La galería "${existing.title}" ya está configurada como pública para este tipo de servicio. Solo puede haber una galería pública por servicio.\n\n¿Qué deseas hacer?`,
+                        type: 'warning',
+                        confirmText: 'Crear como privada',
+                        cancelText: 'Ver galería existente',
+                        onConfirm: () => {
+                            // Cambiar a privada y continuar con la creación
+                            setValue('isPublic', false);
+                            console.log('✅ Cambiando a galería privada');
+                            // Re-ejecutar el submit
+                            handleSubmit(onSubmit)();
+                        },
+                        onCancel: () => {
+                            // Navegar a la galería existente
+                            router.push(`/dashboard/galerias/${existing.id}`);
+                        }
                     });
                     return;
                 }
@@ -351,8 +362,6 @@ export default function CreateGalleryForm() {
                 views_count: 0,
                 service_type: data.serviceType || null,
                 custom_message: data.customMessage?.trim() || null,
-                notify_on_view: data.notifyOnView,
-                notify_on_favorites: data.notifyOnFavorites,
                 password: data.password?.trim() || null,
                 allow_downloads: data.allowDownloads,
                 allow_comments: data.allowComments,
@@ -428,6 +437,22 @@ export default function CreateGalleryForm() {
             }
 
             console.log('✅ Galería creada exitosamente:', gallery);
+
+            // Enviar notificación de creación de galería
+            try {
+                console.log('📬 Enviando notificación de creación...');
+                const notifResponse = await fetch('/api/galleries/created', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ galleryId: gallery.id }),
+                });
+
+                const notifData = await notifResponse.json();
+                console.log('📥 Notificación resultado:', notifData);
+            } catch (notifError) {
+                // Error silencioso - no afectar UX
+                console.error('⚠️ Error enviando notificación de creación:', notifError);
+            }
 
             showModal({
                 title: 'Galería creada',
@@ -827,52 +852,6 @@ export default function CreateGalleryForm() {
                         </label>
                     </div>
                 </motion.div>
-
-                {/* Notificaciones por email */}
-                <div className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-300">
-                    <div className="flex items-center gap-2 mb-2">
-                        <Bell size={16} className="text-[#79502A]" />
-                        <h4 className="font-fira text-sm font-medium text-black">
-                            Notificaciones por email
-                        </h4>
-                    </div>
-
-                    {/* Notificar al ver */}
-                    <div className="flex items-start gap-3">
-                        <input
-                            type="checkbox"
-                            id="notifyOnView"
-                            {...register('notifyOnView')}
-                            className="mt-1 w-4 h-4 accent-[#79502A] cursor-pointer flex-shrink-0"
-                        />
-                        <label htmlFor="notifyOnView" className="flex-1 cursor-pointer">
-                            <p className="font-fira text-sm text-black">
-                                Cuando un cliente vea la galería
-                            </p>
-                            <p className="font-fira text-xs text-black/60 mt-0.5">
-                                Recibirás un email cada vez que alguien abra el link
-                            </p>
-                        </label>
-                    </div>
-
-                    {/* Notificar al seleccionar favoritos */}
-                    <div className="flex items-start gap-3">
-                        <input
-                            type="checkbox"
-                            id="notifyOnFavorites"
-                            {...register('notifyOnFavorites')}
-                            className="mt-1 w-4 h-4 accent-[#79502A] cursor-pointer flex-shrink-0"
-                        />
-                        <label htmlFor="notifyOnFavorites" className="flex-1 cursor-pointer">
-                            <p className="font-fira text-sm text-black">
-                                Cuando seleccione favoritos
-                            </p>
-                            <p className="font-fira text-xs text-black/60 mt-0.5">
-                                Recibirás un email cuando finalice su selección
-                            </p>
-                        </label>
-                    </div>
-                </div>
 
                 {/* Opciones avanzadas (colapsables) */}
                 <motion.div

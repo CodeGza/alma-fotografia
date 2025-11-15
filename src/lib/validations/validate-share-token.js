@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/server';
+import { notifyLinkExpired } from '@/lib/notifications/notification-helpers';
 
 /**
  * Validar token de galería compartida
@@ -175,7 +176,7 @@ export async function getGalleryWithToken(slug, token) {
 
 /**
  * Cron job / Tarea programada
- * 
+ *
  * Desactivar todos los enlaces vencidos
  * Ejecutar diariamente a medianoche
  */
@@ -196,17 +197,30 @@ export async function deactivateExpiredLinks() {
 
     console.log(`Desactivados ${data?.length || 0} enlaces vencidos`);
 
-    return { 
-      success: true, 
-      deactivated: data?.length || 0 
+    // Enviar notificaciones para cada enlace expirado
+    if (data && data.length > 0) {
+      console.log(`📧 Enviando notificaciones para ${data.length} enlaces expirados...`);
+
+      for (const share of data) {
+        try {
+          await notifyLinkExpired(share.id);
+        } catch (notifyError) {
+          console.error(`Error enviando notificación para share ${share.id}:`, notifyError);
+          // Continuar con los demás
+        }
+      }
+    }
+
+    return {
+      success: true,
+      deactivated: data?.length || 0
     };
 
   } catch (error) {
     console.error('Error deactivating expired links:', error);
-    return { 
-      success: false, 
-      error: error.message 
+    return {
+      success: false,
+      error: error.message
     };
   }
-// 
 }

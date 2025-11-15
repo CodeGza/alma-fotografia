@@ -2,51 +2,97 @@
 
 import { useState, useCallback, useEffect, memo, useRef } from 'react';
 import Image from 'next/image';
-import { Download, X, ChevronLeft, ChevronRight, Grid3x3 } from 'lucide-react';
+import { Download, X, ChevronLeft, ChevronRight, Grid3x3, Heart, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PublicDownloadAllButton from '@/components/public/PublicDownloadAllButton';
+import FavoritesSelector from '@/components/public/FavoritesSelector';
+import TestimonialForm from '@/components/public/TestimonialForm';
+import { toggleFavorite, getClientFavorites } from '@/app/actions/favorites-actions';
 
 /**
- * PhotoGrid - Grid memoizado de fotos
+ * PhotoGrid - Grid memoizado de fotos con indicador de favoritos
  */
-const PhotoGrid = memo(({ photos, galleryTitle, onPhotoClick, onDownload }) => {
+const PhotoGrid = memo(({
+  photos,
+  galleryTitle,
+  onPhotoClick,
+  onDownload,
+  onToggleFavorite,
+  favoritePhotoIds,
+  allowDownloads,
+}) => {
   return (
     <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-      {photos.map((photo, index) => (
-        <div
-          key={photo.id}
-          className="group relative break-inside-avoid mb-4"
-        >
-          <div
-            className="relative w-full bg-beige/20 rounded-lg overflow-hidden cursor-pointer"
-            onClick={() => onPhotoClick(photo, index)}
-          >
-            <Image
-              src={photo.file_path}
-              alt={`${galleryTitle} - ${photo.file_name || `Foto ${index + 1}`}`}
-              width={800}
-              height={800}
-              className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-110"
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              loading="lazy"
-              quality={85}
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+      {photos.map((photo, index) => {
+        const isFavorite = favoritePhotoIds.includes(photo.id);
 
-            {/* Botón descargar */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDownload(photo);
-              }}
-              className="absolute bottom-4 right-4 p-2.5 bg-white/90 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-              title="Descargar foto"
+        return (
+          <div
+            key={photo.id}
+            className="group relative break-inside-avoid mb-4"
+          >
+            <div
+              className="relative w-full bg-beige/20 rounded-lg overflow-hidden cursor-pointer"
+              onClick={() => onPhotoClick(photo, index)}
             >
-              <Download size={18} className="text-black" />
-            </button>
+              <Image
+                src={photo.file_path}
+                alt={`${galleryTitle} - ${photo.file_name || `Foto ${index + 1}`}`}
+                width={800}
+                height={800}
+                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-110"
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                loading="lazy"
+                quality={85}
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+
+              {/* Botones superpuestos */}
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Botón favorito */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleFavorite(photo.id);
+                  }}
+                  className={`p-2.5 rounded-full shadow-lg transition-all ${
+                    isFavorite
+                      ? 'bg-gradient-to-r from-pink-500 to-rose-500'
+                      : 'bg-white/90 hover:bg-white'
+                  }`}
+                  title={isFavorite ? 'Quitar de favoritas' : 'Agregar a favoritas'}
+                >
+                  <Heart
+                    size={18}
+                    className={isFavorite ? 'fill-white text-white' : 'text-pink-500'}
+                  />
+                </button>
+
+                {/* Botón descargar */}
+                {allowDownloads && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDownload(photo);
+                    }}
+                    className="p-2.5 bg-white/90 hover:bg-white rounded-full shadow-lg"
+                    title="Descargar foto"
+                  >
+                    <Download size={18} className="text-black" />
+                  </button>
+                )}
+              </div>
+
+              {/* Badge de favorita (siempre visible si está seleccionada) */}
+              {isFavorite && (
+                <div className="absolute top-4 right-4 p-2 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full shadow-lg">
+                  <Heart size={16} className="fill-white text-white" />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 });
@@ -54,13 +100,27 @@ const PhotoGrid = memo(({ photos, galleryTitle, onPhotoClick, onDownload }) => {
 PhotoGrid.displayName = 'PhotoGrid';
 
 /**
- * Componente principal
+ * Componente principal - Vista pública profesional
  */
 export default function PublicGalleryView({ gallery, token }) {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [clientEmail, setClientEmail] = useState('');
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
+  const [favoritePhotoIds, setFavoritePhotoIds] = useState([]);
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
   const hasRegisteredView = useRef(false);
 
-  const { title, eventDate, photos, coverImage } = gallery;
+  const {
+    id: galleryId,
+    title,
+    eventDate,
+    photos,
+    coverImage,
+    allowDownloads,
+    maxFavorites,
+    customMessage,
+    allowComments,
+  } = gallery;
 
   // Formatear fecha
   const formattedDate = eventDate
@@ -71,44 +131,115 @@ export default function PublicGalleryView({ gallery, token }) {
     })
     : null;
 
+  // Cargar favoritos del cliente - Memoizado para evitar re-renders
+  const loadFavorites = useCallback(async (email) => {
+    if (!email) return;
+
+    setIsLoadingFavorites(true);
+    try {
+      const result = await getClientFavorites(galleryId, email);
+      if (result.success) {
+        setFavoritePhotoIds(result.favorites.map(f => f.photo_id));
+      }
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    } finally {
+      setIsLoadingFavorites(false);
+    }
+  }, [galleryId]);
+
+  // Cargar email del cliente desde localStorage
+  useEffect(() => {
+    const savedEmail = localStorage.getItem(`gallery_${galleryId}_email`);
+    if (savedEmail) {
+      setClientEmail(savedEmail);
+      loadFavorites(savedEmail);
+    } else {
+      setIsLoadingFavorites(false);
+      // Mostrar prompt de email si hay funciones que lo requieren
+      if (maxFavorites > 0) {
+        setShowEmailPrompt(true);
+      }
+    }
+  }, [galleryId, maxFavorites, loadFavorites]);
+
+  // Guardar email y cargar favoritos
+  const handleEmailSubmit = (email) => {
+    const trimmedEmail = email.toLowerCase().trim();
+    setClientEmail(trimmedEmail);
+    localStorage.setItem(`gallery_${galleryId}_email`, trimmedEmail);
+    setShowEmailPrompt(false);
+    loadFavorites(trimmedEmail);
+  };
+
+  // Toggle favorito
+  const handleToggleFavorite = async (photoId) => {
+    // Si no hay email, pedir primero
+    if (!clientEmail) {
+      setShowEmailPrompt(true);
+      return;
+    }
+
+    // Optimistic update
+    const wasFavorite = favoritePhotoIds.includes(photoId);
+    if (wasFavorite) {
+      setFavoritePhotoIds(prev => prev.filter(id => id !== photoId));
+    } else {
+      // Verificar límite
+      if (favoritePhotoIds.length >= maxFavorites) {
+        alert(`Has alcanzado el límite de ${maxFavorites} fotos favoritas`);
+        return;
+      }
+      setFavoritePhotoIds(prev => [...prev, photoId]);
+    }
+
+    // Llamada al servidor
+    try {
+      const result = await toggleFavorite(galleryId, photoId, clientEmail, maxFavorites);
+      if (!result.success) {
+        // Revertir en caso de error
+        if (wasFavorite) {
+          setFavoritePhotoIds(prev => [...prev, photoId]);
+        } else {
+          setFavoritePhotoIds(prev => prev.filter(id => id !== photoId));
+        }
+        alert(result.error || 'Error al actualizar favorita');
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      // Revertir
+      if (wasFavorite) {
+        setFavoritePhotoIds(prev => [...prev, photoId]);
+      } else {
+        setFavoritePhotoIds(prev => prev.filter(id => id !== photoId));
+      }
+    }
+  };
+
   // Registrar vista de galería (una sola vez al montar)
   useEffect(() => {
     const registerView = async () => {
-      // Crear key único para esta galería
       const storageKey = `gallery_view_${gallery.id}`;
 
-      // Prevenir duplicados usando useRef + sessionStorage
-      if (hasRegisteredView.current) {
-        console.log('⏭️ [PublicGalleryView] Vista ya registrada (ref), saltando...');
-        return;
-      }
+      if (hasRegisteredView.current) return;
 
-      // Verificar si ya se registró en esta sesión del navegador
       const alreadyRegistered = sessionStorage.getItem(storageKey);
       if (alreadyRegistered) {
-        console.log('⏭️ [PublicGalleryView] Vista ya registrada (session), saltando...');
         hasRegisteredView.current = true;
         return;
       }
 
-      // Marcar como registrada inmediatamente
       hasRegisteredView.current = true;
       sessionStorage.setItem(storageKey, 'true');
 
       try {
-        console.log('👁️ [PublicGalleryView] Registrando vista de galería:', gallery.id);
-        const response = await fetch('/api/galleries/view', {
+        await fetch('/api/galleries/view', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ galleryId: gallery.id }),
         });
-
-        const data = await response.json();
-        console.log('📥 [PublicGalleryView] Respuesta del API:', data);
       } catch (error) {
-        // Error silencioso - no afectar UX del cliente
-        console.error('❌ [PublicGalleryView] Error registering gallery view:', error);
-        // Si falla, limpiar el flag para permitir reintentos
+        console.error('Error registering gallery view:', error);
         sessionStorage.removeItem(storageKey);
         hasRegisteredView.current = false;
       }
@@ -117,7 +248,7 @@ export default function PublicGalleryView({ gallery, token }) {
     registerView();
   }, [gallery.id]);
 
-  // ✅ Callbacks para lightbox
+  // Callbacks para lightbox
   const openLightbox = useCallback((photo, index) => {
     setSelectedPhoto({ ...photo, index });
   }, []);
@@ -142,65 +273,44 @@ export default function PublicGalleryView({ gallery, token }) {
     });
   }, [photos]);
 
-  // Función de descarga
+  // Función de descarga individual
   const handleDownload = useCallback(async (photo) => {
     try {
       let downloadUrl = photo.file_path;
 
-      // ✅ Si es Cloudinary, forzar formato original (NO webp) + calidad máxima
       if (downloadUrl.includes('res.cloudinary.com')) {
         const urlParts = downloadUrl.split('/upload/');
         if (urlParts.length === 2) {
-          // Detectar si la imagen original es PNG (tiene transparencia) o JPG
           const isPNG = urlParts[1].toLowerCase().includes('.png') ||
             photo.file_name?.toLowerCase().endsWith('.png');
-
-          // Forzar formato original: PNG si es PNG, JPG si no
           const format = isPNG ? 'png' : 'jpg';
-
-          // fl_attachment: fuerza descarga
-          // q_100: calidad máxima
-          // f_png o f_jpg: fuerza formato específico (evita webp)
           downloadUrl = `${urlParts[0]}/upload/fl_attachment,q_100,f_${format}/${urlParts[1]}`;
         }
       }
 
-      // ✅ Determinar nombre amigable para descarga
       let fileName = photo.file_name;
-
       if (!fileName) {
         const urlPath = photo.file_path.split('/').pop().split('?')[0];
         fileName = urlPath || `foto-${Date.now()}.jpg`;
       }
 
-      // ✅ Forzar extensión JPG o PNG (nunca webp)
       const isPNG = fileName.toLowerCase().includes('.png') ||
         photo.file_path.toLowerCase().includes('.png');
 
-      // Remover cualquier extensión existente
       fileName = fileName.replace(/\.(jpg|jpeg|png|webp|gif)$/i, '');
-
-      // ✅ Convertir a formato amigable: "nombre-galeria-foto-001" → "Nombre Galeria - Foto 001"
       fileName = fileName
         .split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
         .replace(/ Foto /, ' - Foto ');
-
-      // Agregar extensión correcta
       fileName += isPNG ? '.png' : '.jpg';
 
-      console.log('📥 Descargando:', fileName, 'desde:', downloadUrl);
-
-      // ✅ Fetch y descarga sin abrir pestaña
       const response = await fetch(downloadUrl, {
         mode: 'cors',
         credentials: 'omit'
       });
 
-      if (!response.ok) {
-        throw new Error('Error al obtener la imagen');
-      }
+      if (!response.ok) throw new Error('Error al obtener la imagen');
 
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
@@ -213,14 +323,13 @@ export default function PublicGalleryView({ gallery, token }) {
       document.body.appendChild(a);
       a.click();
 
-      // Cleanup
       setTimeout(() => {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(blobUrl);
       }, 150);
 
     } catch (error) {
-      console.error('❌ Error downloading photo:', error);
+      console.error('Error downloading photo:', error);
       alert('Error al descargar la foto. Por favor intenta de nuevo.');
     }
   }, []);
@@ -268,10 +377,14 @@ export default function PublicGalleryView({ gallery, token }) {
                     </span>
                   </div>
 
-                  <PublicDownloadAllButton
-                    photos={photos}
-                    galleryTitle={title}
-                  />
+                  {allowDownloads && (
+                    <PublicDownloadAllButton
+                      photos={photos}
+                      galleryTitle={title}
+                      favoritePhotoIds={favoritePhotoIds}
+                      showFavoritesOption={favoritePhotoIds.length > 0}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -306,13 +419,42 @@ export default function PublicGalleryView({ gallery, token }) {
                   {photos.length} {photos.length === 1 ? 'foto' : 'fotos'}
                 </span>
               </div>
-              <PublicDownloadAllButton
-                photos={photos}
-                galleryTitle={title}
-              />
+              {allowDownloads && (
+                <PublicDownloadAllButton
+                  photos={photos}
+                  galleryTitle={title}
+                  favoritePhotoIds={favoritePhotoIds}
+                  showFavoritesOption={favoritePhotoIds.length > 0}
+                />
+              )}
             </div>
           </div>
         </header>
+      )}
+
+      {/* Mensaje personalizado */}
+      {customMessage && (
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6"
+          >
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-blue-500 rounded-lg">
+                <Info size={20} className="text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-voga text-xl text-black mb-2">
+                  Mensaje del Fotógrafo
+                </h3>
+                <p className="font-fira text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {customMessage}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       )}
 
       {/* Main content */}
@@ -329,9 +471,81 @@ export default function PublicGalleryView({ gallery, token }) {
             galleryTitle={title}
             onPhotoClick={openLightbox}
             onDownload={handleDownload}
+            onToggleFavorite={handleToggleFavorite}
+            favoritePhotoIds={favoritePhotoIds}
+            allowDownloads={allowDownloads}
           />
         )}
       </main>
+
+      {/* Sección de Testimonios */}
+      {allowComments && clientEmail && (
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <TestimonialForm galleryId={galleryId} galleryTitle={title} />
+        </div>
+      )}
+
+      {/* Floating Favorites Selector */}
+      {maxFavorites > 0 && clientEmail && (
+        <FavoritesSelector
+          favoritesCount={favoritePhotoIds.length}
+          maxFavorites={maxFavorites}
+          selectedPhotoIds={favoritePhotoIds}
+          photos={photos}
+          galleryId={galleryId}
+          clientEmail={clientEmail}
+          onRemoveFavorite={handleToggleFavorite}
+        />
+      )}
+
+      {/* Email Prompt Modal */}
+      <AnimatePresence>
+        {showEmailPrompt && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              onClick={() => setShowEmailPrompt(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 50 }}
+              className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-md bg-white rounded-2xl shadow-2xl z-50 p-8"
+            >
+              <h2 className="font-voga text-2xl text-black mb-3">
+                Ingresa tu Email
+              </h2>
+              <p className="font-fira text-sm text-gray-600 mb-6">
+                Para seleccionar tus fotos favoritas, necesitamos tu email
+              </p>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const email = e.target.email.value;
+                  if (email) handleEmailSubmit(email);
+                }}
+              >
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="tu@email.com"
+                  required
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl font-fira text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl font-fira font-semibold transition-all"
+                >
+                  Continuar
+                </button>
+              </form>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Lightbox */}
       <AnimatePresence>

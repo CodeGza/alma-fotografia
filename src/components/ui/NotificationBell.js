@@ -85,19 +85,10 @@ export default function NotificationBell({ className = '', isMobile = false }) {
               filter: `user_id=eq.${user.id}`,
             },
             (payload) => {
-              console.log('📬 Notificación recibida en tiempo real:', payload);
               loadNotifications();
             }
           )
-          .subscribe((status, err) => {
-            if (status === 'SUBSCRIBED') {
-              console.log('✅ Realtime conectado correctamente');
-            } else if (status === 'CHANNEL_ERROR') {
-              console.warn('⚠️ Error de canal Realtime (usando polling):', err);
-            } else if (status === 'CLOSED') {
-              console.log('📪 Canal Realtime cerrado (usando polling)');
-            }
-          });
+          .subscribe();
       } catch (error) {
         console.warn('⚠️ Realtime no disponible, usando polling:', error);
       }

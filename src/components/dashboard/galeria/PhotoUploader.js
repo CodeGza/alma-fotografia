@@ -230,7 +230,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
       }
 
       // ==========================================
-      // PASO 1: Subir a Cloudinary primero
+      // PASO 1: Subir a Cloudinary con retry automático
       // ==========================================
 
       setUploadProgress(prev => ({
@@ -243,19 +243,43 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
       formData.append('folder', `galleries/${galleryId}`);
       formData.append('resourceType', 'image');
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      // ✅ Retry logic: 3 intentos con backoff exponencial
+      let result = null;
+      const MAX_RETRIES = 3;
 
-      if (!response.ok) {
-        throw new Error('Error al subir imagen a Cloudinary');
-      }
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
 
-      const result = await response.json();
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: Error al subir imagen`);
+          }
 
-      if (!result.success) {
-        throw new Error(result.error || 'Upload to Cloudinary failed');
+          result = await response.json();
+
+          if (!result.success) {
+            throw new Error(result.error || 'Upload to Cloudinary failed');
+          }
+
+          // ✅ Upload exitoso, salir del loop
+          break;
+
+        } catch (error) {
+          console.warn(`⚠️ Intento ${attempt}/${MAX_RETRIES} falló para ${prettyFileName}:`, error.message);
+
+          // Si es el último intento, lanzar error
+          if (attempt === MAX_RETRIES) {
+            throw new Error(`Error después de ${MAX_RETRIES} intentos: ${error.message}`);
+          }
+
+          // Esperar antes de reintentar (backoff exponencial: 2s, 4s, 8s)
+          const waitTime = Math.pow(2, attempt) * 1000;
+          console.log(`⏳ Esperando ${waitTime/1000}s antes de reintentar...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
       }
 
       uploadedCloudinaryUrl = result.url; // ✅ Guardar para posible rollback
@@ -334,21 +358,28 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
 
     setUploading(true);
 
+    // ✅ Batch size de 3 para evitar saturar servidor y Cloudinary
     const BATCH_SIZE = 3;
     const batches = [];
 
+    // Crear batches con índice global correcto
     for (let i = 0; i < selectedFiles.length; i += BATCH_SIZE) {
-      batches.push(selectedFiles.slice(i, i + BATCH_SIZE));
+      batches.push({
+        files: selectedFiles.slice(i, i + BATCH_SIZE),
+        startIndex: i, // ✅ Guardar índice inicial del batch
+      });
     }
 
+    // Procesar cada batch secuencialmente
     for (const batch of batches) {
       await Promise.all(
-        batch.map((fileData, index) =>
-          uploadSinglePhoto(fileData, index)
+        batch.files.map((fileData, batchIndex) =>
+          uploadSinglePhoto(fileData, batch.startIndex + batchIndex) // ✅ Usar índice global
         )
       );
     }
 
+    // Cleanup
     selectedFiles.forEach(f => {
       if (f.preview) {
         URL.revokeObjectURL(f.preview);

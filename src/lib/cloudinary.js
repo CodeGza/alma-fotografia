@@ -55,6 +55,10 @@ export const uploadToCloudinary = async (file, options = {}) => {
       folder: options.folder || 'alma-fotografia',
       resource_type: options.resourceType || 'image',
 
+      // ⏱️ TIMEOUT EXTENDIDO: 5 minutos para archivos grandes
+      // Default 60s es insuficiente para fotos de alta calidad en conexiones lentas
+      timeout: 300000, // 5 minutos
+
       // ✅ TRANSFORMACIONES DE RESPALDO (garantizan optimización PROFESIONAL)
       // Configuración optimizada para plan gratuito long-term
       transformation: [

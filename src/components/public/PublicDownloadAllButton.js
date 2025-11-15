@@ -14,10 +14,17 @@ import { saveAs } from 'file-saver';
  * - Retry automático con backoff
  * - Manejo robusto de errores
  */
-export default function PublicDownloadAllButton({ photos, galleryTitle }) {
-    const [isDownloading, setIsDownloading] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const [status, setStatus] = useState('');
+export default function PublicDownloadAllButton({
+  photos,
+  galleryTitle,
+  favoritePhotoIds = [],
+  showFavoritesOption = false,
+}) {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState('');
+  const [downloadType, setDownloadType] = useState('all'); // 'all' | 'favorites'
+  const [showMenu, setShowMenu] = useState(false);
 
     /**
      * Obtiene la URL de máxima calidad desde Cloudinary
@@ -68,11 +75,24 @@ export default function PublicDownloadAllButton({ photos, galleryTitle }) {
         }
     };
 
-    const handleDownloadAll = async () => {
-        if (!photos || photos.length === 0) {
+    const handleDownloadAll = async (type = 'all') => {
+        // Filtrar fotos según el tipo seleccionado
+        let photosToDownload = photos;
+
+        if (type === 'favorites') {
+            if (!favoritePhotoIds || favoritePhotoIds.length === 0) {
+                alert('No has seleccionado ninguna foto favorita');
+                return;
+            }
+            photosToDownload = photos.filter(p => favoritePhotoIds.includes(p.id));
+        }
+
+        if (!photosToDownload || photosToDownload.length === 0) {
             alert('No hay fotos para descargar');
             return;
         }
+
+        setShowMenu(false);
 
         setIsDownloading(true);
         setProgress(0);
@@ -80,7 +100,7 @@ export default function PublicDownloadAllButton({ photos, galleryTitle }) {
 
         try {
             const zip = new JSZip();
-            const total = photos.length;
+            const total = photosToDownload.length;
             let completedCount = 0;
             let successCount = 0;
             let errorCount = 0;
@@ -162,8 +182,8 @@ export default function PublicDownloadAllButton({ photos, galleryTitle }) {
              */
             setStatus('Descargando fotos...');
 
-            for (let i = 0; i < photos.length; i += BATCH_SIZE) {
-                const batch = photos.slice(i, i + BATCH_SIZE);
+            for (let i = 0; i < photosToDownload.length; i += BATCH_SIZE) {
+                const batch = photosToDownload.slice(i, i + BATCH_SIZE);
 
                 const promises = batch.map((photo, batchIndex) =>
                     downloadPhoto(photo, i + batchIndex)
@@ -177,7 +197,7 @@ export default function PublicDownloadAllButton({ photos, galleryTitle }) {
                 setStatus(`Descargadas ${completedCount} de ${total}...`);
 
                 // Pequeña pausa entre lotes para no saturar
-                if (i + BATCH_SIZE < photos.length) {
+                if (i + BATCH_SIZE < photosToDownload.length) {
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
             }
@@ -206,7 +226,8 @@ export default function PublicDownloadAllButton({ photos, galleryTitle }) {
                 .replace(/[^a-z0-9]/gi, '_')
                 .toLowerCase();
 
-            const zipName = `${safeName}_fotos.zip`;
+            const suffix = type === 'favorites' ? '_favoritas' : '_fotos';
+            const zipName = `${safeName}${suffix}.zip`;
 
             // Descargar el ZIP
             setStatus('Iniciando descarga...');
@@ -232,27 +253,64 @@ export default function PublicDownloadAllButton({ photos, galleryTitle }) {
         }
     };
 
+    // Si hay favoritas, mostrar dropdown con opciones
+    if (showFavoritesOption && favoritePhotoIds.length > 0) {
+        return (
+            <div className="relative">
+                <button
+                    onClick={() => setShowMenu(!showMenu)}
+                    disabled={isDownloading}
+                    className="px-4 py-2.5 bg-brown hover:bg-brown/90 text-white rounded-lg transition-all duration-200 flex items-center gap-2 font-fira text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-sm hover:shadow-md"
+                >
+                    <Download size={16} className={isDownloading ? 'animate-bounce' : ''} />
+                    {isDownloading ? (
+                        <span className="hidden sm:inline">
+                            {progress > 0 ? `${progress}%` : 'Preparando...'}
+                        </span>
+                    ) : (
+                        <span className="hidden sm:inline">Descargar</span>
+                    )}
+                </button>
+
+                {showMenu && !isDownloading && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border-2 border-gray-200 overflow-hidden z-50">
+                        <button
+                            onClick={() => handleDownloadAll('all')}
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-200"
+                        >
+                            <div className="font-fira text-sm font-semibold text-black">
+                                Todas las fotos
+                            </div>
+                            <div className="font-fira text-xs text-gray-500 mt-0.5">
+                                {photos.length} fotos
+                            </div>
+                        </button>
+                        <button
+                            onClick={() => handleDownloadAll('favorites')}
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                        >
+                            <div className="font-fira text-sm font-semibold text-pink-600">
+                                Solo favoritas ♥
+                            </div>
+                            <div className="font-fira text-xs text-gray-500 mt-0.5">
+                                {favoritePhotoIds.length} fotos seleccionadas
+                            </div>
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    // Botón simple si no hay favoritas
     return (
         <button
-            onClick={handleDownloadAll}
+            onClick={() => handleDownloadAll('all')}
             disabled={isDownloading || !photos || photos.length === 0}
-            className="
-        px-4 py-2.5 
-        bg-brown hover:bg-brown/90 
-        text-white rounded-lg 
-        transition-all duration-200
-        flex items-center gap-2 
-        font-fira text-sm font-medium
-        disabled:opacity-50 disabled:cursor-not-allowed
-        active:scale-95
-        shadow-sm hover:shadow-md
-      "
+            className="px-4 py-2.5 bg-brown hover:bg-brown/90 text-white rounded-lg transition-all duration-200 flex items-center gap-2 font-fira text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-sm hover:shadow-md"
             title={status || 'Descargar todas las fotos'}
         >
-            <Download
-                size={16}
-                className={isDownloading ? 'animate-bounce' : ''}
-            />
+            <Download size={16} className={isDownloading ? 'animate-bounce' : ''} />
             {isDownloading ? (
                 <span className="hidden sm:inline">
                     {progress > 0 ? `${progress}%` : 'Preparando...'}
@@ -260,12 +318,6 @@ export default function PublicDownloadAllButton({ photos, galleryTitle }) {
             ) : (
                 <span className="hidden sm:inline">Descargar todas</span>
             )}
-            <span className="sr-only">
-                {isDownloading
-                    ? status || `Descargando ${progress}%`
-                    : `Descargar todas las fotos (${photos?.length || 0})`
-                }
-            </span>
         </button>
     );
 }

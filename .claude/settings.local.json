@@ -11,7 +11,20 @@
       "Bash(taskkill /F /PID 13156)",
       "Bash(taskkill //F //PID 13156)",
       "Bash(git add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(pnpm add:*)",
+      "Bash(test:*)",
+      "Bash(taskkill:*)",
+      "Bash(pnpm run dev:*)",
+      "Bash(cat:*)",
+      "Bash(node -e:*)",
+      "Bash(logo_base64.txt)",
+      "Bash(dir:*)",
+      "Bash(del:*)",
+      "Bash(rm:*)",
+      "WebSearch",
+      "Bash(node scripts/upload-logo-to-cloudinary.js:*)",
+      "Bash(npx supabase:*)"
     ],
     "deny": [],
     "ask": []

@@ -179,14 +179,19 @@ export default function ShareGalleryModal({ galleryId, gallerySlug, onClose }) {
     setErrorMessage('');
 
     try {
-      const { error } = await supabase
-        .from('gallery_shares')
-        .update({ is_active: false })
-        .eq('id', existingShare.id);
+      // Llamar a la API que desactiva y envía notificación
+      const response = await fetch('/api/gallery-shares/deactivate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ shareId: existingShare.id }),
+      });
 
-      if (error) {
-        console.error('Error deactivating share:', error);
-        throw new Error('Error al desactivar el enlace');
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Error al desactivar el enlace');
       }
 
       // Reset state

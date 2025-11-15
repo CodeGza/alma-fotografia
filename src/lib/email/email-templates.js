@@ -91,13 +91,10 @@ const baseStyles = `
 `;
 
 function wrapTemplate(content, title) {
-  // Usar URL absoluta para que funcione en emails
-  // Prioridad: 1) NEXT_PUBLIC_SITE_URL, 2) VERCEL_URL, 3) localhost
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
-    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
-    || 'http://localhost:3000';
-
-  const logoUrl = `${siteUrl}/img/logos/logo_BN_SF.png`;
+  // Usar URL de Cloudinary para el logo (funciona en desarrollo y producción)
+  // Si no está configurado, fallback a la URL del sitio
+  const logoUrl = process.env.EMAIL_LOGO_URL
+    || `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/img/logos/logo_BN_SF.png`;
 
   return `
     <!DOCTYPE html>
@@ -338,6 +335,39 @@ export function galleryArchivedEmail({ galleryTitle }) {
 }
 
 /**
+ * Notificación de galería restaurada
+ */
+export function galleryRestoredEmail({ galleryTitle, galleryUrl }) {
+  const content = `
+    <p style="color: #10b981; font-weight: 600;">Galería restaurada</p>
+    <p>La galería <strong>"${galleryTitle}"</strong> ha sido restaurada correctamente.</p>
+
+    <div class="highlight">
+      <p style="margin: 0; color: #79502A; font-weight: 600;">Galería activa nuevamente</p>
+      <p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">
+        La galería vuelve a estar visible en tu listado principal
+      </p>
+    </div>
+
+    <p>Ahora puedes:</p>
+    <ul style="color: #2d2d2d; line-height: 1.8;">
+      <li>Ver y editar la galería</li>
+      <li>Generar nuevos enlaces para compartir</li>
+      <li>Subir más fotos si lo necesitas</li>
+    </ul>
+
+    <center>
+      <a href="${galleryUrl}" class="button">Ver galería →</a>
+    </center>
+  `;
+
+  return {
+    subject: `Galería "${galleryTitle}" restaurada`,
+    html: wrapTemplate(content, 'Galería Restaurada'),
+  };
+}
+
+/**
  * Notificación de galería eliminada
  */
 export function galleryDeletedEmail({ galleryTitle }) {
@@ -380,6 +410,8 @@ export function getEmailTemplate(type, data) {
       return linkDeactivatedEmail(data);
     case 'gallery_archived':
       return galleryArchivedEmail(data);
+    case 'gallery_restored':
+      return galleryRestoredEmail(data);
     case 'gallery_deleted':
       return galleryDeletedEmail(data);
     default:

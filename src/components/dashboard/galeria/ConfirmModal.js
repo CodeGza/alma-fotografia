@@ -1,10 +1,11 @@
 'use client';
 
+import { useState, useRef } from 'react';
 import { X, AlertTriangle, Archive, Trash2, ArchiveRestore } from 'lucide-react';
 
 /**
  * ConfirmModal - Modal de confirmación profesional
- * 
+ *
  * Props:
  * - isOpen: boolean
  * - onClose: función
@@ -28,11 +29,24 @@ export default function ConfirmModal({
   icon,
   count,
 }) {
+  const isConfirmingRef = useRef(false);
+
   if (!isOpen) return null;
 
   const handleConfirm = () => {
-    onConfirm();
-    onClose();
+    if (isConfirmingRef.current) {
+      console.warn('⚠️ Intento de confirmar mientras ya está en proceso');
+      return;
+    }
+
+    isConfirmingRef.current = true;
+    onClose(); // Cerrar modal inmediatamente
+    onConfirm(); // Ejecutar acción
+
+    // Reset después de 2 segundos
+    setTimeout(() => {
+      isConfirmingRef.current = false;
+    }, 2000);
   };
 
   const variantStyles = {

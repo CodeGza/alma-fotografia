@@ -73,8 +73,7 @@ export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: 
 
       if (result.success) {
         setSubmitSuccess(true);
-        setFormData({ clientName: '', clientEmail: initialEmail, message: '', rating: 0 });
-        setTimeout(() => setSubmitSuccess(false), 5000);
+        // No limpiar el formulario ni resetear el éxito - permanente
       } else {
         setError(result.error || 'Error al enviar el testimonio');
       }
@@ -89,54 +88,63 @@ export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: 
   return (
     <section className={compact ? "" : "bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8"}>
       <div className="max-w-2xl mx-auto">
-        {/* Header - oculto en modo compacto */}
-        {!compact && (
-          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-            <div className="p-2 sm:p-3 bg-gradient-to-br from-[#79502A] to-[#8B5A2F] rounded-lg sm:rounded-xl flex-shrink-0">
-              <Star size={20} className="text-yellow-300 fill-yellow-300 sm:w-6 sm:h-6" />
+        {/* Mensaje de agradecimiento permanente después de enviar */}
+        {submitSuccess ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-8 sm:py-12"
+          >
+            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#79502A] to-[#8B5A2F] rounded-full mb-4 sm:mb-6">
+              <CheckCircle2 size={32} className="text-white sm:w-10 sm:h-10" />
             </div>
-            <div className="min-w-0">
-              <h2 className="font-voga text-xl sm:text-2xl md:text-3xl text-black">
-                Comparte tu Experiencia
-              </h2>
-              <p className="font-fira text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
-                Tu opinión es muy importante para nosotros
-              </p>
+            <h3 className="font-voga text-2xl sm:text-3xl md:text-4xl text-black mb-3 sm:mb-4">
+              ¡Gracias por Elegirnos!
+            </h3>
+            <p className="font-fira text-sm sm:text-base text-gray-600 max-w-md mx-auto leading-relaxed mb-2">
+              Tu testimonio ha sido enviado exitosamente.
+            </p>
+            <p className="font-fira text-sm sm:text-base text-gray-600 max-w-md mx-auto leading-relaxed">
+              Tu opinión es muy valiosa y nos ayuda a seguir mejorando cada día.
+            </p>
+            <div className="mt-6 sm:mt-8 flex items-center justify-center gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  size={20}
+                  className="fill-yellow-400 text-yellow-400 sm:w-6 sm:h-6"
+                />
+              ))}
             </div>
-          </div>
-        )}
-
-        {/* Success Message */}
-        <AnimatePresence>
-          {submitSuccess && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-50 border-2 border-green-300 rounded-lg sm:rounded-xl flex items-start gap-2 sm:gap-3"
-            >
-              <CheckCircle2 size={20} className="text-green-600 flex-shrink-0 mt-0.5 sm:w-6 sm:h-6" />
-              <div>
-                <p className="font-fira text-sm font-semibold text-green-800">
-                  ¡Gracias por tu testimonio!
-                </p>
-                <p className="font-fira text-xs text-green-700 mt-1">
-                  Tu mensaje ha sido enviado exitosamente.
-                </p>
+          </motion.div>
+        ) : (
+          <>
+            {/* Header - oculto en modo compacto */}
+            {!compact && (
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <div className="p-2 sm:p-3 bg-gradient-to-br from-[#79502A] to-[#8B5A2F] rounded-lg sm:rounded-xl flex-shrink-0">
+                  <Star size={20} className="text-yellow-300 fill-yellow-300 sm:w-6 sm:h-6" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="font-voga text-xl sm:text-2xl md:text-3xl text-black">
+                    Comparte tu Experiencia
+                  </h2>
+                  <p className="font-fira text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
+                    Tu opinión es muy importante para nosotros
+                  </p>
+                </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )}
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border-2 border-red-300 rounded-lg sm:rounded-xl">
-            <p className="font-fira text-xs sm:text-sm text-red-800">{error}</p>
-          </div>
-        )}
+            {/* Error Message */}
+            {error && (
+              <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border-2 border-red-300 rounded-lg sm:rounded-xl">
+                <p className="font-fira text-xs sm:text-sm text-red-800">{error}</p>
+              </div>
+            )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className={compact ? "space-y-3" : "space-y-6"}>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className={compact ? "space-y-3" : "space-y-6"}>
           {/* Name Input */}
           <div>
             <label className={`block font-fira text-sm font-semibold text-black ${compact ? 'mb-1' : 'mb-2'}`}>
@@ -245,6 +253,8 @@ export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: 
             )}
           </button>
         </form>
+          </>
+        )}
       </div>
     </section>
   );

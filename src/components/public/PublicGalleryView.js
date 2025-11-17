@@ -21,6 +21,7 @@ const PhotoGrid = memo(({
   onPhotoClick,
   onToggleFavorite,
   favoritePhotoIds,
+  maxFavorites,
 }) => {
   return (
     <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
@@ -51,25 +52,27 @@ const PhotoGrid = memo(({
               {/* Overlay en hover */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
 
-              {/* Botón de favorito - siempre visible si está seleccionado, aparece en hover si no */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleFavorite(photo.id);
-                }}
-                className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 ${
-                  isFavorite
-                    ? 'bg-white shadow-md opacity-100'
-                    : 'bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100'
-                }`}
-                title={isFavorite ? 'Quitar de favoritas' : 'Agregar a favoritas'}
-              >
-                <Heart
-                  size={18}
-                  className={isFavorite ? 'fill-rose-500 text-rose-500' : 'text-gray-700'}
-                  strokeWidth={1.5}
-                />
-              </button>
+              {/* Botón de favorito - solo si maxFavorites > 0 */}
+              {maxFavorites > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleFavorite(photo.id);
+                  }}
+                  className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 ${
+                    isFavorite
+                      ? 'bg-white shadow-md opacity-100'
+                      : 'bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100'
+                  }`}
+                  title={isFavorite ? 'Quitar de favoritas' : 'Agregar a favoritas'}
+                >
+                  <Heart
+                    size={18}
+                    className={isFavorite ? 'fill-rose-500 text-rose-500' : 'text-gray-700'}
+                    strokeWidth={1.5}
+                  />
+                </button>
+              )}
             </div>
           </div>
         );
@@ -276,6 +279,11 @@ export default function PublicGalleryView({ gallery, token }) {
 
   // Toggle favorito
   const handleToggleFavorite = async (photoId) => {
+    // Si maxFavorites es 0, desactivar completamente esta funcionalidad
+    if (maxFavorites === 0) {
+      return;
+    }
+
     if (hasSubmitted && !isEditingAfterSubmit) {
       return;
     }
@@ -795,6 +803,7 @@ export default function PublicGalleryView({ gallery, token }) {
             onPhotoClick={openLightbox}
             onToggleFavorite={handleToggleFavorite}
             favoritePhotoIds={favoritePhotoIds}
+            maxFavorites={maxFavorites}
           />
         )}
       </main>

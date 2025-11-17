@@ -67,25 +67,28 @@ async function FavoritesGalleryContent({ slug, hash, token }) {
     notFound();
   }
 
-  // Obtener galería
-  const { data: gallery, error: galleryError } = await supabase
-    .from('galleries')
-    .select('*')
-    .eq('id', shareData.gallery_id)
-    .eq('slug', slug)
-    .single();
+  // Obtener galería Y favoritos en paralelo (optimización)
+  const [galleryResult, favoritesResult] = await Promise.all([
+    supabase
+      .from('galleries')
+      .select('*')
+      .eq('id', shareData.gallery_id)
+      .eq('slug', slug)
+      .single(),
+    supabase
+      .from('favorites')
+      .select('photo_id')
+      .eq('gallery_id', shareData.gallery_id)
+      .eq('client_email', clientEmail.toLowerCase().trim())
+  ]);
+
+  const { data: gallery, error: galleryError } = galleryResult;
+  const { data: favorites, error: favError } = favoritesResult;
 
   if (galleryError || !gallery) {
     console.error('❌ Gallery not found');
     notFound();
   }
-
-  // Obtener IDs de fotos favoritas del cliente
-  const { data: favorites, error: favError } = await supabase
-    .from('favorites')
-    .select('photo_id')
-    .eq('gallery_id', gallery.id)
-    .eq('client_email', clientEmail.toLowerCase().trim());
 
   if (favError) {
     console.error('❌ Error loading favorites:', favError);
@@ -99,10 +102,10 @@ async function FavoritesGalleryContent({ slug, hash, token }) {
 
   const favoritePhotoIds = favorites.map(f => f.photo_id);
 
-  // Obtener SOLO las fotos favoritas
+  // Obtener SOLO las fotos favoritas (query optimizada)
   const { data: photos, error: photosError } = await supabase
     .from('photos')
-    .select('*')
+    .select('id, gallery_id, file_name, file_path, cloudinary_url, display_order, created_at')
     .eq('gallery_id', gallery.id)
     .in('id', favoritePhotoIds)
     .order('display_order', { ascending: true });

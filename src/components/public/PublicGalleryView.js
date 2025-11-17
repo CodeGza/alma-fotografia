@@ -113,6 +113,7 @@ export default function PublicGalleryView({ gallery, token }) {
   const [hasSeenMessage, setHasSeenMessage] = useState(false);
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
   const favoritesDebounceRef = useRef(null);
+  const lastNotificationSentRef = useRef(false);
   const { showToast } = useToast();
 
   const {
@@ -247,27 +248,50 @@ export default function PublicGalleryView({ gallery, token }) {
     // Limpiar timer anterior si existe
     if (favoritesDebounceRef.current) {
       clearTimeout(favoritesDebounceRef.current);
+      console.log('[Debounce] Timer reseteado - nueva actividad detectada');
     }
 
     // Programar nuevo auto-submit para 5 minutos (300000 ms)
     favoritesDebounceRef.current = setTimeout(async () => {
-      if (clientEmail && favoritePhotoIds.length > 0 && !hasSubmitted) {
-        console.log('[Auto-Submit] Enviando favoritos después de 5 minutos de inactividad...');
-        try {
-          const result = await submitFavoritesSelection(galleryId, clientEmail, clientName);
-          if (result.success) {
-            setHasSubmitted(true);
-            showToast({
-              message: 'Tu selección ha sido enviada automáticamente',
-              type: 'success'
-            });
-          }
-        } catch (error) {
-          console.error('[Auto-Submit] Error:', error);
+      console.log('[Debounce] 5 minutos de inactividad - enviando notificación...');
+
+      if (!clientEmail) {
+        console.log('[Debounce] No hay email del cliente, cancelando');
+        return;
+      }
+
+      if (favoritePhotoIds.length === 0) {
+        console.log('[Debounce] No hay favoritos seleccionados, cancelando');
+        return;
+      }
+
+      // Evitar enviar notificación duplicada
+      if (lastNotificationSentRef.current) {
+        console.log('[Debounce] Notificación ya enviada, cancelando');
+        return;
+      }
+
+      try {
+        console.log(`[Debounce] Enviando notificación para ${favoritePhotoIds.length} favoritos`);
+        const result = await submitFavoritesSelection(galleryId, clientEmail, clientName);
+
+        if (result.success) {
+          lastNotificationSentRef.current = true;
+          console.log('[Debounce] Notificación enviada exitosamente');
+          showToast({
+            message: 'Tu selección ha sido guardada',
+            type: 'success'
+          });
+        } else {
+          console.error('[Debounce] Error al enviar notificación:', result.error);
         }
+      } catch (error) {
+        console.error('[Debounce] Error inesperado:', error);
       }
     }, 300000); // 5 minutos
-  }, [clientEmail, clientName, favoritePhotoIds.length, galleryId, hasSubmitted, showToast]);
+
+    console.log('[Debounce] Nuevo timer de 5 minutos iniciado');
+  }, [clientEmail, clientName, galleryId, showToast]);
 
   // Limpiar timer al desmontar componente
   useEffect(() => {
@@ -308,6 +332,7 @@ export default function PublicGalleryView({ gallery, token }) {
     try {
       const result = await toggleFavorite(galleryId, photoId, clientEmail, maxFavorites, clientName);
       if (!result.success) {
+        // Revertir cambio si falló
         if (wasFavorite) {
           setFavoritePhotoIds(prev => [...prev, photoId]);
         } else {
@@ -315,15 +340,22 @@ export default function PublicGalleryView({ gallery, token }) {
         }
         showToast({ message: result.error || 'Error al actualizar favorita', type: 'error' });
       } else {
+        // Resetear flag de notificación enviada si se hace un nuevo cambio
+        lastNotificationSentRef.current = false;
+
         // Resetear el timer de auto-submit después de cada cambio exitoso
         scheduleAutoSubmit();
+
+        console.log(`[Toggle] Favorito ${wasFavorite ? 'removido' : 'agregado'}, timer reseteado`);
       }
     } catch (error) {
+      // Revertir cambio si hubo error
       if (wasFavorite) {
         setFavoritePhotoIds(prev => [...prev, photoId]);
       } else {
         setFavoritePhotoIds(prev => prev.filter(id => id !== photoId));
       }
+      console.error('[Toggle] Error:', error);
     }
   };
 

@@ -40,7 +40,7 @@ const PhotoGrid = memo(({
               onClick={() => onPhotoClick(photo, index)}
             >
               <Image
-                src={photo.cloudinary_url || photo.file_path}
+                src={photo.file_path}
                 alt={`${galleryTitle} - ${photo.file_name || `Foto ${index + 1}`}`}
                 width={1200}
                 height={1200}
@@ -629,7 +629,7 @@ export default function PublicGalleryView({ gallery, token }) {
   // Descargar foto individual
   const handleDownloadPhoto = async (photo) => {
     try {
-      const url = photo.cloudinary_url || photo.file_path;
+      const url = photo.file_path;
 
       // Si es URL de Cloudinary, obtener la versión de máxima calidad
       let downloadUrl = url;

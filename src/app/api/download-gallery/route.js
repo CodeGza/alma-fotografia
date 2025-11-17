@@ -55,9 +55,9 @@ export async function GET(request) {
     // Obtener todas las fotos de la galería
     const { data: photos, error: photosError } = await supabase
       .from('photos')
-      .select('id, file_name, cloudinary_url, file_path')
+      .select('id, file_name, file_path')
       .eq('gallery_id', galleryId)
-      .order('order_index', { ascending: true });
+      .order('display_order', { ascending: true });
 
     if (photosError) {
       throw new Error('Error al obtener fotos: ' + photosError.message);
@@ -77,7 +77,7 @@ export async function GET(request) {
     // Descargar y agregar cada foto al ZIP
     for (let i = 0; i < photos.length; i++) {
       const photo = photos[i];
-      const url = photo.cloudinary_url || photo.file_path;
+      const url = photo.file_path;
 
       // Obtener la versión de máxima calidad de Cloudinary
       let downloadUrl = url;
@@ -96,8 +96,10 @@ export async function GET(request) {
 
         const arrayBuffer = await response.arrayBuffer();
 
-        // Generar nombre de archivo
-        const fileName = photo.file_name || `foto-${i + 1}.jpg`;
+        // Generar nombre coherente: slug-galeria-001.jpg
+        const paddedNumber = String(i + 1).padStart(3, '0');
+        const extension = photo.file_name ? photo.file_name.split('.').pop() : 'jpg';
+        const fileName = `${gallery.slug || 'galeria'}-${paddedNumber}.${extension}`;
 
         // Agregar al ZIP
         folder.file(fileName, arrayBuffer);

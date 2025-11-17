@@ -11,7 +11,7 @@ import { createTestimonial } from '@/app/actions/testimonial-actions';
  * Permite a los clientes dejar un comentario y calificación
  * sobre su experiencia con la galería/fotógrafo
  */
-export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: initialEmail = '' }) {
+export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: initialEmail = '', compact = false }) {
   // Pre-cargar nombre y email desde localStorage si están disponibles
   const getInitialName = () => {
     if (typeof window === 'undefined') return '';
@@ -87,22 +87,24 @@ export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: 
   };
 
   return (
-    <section className="bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
+    <section className={compact ? "" : "bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8"}>
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-          <div className="p-2 sm:p-3 bg-gradient-to-br from-[#79502A] to-[#8B5A2F] rounded-lg sm:rounded-xl flex-shrink-0">
-            <Star size={20} className="text-yellow-300 fill-yellow-300 sm:w-6 sm:h-6" />
+        {/* Header - oculto en modo compacto */}
+        {!compact && (
+          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-[#79502A] to-[#8B5A2F] rounded-lg sm:rounded-xl flex-shrink-0">
+              <Star size={20} className="text-yellow-300 fill-yellow-300 sm:w-6 sm:h-6" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="font-voga text-xl sm:text-2xl md:text-3xl text-black">
+                Comparte tu Experiencia
+              </h2>
+              <p className="font-fira text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
+                Tu opinión es muy importante para nosotros
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <h2 className="font-voga text-xl sm:text-2xl md:text-3xl text-black">
-              Comparte tu Experiencia
-            </h2>
-            <p className="font-fira text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
-              Tu opinión es muy importante para nosotros
-            </p>
-          </div>
-        </div>
+        )}
 
         {/* Success Message */}
         <AnimatePresence>
@@ -134,10 +136,10 @@ export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: 
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className={compact ? "space-y-3" : "space-y-6"}>
           {/* Name Input */}
           <div>
-            <label className="block font-fira text-sm font-semibold text-black mb-2">
+            <label className={`block font-fira text-sm font-semibold text-black ${compact ? 'mb-1' : 'mb-2'}`}>
               Tu Nombre *
             </label>
             <input
@@ -145,14 +147,14 @@ export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: 
               value={formData.clientName}
               onChange={(e) => setFormData(prev => ({ ...prev, clientName: e.target.value }))}
               placeholder="Ej: María García"
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl font-fira text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent transition-all"
+              className={`w-full px-3 ${compact ? 'py-2' : 'py-3'} border-2 border-gray-300 rounded-lg font-fira text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent transition-all`}
               disabled={isSubmitting}
             />
           </div>
 
           {/* Email Input */}
           <div>
-            <label className="block font-fira text-sm font-semibold text-black mb-2">
+            <label className={`block font-fira text-sm font-semibold text-black ${compact ? 'mb-1' : 'mb-2'}`}>
               Tu Email *
             </label>
             <input
@@ -160,17 +162,19 @@ export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: 
               value={formData.clientEmail}
               onChange={(e) => setFormData(prev => ({ ...prev, clientEmail: e.target.value }))}
               placeholder="Ej: maria@ejemplo.com"
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl font-fira text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent transition-all"
+              className={`w-full px-3 ${compact ? 'py-2' : 'py-3'} border-2 border-gray-300 rounded-lg font-fira text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent transition-all`}
               disabled={isSubmitting}
             />
-            <p className="font-fira text-xs text-gray-500 mt-2">
-              Solo puedes enviar un testimonio por galería
-            </p>
+            {!compact && (
+              <p className="font-fira text-xs text-gray-500 mt-2">
+                Solo puedes enviar un testimonio por galería
+              </p>
+            )}
           </div>
 
           {/* Rating */}
           <div>
-            <label className="block font-fira text-sm font-semibold text-black mb-3">
+            <label className={`block font-fira text-sm font-semibold text-black ${compact ? 'mb-1.5' : 'mb-3'}`}>
               Calificación (opcional)
             </label>
             <div className="flex items-center gap-2">
@@ -185,7 +189,7 @@ export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: 
                   className="transition-transform hover:scale-110 disabled:cursor-not-allowed"
                 >
                   <Star
-                    size={32}
+                    size={compact ? 28 : 32}
                     className={`${
                       star <= (hoveredRating || formData.rating)
                         ? 'fill-yellow-400 text-yellow-400'
@@ -195,7 +199,7 @@ export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: 
                 </button>
               ))}
               {formData.rating > 0 && (
-                <span className="ml-2 font-fira text-sm text-gray-600">
+                <span className="ml-2 font-fira text-xs sm:text-sm text-gray-600">
                   {formData.rating} {formData.rating === 1 ? 'estrella' : 'estrellas'}
                 </span>
               )}
@@ -204,27 +208,29 @@ export default function TestimonialForm({ galleryId, galleryTitle, clientEmail: 
 
           {/* Message Textarea */}
           <div>
-            <label className="block font-fira text-sm font-semibold text-black mb-2">
+            <label className={`block font-fira text-sm font-semibold text-black ${compact ? 'mb-1' : 'mb-2'}`}>
               Tu Mensaje *
             </label>
             <textarea
               value={formData.message}
               onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
               placeholder="Cuéntanos sobre tu experiencia con las fotos..."
-              rows={5}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl font-fira text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent transition-all resize-none"
+              rows={compact ? 3 : 5}
+              className={`w-full px-3 ${compact ? 'py-2' : 'py-3'} border-2 border-gray-300 rounded-lg font-fira text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent transition-all resize-none`}
               disabled={isSubmitting}
             />
-            <p className="font-fira text-xs text-gray-500 mt-2">
-              Mínimo 10 caracteres
-            </p>
+            {!compact && (
+              <p className="font-fira text-xs text-gray-500 mt-2">
+                Mínimo 10 caracteres
+              </p>
+            )}
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={isSubmitting || !formData.clientName.trim() || !formData.clientEmail.trim() || !formData.message.trim()}
-            className="w-full py-3 bg-gradient-to-r from-[#79502A] to-[#8B5A2F] hover:from-[#8B5A2F] hover:to-[#9A6B3C] disabled:from-gray-300 disabled:to-gray-300 text-white rounded-xl font-fira font-semibold flex items-center justify-center gap-2 transition-all disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+            className={`w-full ${compact ? 'py-2.5' : 'py-3'} bg-gradient-to-r from-[#79502A] to-[#8B5A2F] hover:from-[#8B5A2F] hover:to-[#9A6B3C] disabled:from-gray-300 disabled:to-gray-300 text-white rounded-lg font-fira font-semibold flex items-center justify-center gap-2 transition-all disabled:cursor-not-allowed shadow-lg hover:shadow-xl`}
           >
             {isSubmitting ? (
               <>

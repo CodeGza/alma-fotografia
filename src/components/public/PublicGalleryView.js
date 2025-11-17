@@ -822,18 +822,22 @@ export default function PublicGalleryView({ gallery, token }) {
         )}
       </main>
 
-      {/* ===== SECCIÓN DE TESTIMONIOS ===== */}
-      {allowComments && clientEmail && (
-        <div className="px-4 sm:px-6 py-10 sm:py-16">
-          <div className="max-w-4xl mx-auto">
-            <TestimonialForm
-              galleryId={galleryId}
-              galleryTitle={title}
-              clientEmail={clientEmail}
-            />
+      {/* ===== FOOTER ===== */}
+      <footer className="bg-gradient-to-br from-gray-50 to-white border-t border-gray-200 py-8 sm:py-12">
+        <div className="px-4 sm:px-6 max-w-6xl mx-auto">
+          <div className="text-center">
+            <h3 className="font-voga text-2xl sm:text-3xl text-black mb-2">
+              Alma Fotografía
+            </h3>
+            <p className="font-fira text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
+              Capturando momentos únicos e irrepetibles con dedicación y pasión
+            </p>
+            <p className="font-fira text-xs text-gray-400 mt-4">
+              © {new Date().getFullYear()} Alma Fotografía. Todos los derechos reservados.
+            </p>
           </div>
         </div>
-      )}
+      </footer>
 
       {/* ===== MODAL MENSAJE PERSONALIZADO ===== */}
       <AnimatePresence>
@@ -1242,27 +1246,28 @@ export default function PublicGalleryView({ gallery, token }) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl bg-white rounded-2xl shadow-2xl z-50 overflow-y-auto max-h-[90vh]"
+              className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-xl bg-white rounded-xl sm:rounded-2xl shadow-2xl z-50 max-h-[95vh] flex flex-col"
             >
               {/* Header del Modal */}
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                <h3 className="font-voga text-2xl text-black">
+              <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-xl sm:rounded-t-2xl flex-shrink-0">
+                <h3 className="font-voga text-xl sm:text-2xl text-black">
                   Dejar un Testimonio
                 </h3>
                 <button
                   onClick={() => setShowTestimonialModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
                 >
-                  <X size={20} strokeWidth={1.5} className="text-black/60" />
+                  <X size={18} strokeWidth={1.5} className="text-black/60 sm:w-5 sm:h-5" />
                 </button>
               </div>
 
               {/* Contenido del Modal */}
-              <div className="p-6">
+              <div className="p-4 sm:p-6 overflow-y-auto flex-1">
                 <TestimonialForm
                   galleryId={galleryId}
                   galleryTitle={title}
                   clientEmail={clientEmail}
+                  compact={true}
                 />
               </div>
             </motion.div>

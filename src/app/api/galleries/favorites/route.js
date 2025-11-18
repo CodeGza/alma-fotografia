@@ -4,7 +4,7 @@ import { notifyFavoritesSelected } from '@/lib/notifications/notification-helper
 /**
  * POST /api/galleries/favorites
  *
- * Registra que un cliente seleccionó favoritos y envía notificación al fotógrafo
+ * Registra que un cliente seleccionó favoritos y envía notificación a la fotógrafa
  *
  * Body:
  * {

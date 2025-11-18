@@ -33,6 +33,7 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
     service_type,
     allow_downloads,
     password,
+    download_pin,
     has_active_link,
     favorites_count = 0,
     archived_at,
@@ -224,6 +225,16 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
               <div className="flex items-center gap-2 text-white/60">
                 <Mail size={12} className="flex-shrink-0" />
                 <span className="font-fira text-xs truncate">{client_email}</span>
+              </div>
+            )}
+
+            {/* PIN de descarga */}
+            {allow_downloads && download_pin && (
+              <div className="flex items-center gap-2">
+                <Lock size={12} className="flex-shrink-0 text-[#b8824f]" />
+                <span className="font-fira text-xs font-semibold text-[#b8824f]">
+                  Pin de descarga: {download_pin}
+                </span>
               </div>
             )}
           </div>

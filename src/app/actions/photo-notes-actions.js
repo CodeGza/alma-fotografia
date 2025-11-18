@@ -7,7 +7,7 @@ import { createClient } from '@/lib/server';
  * SERVER ACTIONS - NOTAS EN FOTOS FAVORITAS
  * ============================================
  *
- * Acciones para que el fotógrafo agregue notas
+ * Acciones para que la fotógrafa agregue notas
  * en las fotos favoritas de los clientes
  */
 

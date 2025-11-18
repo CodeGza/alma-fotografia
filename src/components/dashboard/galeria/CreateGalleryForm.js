@@ -75,7 +75,6 @@ export default function CreateGalleryForm() {
             slug: '',
             description: '',
             eventDate: '',
-            clientEmail: '',
             isPublic: false,
             serviceType: '',
             customMessage: '',
@@ -83,6 +82,7 @@ export default function CreateGalleryForm() {
             allowDownloads: true,
             allowComments: true,
             maxFavorites: 150,
+            downloadPin: '',
         }
     });
 
@@ -283,71 +283,59 @@ export default function CreateGalleryForm() {
                 return;
             }
 
-            console.log('✅ Tipo de servicio:', data.serviceType);
+            // ✅ OPTIMIZACIÓN: Verificaciones en paralelo
+            const [publicGalleryCheck, slugCheck, uploadResult] = await Promise.all([
+                // 1. Verificar galería pública (solo si aplica)
+                data.isPublic && data.serviceType
+                    ? supabase
+                        .from('galleries')
+                        .select('id, title')
+                        .eq('is_public', true)
+                        .eq('service_type', data.serviceType)
+                        .maybeSingle()
+                    : Promise.resolve({ data: null }),
 
-            // ✅ Validar galería pública única por servicio
-            if (data.isPublic && data.serviceType) {
-                console.log('🔍 Verificando galerías públicas existentes...');
-
-                const { data: existing, error: checkError } = await supabase
+                // 2. Verificar slug duplicado
+                supabase
                     .from('galleries')
-                    .select('id')
-                    .eq('is_public', true)
-                    .eq('service_type', data.serviceType)
-                    .single();
+                    .select('id, title')
+                    .eq('slug', data.slug.trim())
+                    .maybeSingle(),
 
-                if (checkError && checkError.code !== 'PGRST116') {
-                    // PGRST116 = no rows returned (está bien, no hay duplicados)
-                    console.error('❌ Error verificando galerías:', checkError);
-                    throw checkError;
-                }
+                // 3. Subir imagen en paralelo
+                uploadCoverImage()
+            ]);
 
-                if (existing) {
-                    console.log('⚠️ Ya existe galería pública con este servicio:', existing.title);
-                    showModal({
-                        title: 'Ya existe una galería pública para este servicio',
-                        message: `La galería "${existing.title}" ya está configurada como pública para este tipo de servicio. Solo puede haber una galería pública por servicio.\n\n¿Qué deseas hacer?`,
-                        type: 'warning',
-                        confirmText: 'Crear como privada',
-                        cancelText: 'Ver galería existente',
-                        onConfirm: () => {
-                            // Cambiar a privada y continuar con la creación
-                            setValue('isPublic', false);
-                            console.log('✅ Cambiando a galería privada');
-                            // Re-ejecutar el submit
-                            handleSubmit(onSubmit)();
-                        },
-                        onCancel: () => {
-                            // Navegar a la galería existente
-                            router.push(`/dashboard/galerias/${existing.id}`);
-                        }
-                    });
-                    return;
-                }
+            // Manejar galería pública duplicada
+            if (publicGalleryCheck.data) {
+                showModal({
+                    title: 'Ya existe una galería pública para este servicio',
+                    message: `La galería "${publicGalleryCheck.data.title}" ya está configurada como pública para este tipo de servicio. Solo puede haber una galería pública por servicio.\n\n¿Qué deseas hacer?`,
+                    type: 'warning',
+                    confirmText: 'Crear como privada',
+                    cancelText: 'Ver galería existente',
+                    onConfirm: () => {
+                        setValue('isPublic', false);
+                        handleSubmit(onSubmit)();
+                    },
+                    onCancel: () => {
+                        router.push(`/dashboard/galerias/${publicGalleryCheck.data.id}`);
+                    }
+                });
+                return;
             }
 
-            // Verificar que el slug no exista antes de subir la portada
-            console.log('🔍 Verificando slug:', data.slug);
-            const { data: existingSlug } = await supabase
-                .from('galleries')
-                .select('id, title')
-                .eq('slug', data.slug.trim())
-                .maybeSingle();
-
-            if (existingSlug) {
-                console.log('⚠️ Slug duplicado encontrado:', existingSlug);
+            // Manejar slug duplicado
+            if (slugCheck.data) {
                 showModal({
                     title: 'URL duplicada',
-                    message: `Ya existe una galería con esta URL (${data.slug}). La galería existente se llama: "${existingSlug.title}". Por favor elige otra URL.`,
+                    message: `Ya existe una galería con esta URL (${data.slug}). La galería existente se llama: "${slugCheck.data.title}". Por favor elige otra URL.`,
                     type: 'error'
                 });
                 return;
             }
 
-            // Subir portada si existe
-            console.log('📸 Subiendo imagen de portada...');
-            uploadedCoverUrl = await uploadCoverImage();
-            console.log('✅ Imagen subida:', uploadedCoverUrl || 'Sin imagen');
+            uploadedCoverUrl = uploadResult;
 
             // Preparar datos
             const galleryData = {
@@ -355,7 +343,6 @@ export default function CreateGalleryForm() {
                 slug: data.slug.trim(),
                 description: data.description?.trim() || null,
                 event_date: data.eventDate || null,
-                client_email: data.clientEmail?.trim() || null,
                 cover_image: uploadedCoverUrl,
                 is_public: data.isPublic,
                 created_by: user.id,
@@ -366,9 +353,8 @@ export default function CreateGalleryForm() {
                 allow_downloads: data.allowDownloads,
                 allow_comments: data.allowComments,
                 max_favorites: data.maxFavorites || 150,
+                download_pin: data.downloadPin?.trim() || null,
             };
-
-            console.log('💾 Insertando galería en Supabase:', galleryData);
 
             const { data: gallery, error } = await supabase
                 .from('galleries')
@@ -680,27 +666,6 @@ export default function CreateGalleryForm() {
                         />
                     </div>
 
-                    {/* Email cliente */}
-                    <div>
-                        <label className="block font-fira text-sm font-medium text-black mb-2 flex items-center gap-2">
-                            <Mail size={16} className="text-[#79502A]" />
-                            Email del cliente
-                        </label>
-                        <input
-                            type="email"
-                            {...register('clientEmail')}
-                            placeholder="cliente@ejemplo.com"
-                            className={`w-full px-4 py-3 border rounded-lg font-fira text-sm text-black 
-                                focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 transition-all
-                                ${errors.clientEmail
-                                    ? 'border-red-300'
-                                    : 'border-gray-300 hover:border-gray-400'
-                                }`}
-                        />
-                        {errors.clientEmail && (
-                            <p className="mt-2 font-fira text-sm text-red-600">{errors.clientEmail.message}</p>
-                        )}
-                    </div>
                 </motion.div>
 
                 {/* Imagen de portada */}
@@ -833,6 +798,39 @@ export default function CreateGalleryForm() {
                             </p>
                         </label>
                     </div>
+
+                    {/* PIN de descarga (solo si descargas están habilitadas) */}
+                    {watch('allowDownloads') && (
+                        <div className="ml-8 -mt-2">
+                            <label className="block font-fira text-sm font-medium text-black mb-2">
+                                PIN de descarga (opcional)
+                            </label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    {...register('downloadPin')}
+                                    placeholder="Ej: 1234"
+                                    maxLength={6}
+                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-fira text-sm text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const pin = Math.floor(1000 + Math.random() * 9000).toString();
+                                        setValue('downloadPin', pin);
+                                    }}
+                                    className="px-4 py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg font-fira text-xs font-medium transition-colors whitespace-nowrap"
+                                >
+                                    Generar
+                                </button>
+                            </div>
+                            <p className="font-fira text-xs text-gray-500 mt-2">
+                                {watch('downloadPin')
+                                    ? 'Los clientes necesitarán este PIN para descargar fotos.'
+                                    : 'Deja vacío para no requerir PIN.'}
+                            </p>
+                        </div>
+                    )}
 
                     {/* Permitir comentarios */}
                     <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-300">

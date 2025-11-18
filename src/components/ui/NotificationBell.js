@@ -46,12 +46,26 @@ export default function NotificationBell({ className = '', isMobile = false }) {
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error loading notifications:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        // Si la tabla no existe o no hay permisos, simplemente no mostrar notificaciones
+        setNotifications([]);
+        setUnreadCount(0);
+        setIsLoading(false);
+        return;
+      }
 
       setNotifications(data || []);
       setUnreadCount(data?.filter(n => !n.is_read).length || 0);
     } catch (error) {
-      console.error('Error loading notifications:', error);
+      console.error('Error loading notifications:', error?.message || error);
+      setNotifications([]);
+      setUnreadCount(0);
     } finally {
       setIsLoading(false);
     }

@@ -46,12 +46,6 @@ export const gallerySchema = z.object({
         .optional()
         .or(z.literal('')),
 
-    clientEmail: z
-        .string()
-        .email('Email inválido')
-        .optional()
-        .or(z.literal('')),
-
     isPublic: z.boolean(),
 
     // Nuevo: Tipo de servicio
@@ -84,6 +78,12 @@ export const gallerySchema = z.object({
         .min(0, 'Debe ser un número positivo')
         .max(500, 'Máximo 500 favoritos')
         .optional(),
+
+    downloadPin: z
+        .string()
+        .max(10, 'El PIN no puede superar los 10 caracteres')
+        .optional()
+        .or(z.literal('')),
 });
 
 /**

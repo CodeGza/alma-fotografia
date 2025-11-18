@@ -32,7 +32,8 @@ async function GalleryContent({ galleryId }) {
   // Por qué Promise.all: ejecuta queries en paralelo (más rápido)
   const [
     { data: gallery, error: galleryError },
-    { data: shares, error: sharesError }
+    { data: shares, error: sharesError },
+    { data: photos, error: photosError }
   ] = await Promise.all([
     supabase
       .from('galleries')
@@ -55,24 +56,33 @@ async function GalleryContent({ galleryId }) {
         password,
         expiration_date,
         max_favorites,
-        created_at,
-        photos:photos(
-          id,
-          file_path,
-          file_name,
-          file_size,
-          display_order,
-          created_at
-        )
+        download_pin,
+        show_all_sections,
+        created_at
       `)
       .eq('id', galleryId)
       .single(),
-    
+
     // Query de shares en paralelo
     supabase
       .from('gallery_shares')
       .select('views_count, is_active')
+      .eq('gallery_id', galleryId),
+
+    // Query de fotos ordenadas por display_order
+    supabase
+      .from('photos')
+      .select(`
+        id,
+        file_path,
+        file_name,
+        file_size,
+        display_order,
+        section_id,
+        created_at
+      `)
       .eq('gallery_id', galleryId)
+      .order('display_order', { ascending: true })
   ]);
 
   if (galleryError || !gallery) {
@@ -88,16 +98,12 @@ async function GalleryContent({ galleryId }) {
   // Verificar si hay algún enlace activo
   const hasActiveLink = shares?.some(s => s.is_active) || false;
 
-  // Ordenar fotos por display_order
-  const sortedPhotos = (gallery.photos || []).sort(
-    (a, b) => (a.display_order || 0) - (b.display_order || 0)
-  );
-
+  // Las fotos ya vienen ordenadas por display_order desde la query
   return (
     <GalleryDetailView
       gallery={{
         ...gallery,
-        photos: sortedPhotos,
+        photos: photos || [],
         has_active_link: hasActiveLink,
         views_count: totalViews,
       }}

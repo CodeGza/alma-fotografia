@@ -24,6 +24,7 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
     password: '',
     max_favorites: 150,
     download_pin: '',
+    show_all_sections: true,
   });
   const [services, setServices] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
@@ -51,6 +52,7 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
         custom_message: gallery.custom_message || '',
         password: gallery.password || '',
         max_favorites: gallery.max_favorites || 150,
+        show_all_sections: gallery.show_all_sections ?? true,
       });
     }
   }, [gallery]);
@@ -92,12 +94,8 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
       const supabase = await createClient();
 
       // Validaciones
-      if (!formData.title.trim()) {
+      if (!formData.title?.trim()) {
         throw new Error('El título es obligatorio');
-      }
-
-      if (formData.client_email && !formData.client_email.includes('@')) {
-        throw new Error('Email del cliente inválido');
       }
 
       if (formData.max_favorites < 0 || formData.max_favorites > 500) {
@@ -175,18 +173,19 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
       }
 
       const updateData = {
-        title: formData.title.trim(),
-        description: formData.description.trim() || null,
+        title: formData.title?.trim() || '',
+        description: formData.description?.trim() || null,
         event_date: formData.event_date || null,
-        client_email: formData.client_email.trim() || null,
+        client_email: formData.client_email?.trim() || null,
         service_type: formData.service_type || null,
         is_public: formData.is_public,
         allow_downloads: formData.allow_downloads,
         allow_comments: formData.allow_comments,
-        custom_message: formData.custom_message.trim() || null,
-        password: formData.password.trim() || null,
+        custom_message: formData.custom_message?.trim() || null,
+        password: formData.password?.trim() || null,
         max_favorites: formData.max_favorites,
-        download_pin: formData.download_pin.trim() || null,
+        download_pin: formData.download_pin?.trim() || null,
+        show_all_sections: formData.show_all_sections ?? true,
       };
 
       const { data, error: updateError } = await supabase
@@ -351,24 +350,6 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
                 </div>
               </div>
 
-              {/* Email del cliente */}
-              <div>
-                <label className="block font-fira text-[11px] sm:text-xs md:text-sm font-semibold text-black mb-1.5 sm:mb-2">
-                  Email del cliente
-                </label>
-                <input
-                  type="email"
-                  name="client_email"
-                  value={formData.client_email}
-                  onChange={handleChange}
-                  placeholder="cliente@ejemplo.com"
-                  className="w-full px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 border border-gray-300 rounded-lg font-fira text-xs sm:text-sm text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent"
-                />
-                <p className="font-fira text-[10px] sm:text-xs text-gray-500 mt-1">
-                  Para enviar notificaciones
-                </p>
-              </div>
-
               {/* Mensaje personalizado */}
               <div>
                 <label className="block font-fira text-[11px] sm:text-xs md:text-sm font-semibold text-black mb-1.5 sm:mb-2 flex items-center gap-1.5">
@@ -482,7 +463,9 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
                       </button>
                     </div>
                     <p className="font-fira text-[9px] sm:text-[10px] text-gray-500 mt-1">
-                      Deja vacío para no requerir PIN. Los clientes lo necesitarán para descargar.
+                      {formData.download_pin
+                        ? 'Los clientes necesitarán este PIN para descargar fotos.'
+                        : 'Deja vacío para no requerir PIN.'}
                     </p>
                   </div>
                 )}
@@ -508,6 +491,7 @@ export default function EditGalleryModal({ gallery, hasActiveLink, onClose, onSu
                   </div>
                 </label>
               </div>
+
             </div>
 
             {/* Opciones avanzadas (colapsables) */}

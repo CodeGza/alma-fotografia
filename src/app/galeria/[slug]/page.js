@@ -38,7 +38,7 @@ async function GalleryContent({ slug, token }) {
     notFound();
   }
 
-  const { gallery, photos } = result;
+  const { gallery, photos, sections } = result;
 
   // ✅ Filtrar fotos válidas (cloudinary_url o file_path)
   const validPhotos = (photos || [])
@@ -67,7 +67,9 @@ async function GalleryContent({ slug, token }) {
         password: gallery.password,
         allowShareFavorites: gallery.allow_share_favorites || false,
         downloadPin: gallery.download_pin,
+        showAllSections: gallery.show_all_sections ?? true,
         photos: validPhotos,
+        sections: sections || [],
       }}
       token={token}
     />
@@ -230,7 +232,7 @@ function ErrorPage({ message }) {
         
         <div className="mt-8 pt-6 border-t border-gray-200">
           <p className="font-fira text-xs text-gray-500">
-            Si crees que es un error, contacta al fotógrafo
+            Si crees que es un error, contacta a la fotógrafa
           </p>
         </div>
       </div>

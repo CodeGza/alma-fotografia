@@ -4,7 +4,7 @@ import { notifyGalleryCreated } from '@/lib/notifications/notification-helpers';
 /**
  * POST /api/galleries/created
  *
- * Registra que se creó una galería y envía notificación al fotógrafo
+ * Registra que se creó una galería y envía notificación a la fotógrafa
  *
  * Body:
  * {

@@ -10,7 +10,7 @@ export const metadata = {
     template: '%s | Alma Fotografía'
   },
   description: 'Alma Fotografía - Capturamos los momentos más especiales de tu vida. Fotografía profesional de bodas, eventos, retratos y sesiones corporativas. Galerías privadas y descarga de fotos en alta calidad.',
-  keywords: ['fotografía profesional', 'fotógrafo de bodas', 'fotografía de eventos', 'sesiones fotográficas', 'retratos profesionales', 'fotografía corporativa', 'galerías privadas', 'descargas de fotos'],
+  keywords: ['fotografía profesional', 'fotógrafa de bodas', 'fotografía de eventos', 'sesiones fotográficas', 'retratos profesionales', 'fotografía corporativa', 'galerías privadas', 'descargas de fotos'],
   authors: [{ name: 'Alma Fotografía' }],
   creator: 'Alma Fotografía',
   publisher: 'Alma Fotografía',

@@ -51,6 +51,14 @@ async function FavoritesGalleryContent({ slug, hash, token }) {
     notFound();
   }
 
+  // 🔔 NOTIFICACIÓN: Cliente está viendo su galería de favoritos
+  console.log('🔔 VISTA DE FAVORITOS:', {
+    tipo: 'FAVORITOS_VIEWED',
+    cliente: clientEmail,
+    galeria: slug,
+    timestamp: new Date().toISOString()
+  });
+
   console.log('[FavoritesGallery] Looking for share with token:', token);
 
   // Obtener share activo
@@ -253,7 +261,7 @@ function ErrorPage({ message }) {
 
         <div className="mt-8 pt-6 border-t border-gray-200">
           <p className="font-fira text-xs text-gray-500">
-            Si crees que es un error, contacta al fotógrafo
+            Si crees que es un error, contacta a la fotógrafa
           </p>
         </div>
       </div>

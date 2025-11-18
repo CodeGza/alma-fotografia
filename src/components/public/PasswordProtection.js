@@ -135,7 +135,7 @@ export default function PasswordProtection({ galleryTitle, coverImage, onPasswor
           {/* Footer info */}
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="font-fira text-xs text-center text-gray-500">
-              Si no tienes la contraseña, contacta al fotógrafo
+              Si no tienes la contraseña, contacta a la fotógrafa
             </p>
           </div>
         </div>

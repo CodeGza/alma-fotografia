@@ -503,7 +503,7 @@ export async function cleanOrphanedPhotos() {
 /**
  * Actualizar el permiso para compartir favoritos
  *
- * - Permite al fotógrafo controlar si los clientes pueden compartir sus favoritas
+ * - Permite a la fotógrafa controlar si los clientes pueden compartir sus favoritas
  * - Solo actualiza el campo allow_share_favorites de la galería
  *
  * @param {string} galleryId - ID de la galería
@@ -540,6 +540,57 @@ export async function updateAllowShareFavorites(galleryId, allowShare) {
 
   } catch (error) {
     console.error('❌ Error en updateAllowShareFavorites:', error.message);
+    return {
+      success: false,
+      error: `No se pudo actualizar la configuración: ${error.message}`
+    };
+  }
+}
+
+// ============================================
+// ACTUALIZAR MOSTRAR TODAS LAS SECCIONES
+// ============================================
+
+/**
+ * Actualizar la configuración de mostrar todas las fotos
+ *
+ * - Controla si se muestra la sección "Todas" en la galería pública
+ * - Cuando está activo, muestra todas las fotos en una sección especial
+ * - Cuando está desactivo, solo muestra las secciones específicas
+ *
+ * @param {string} galleryId - ID de la galería
+ * @param {boolean} showAll - Si se muestra la sección "Todas"
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export async function updateShowAllSections(galleryId, showAll) {
+  try {
+    const supabase = await createClient();
+
+    // Obtener el usuario actual
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    // Actualizar galería
+    const { error: updateError } = await supabase
+      .from('galleries')
+      .update({ show_all_sections: showAll })
+      .eq('id', galleryId)
+      .eq('created_by', user.id);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    // Revalidar caché
+    revalidatePath('/dashboard/galerias');
+    revalidatePath(`/dashboard/galerias/${galleryId}`);
+
+    return { success: true };
+
+  } catch (error) {
+    console.error('❌ Error en updateShowAllSections:', error.message);
     return {
       success: false,
       error: `No se pudo actualizar la configuración: ${error.message}`

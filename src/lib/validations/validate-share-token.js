@@ -175,10 +175,13 @@ export async function getGalleryWithToken(slug, token) {
       }
     }
 
-    // 4. Obtener fotos
+    // 4. Obtener fotos con sus secciones
     const { data: photos, error: photosError } = await supabase
       .from('photos')
-      .select('*')
+      .select(`
+        *,
+        section:photo_sections(*)
+      `)
       .eq('gallery_id', gallery.id)
       .order('display_order', { ascending: true });
 
@@ -186,10 +189,22 @@ export async function getGalleryWithToken(slug, token) {
       // No fallar si no hay fotos, devolver array vacío
     }
 
+    // 5. Obtener todas las secciones de la galería
+    const { data: sections, error: sectionsError } = await supabase
+      .from('photo_sections')
+      .select('*')
+      .eq('gallery_id', gallery.id)
+      .order('display_order', { ascending: true });
+
+    if (sectionsError) {
+      // No fallar si no hay secciones
+    }
+
     return {
       success: true,
       gallery,
-      photos: photos || []
+      photos: photos || [],
+      sections: sections || []
     };
 
   } catch (error) {

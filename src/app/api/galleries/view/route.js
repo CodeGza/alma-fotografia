@@ -4,7 +4,7 @@ import { notifyGalleryView } from '@/lib/notifications/notification-helpers';
 /**
  * POST /api/galleries/view
  *
- * Registra que un cliente vio una galería y envía notificación al fotógrafo
+ * Registra que un cliente vio una galería y envía notificación a la fotógrafa
  *
  * Body:
  * {

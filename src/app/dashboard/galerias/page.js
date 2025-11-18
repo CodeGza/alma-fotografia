@@ -82,6 +82,7 @@ async function GalleriesContent() {
       service_type: gallery.service_type,
       allow_downloads: gallery.allow_downloads,
       password: gallery.password,
+      download_pin: gallery.download_pin,
       photoCount: gallery.photos?.[0]?.count || 0,
       archived_at: gallery.archived_at,
 

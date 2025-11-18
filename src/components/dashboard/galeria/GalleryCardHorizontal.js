@@ -65,6 +65,8 @@ export default function GalleryCardHorizontal({
     has_active_link,
     favorites_count = 0,
     service_type,
+    allow_downloads,
+    download_pin,
     archived_at,
   } = gallery;
 
@@ -294,6 +296,15 @@ export default function GalleryCardHorizontal({
                 <Mail size={10} />
                 <span className="font-fira text-[10px] sm:text-xs truncate">
                   {client_email}
+                </span>
+              </div>
+            )}
+
+            {allow_downloads && download_pin && (
+              <div className="flex items-center gap-1.5">
+                <Lock size={10} className="text-[#b8824f]" />
+                <span className="font-fira text-[10px] sm:text-xs font-semibold text-[#b8824f]">
+                  PIN DE DESCARGA: {download_pin}
                 </span>
               </div>
             )}

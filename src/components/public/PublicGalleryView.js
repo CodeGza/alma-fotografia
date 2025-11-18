@@ -5,11 +5,12 @@ import Image from 'next/image';
 import {
   Download, X, ChevronLeft, ChevronRight, Heart,
   Share2, Check, Mail, Lock, Loader2, AlertCircle,
-  ChevronDown, Play, Pause, MessageSquare, Info, Star
+  ChevronDown, Play, Pause, MessageSquare, Info, Star, MoreVertical
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TestimonialForm from '@/components/public/TestimonialForm';
 import { toggleFavorite, getClientFavorites, submitFavoritesSelection } from '@/app/actions/favorites-actions';
+import { getGallerySections, getPhotosGroupedBySections } from '@/app/actions/photo-sections-actions';
 import { useToast } from '@/components/ui/Toast';
 
 /**
@@ -127,6 +128,8 @@ export default function PublicGalleryView({ gallery, token }) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(true);
   const [headerSticky, setHeaderSticky] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const mobileMenuRef = useRef(null);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isSlideshow, setIsSlideshow] = useState(false);
   const slideshowIntervalRef = useRef(null);
@@ -135,6 +138,8 @@ export default function PublicGalleryView({ gallery, token }) {
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [hasSeenMessage, setHasSeenMessage] = useState(false);
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
+  const [sections, setSections] = useState([]);
+  const [selectedSection, setSelectedSection] = useState('all');
   const favoritesDebounceRef = useRef(null);
   const lastNotificationSentRef = useRef(false);
   const { showToast } = useToast();
@@ -152,7 +157,10 @@ export default function PublicGalleryView({ gallery, token }) {
     allowComments,
     downloadPin: galleryDownloadPin,
     allowShareFavorites,
+    showAllSections,
   } = gallery;
+
+  const [filteredPhotos, setFilteredPhotos] = useState(photos);
 
   // Formatear fecha elegante
   const formattedDate = eventDate
@@ -325,6 +333,32 @@ export default function PublicGalleryView({ gallery, token }) {
     };
   }, []);
 
+  // Cargar secciones de la galería
+  useEffect(() => {
+    const loadSections = async () => {
+      try {
+        const result = await getGallerySections(galleryId);
+        if (result.success && result.sections) {
+          setSections(result.sections);
+        }
+      } catch (error) {
+        console.error('Error loading sections:', error);
+      }
+    };
+
+    loadSections();
+  }, [galleryId]);
+
+  // Filtrar fotos según sección seleccionada
+  useEffect(() => {
+    if (selectedSection === 'all') {
+      setFilteredPhotos(photos);
+    } else {
+      const filtered = photos.filter(photo => photo.section_id === selectedSection);
+      setFilteredPhotos(filtered);
+    }
+  }, [selectedSection, photos]);
+
   // Toggle favorito
   const handleToggleFavorite = async (photoId) => {
     // Si maxFavorites es 0, desactivar completamente esta funcionalidad
@@ -426,30 +460,30 @@ export default function PublicGalleryView({ gallery, token }) {
   const goToPrevious = useCallback(() => {
     setSelectedPhoto(current => {
       if (!current || current.index === 0) return current;
-      const prevPhoto = photos[current.index - 1];
+      const prevPhoto = filteredPhotos[current.index - 1];
       return { ...prevPhoto, index: current.index - 1 };
     });
-  }, [photos]);
+  }, [filteredPhotos]);
 
   const goToNext = useCallback(() => {
     setSelectedPhoto(current => {
-      if (!current || current.index === photos.length - 1) return current;
-      const nextPhoto = photos[current.index + 1];
+      if (!current || current.index === filteredPhotos.length - 1) return current;
+      const nextPhoto = filteredPhotos[current.index + 1];
       return { ...nextPhoto, index: current.index + 1 };
     });
-  }, [photos]);
+  }, [filteredPhotos]);
 
   // Iniciar slideshow
   const startSlideshow = useCallback(() => {
-    if (photos.length === 0) return;
+    if (filteredPhotos.length === 0) return;
 
     // Abrir lightbox con la primera foto si no hay ninguna abierta
     if (!selectedPhoto) {
-      openLightbox(photos[0], 0);
+      openLightbox(filteredPhotos[0], 0);
     }
 
     setIsSlideshow(true);
-  }, [photos, selectedPhoto, openLightbox]);
+  }, [filteredPhotos, selectedPhoto, openLightbox]);
 
   // Detener slideshow
   const stopSlideshow = useCallback(() => {
@@ -477,11 +511,11 @@ export default function PublicGalleryView({ gallery, token }) {
           if (!current) return null;
 
           // Si llegamos al final, volver al principio
-          if (current.index === photos.length - 1) {
-            return { ...photos[0], index: 0 };
+          if (current.index === filteredPhotos.length - 1) {
+            return { ...filteredPhotos[0], index: 0 };
           }
 
-          const nextPhoto = photos[current.index + 1];
+          const nextPhoto = filteredPhotos[current.index + 1];
           return { ...nextPhoto, index: current.index + 1 };
         });
       }, 3000); // Cambiar cada 3 segundos
@@ -492,7 +526,7 @@ export default function PublicGalleryView({ gallery, token }) {
         }
       };
     }
-  }, [isSlideshow, selectedPhoto, photos]);
+  }, [isSlideshow, selectedPhoto, filteredPhotos]);
 
   // Detener slideshow al cerrar lightbox
   useEffect(() => {
@@ -602,6 +636,18 @@ export default function PublicGalleryView({ gallery, token }) {
       setDownloadEmail(clientEmail);
     }
   }, [clientEmail]);
+
+  // Cerrar menú mobile al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+        setShowMobileMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Sistema de descarga con PIN
   const handleDownloadSubmit = async (e) => {
@@ -886,21 +932,72 @@ export default function PublicGalleryView({ gallery, token }) {
           } left-0 right-0 z-40 bg-white`}
         >
           <div className="px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-            {/* Título + Alma */}
-            <div className="flex-shrink min-w-0">
-              <h2 className="font-voga text-base sm:text-xl md:text-2xl text-black truncate">
-                {title}
-              </h2>
-              <p className="text-[9px] sm:text-[10px] md:text-xs text-black/40 tracking-widest uppercase font-light">
+            {/* Título + Alma + Secciones */}
+            <div className="flex-shrink min-w-0 max-w-[65%] sm:max-w-[70%]">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <h2 className="font-voga text-base sm:text-xl md:text-2xl text-black">
+                  {title}
+                </h2>
+                {/* Secciones */}
+                {sections.length > 0 && (
+                  sections.length <= 3 ? (
+                    // Mostrar en línea si son pocas
+                    <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-[10px] md:text-xs font-fira font-medium">
+                      {showAllSections && (
+                        <>
+                          <button
+                            onClick={() => setSelectedSection('all')}
+                            className={`uppercase tracking-wide transition-colors hover:text-[#79502A] ${
+                              selectedSection === 'all' ? 'text-black' : 'text-black/40'
+                            }`}
+                          >
+                            TODAS
+                          </button>
+                          <span className="text-black/30">\</span>
+                        </>
+                      )}
+                      {sections.map((section, index) => (
+                        <div key={section.id} className="flex items-center gap-1 sm:gap-2">
+                          {index > 0 && <span className="text-black/30">\</span>}
+                          <button
+                            onClick={() => setSelectedSection(section.id)}
+                            className={`uppercase tracking-wide transition-colors hover:text-[#79502A] ${
+                              selectedSection === section.id ? 'text-black' : 'text-black/40'
+                            }`}
+                          >
+                            {section.name}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    // Mostrar como select si son muchas
+                    <select
+                      value={selectedSection || (showAllSections ? 'all' : sections[0]?.id)}
+                      onChange={(e) => setSelectedSection(e.target.value)}
+                      className="appearance-none px-3 py-1 pr-8 border border-gray-200 rounded-lg font-fira text-xs text-black focus:outline-none bg-white shadow-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
+                      {showAllSections && <option value="all">TODAS</option>}
+                      {sections.map(section => (
+                        <option key={section.id} value={section.id}>
+                          {section.name.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  )
+                )}
+              </div>
+              <p className="text-[9px] sm:text-[10px] md:text-xs text-black/40 tracking-widest uppercase font-light mt-0.5">
                 Alma Fotografía
               </p>
             </div>
 
             {/* Acciones */}
             <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-shrink-0">
+              {/* Botones Desktop - Ocultos en mobile */}
               <button
                 onClick={() => setShowShareModal(true)}
-                className="p-1.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors"
+                className="hidden sm:flex p-1.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors"
                 title="Compartir"
               >
                 <Share2 size={16} className="text-black/70 sm:w-[18px] sm:h-[18px]" strokeWidth={1.5} />
@@ -908,7 +1005,7 @@ export default function PublicGalleryView({ gallery, token }) {
 
               <button
                 onClick={toggleSlideshow}
-                className="p-1.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors hidden sm:flex"
+                className="hidden sm:flex p-1.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors"
                 title={isSlideshow ? "Pausar presentación" : "Iniciar presentación"}
               >
                 {isSlideshow ? (
@@ -921,7 +1018,7 @@ export default function PublicGalleryView({ gallery, token }) {
               {customMessage && (
                 <button
                   onClick={handleOpenMessage}
-                  className="relative p-1.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors"
+                  className="hidden sm:flex relative p-1.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors"
                   title="Mensaje del fotógrafo"
                 >
                   <MessageSquare size={16} strokeWidth={1.5} className="text-black/70 sm:w-[18px] sm:h-[18px]" />
@@ -931,6 +1028,7 @@ export default function PublicGalleryView({ gallery, token }) {
                 </button>
               )}
 
+              {/* Botón de favoritas - Siempre visible */}
               {maxFavorites > 0 && (
                 <button
                   onClick={() => {
@@ -954,6 +1052,7 @@ export default function PublicGalleryView({ gallery, token }) {
                 </button>
               )}
 
+              {/* Botón de descargas - Desktop */}
               {allowDownloads && (
                 <button
                   onClick={() => {
@@ -976,7 +1075,7 @@ export default function PublicGalleryView({ gallery, token }) {
                   className={`${
                     downloadEnabled
                       ? 'flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-black/5 rounded-full'
-                      : 'p-1.5 sm:p-2 rounded-full relative'
+                      : 'hidden sm:flex p-1.5 sm:p-2 rounded-full relative'
                   } hover:bg-black/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
                   title={downloadEnabled ? (isDownloading ? "Descargando..." : "Descargar todas las fotos") : "Descargar"}
                 >
@@ -1004,10 +1103,11 @@ export default function PublicGalleryView({ gallery, token }) {
                 </button>
               )}
 
+              {/* Botón de testimonio - Desktop */}
               {allowComments && (
                 <motion.button
                   onClick={() => setShowTestimonialModal(true)}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-transparent border border-[#79502A] hover:bg-[#79502A]/5 text-[#79502A] rounded-full transition-all"
+                  className="hidden sm:flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-transparent border border-[#79502A] hover:bg-[#79502A]/5 text-[#79502A] rounded-full transition-all"
                   title="Dejar testimonio"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -1016,6 +1116,95 @@ export default function PublicGalleryView({ gallery, token }) {
                   <span className="font-fira text-[10px] sm:text-xs font-semibold">Testimonio</span>
                 </motion.button>
               )}
+
+              {/* Menú de tres puntos - Solo mobile */}
+              <div className="relative sm:hidden" ref={mobileMenuRef}>
+                <button
+                  onClick={() => setShowMobileMenu(!showMobileMenu)}
+                  className="p-1.5 hover:bg-black/5 rounded-full transition-colors"
+                  title="Más opciones"
+                >
+                  <MoreVertical size={16} className="text-black/70" strokeWidth={1.5} />
+                </button>
+
+                {/* Dropdown menu */}
+                <AnimatePresence>
+                  {showMobileMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 min-w-[200px]"
+                    >
+                      {/* Compartir */}
+                      <button
+                        onClick={() => {
+                          setShowShareModal(true);
+                          setShowMobileMenu(false);
+                        }}
+                        className="w-full px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left"
+                      >
+                        <Share2 size={16} className="text-black/70" strokeWidth={1.5} />
+                        <span className="font-fira text-sm text-black">Compartir</span>
+                      </button>
+
+                      {/* Mensaje del fotógrafo */}
+                      {customMessage && (
+                        <button
+                          onClick={() => {
+                            handleOpenMessage();
+                            setShowMobileMenu(false);
+                          }}
+                          className="w-full px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left relative"
+                        >
+                          <MessageSquare size={16} className="text-black/70" strokeWidth={1.5} />
+                          <span className="font-fira text-sm text-black">Mensaje del fotógrafo</span>
+                          {!hasSeenMessage && (
+                            <span className="ml-auto bg-[#79502A] w-2 h-2 rounded-full" />
+                          )}
+                        </button>
+                      )}
+
+                      {/* Descargar - Solo si no están habilitadas aún */}
+                      {allowDownloads && !downloadEnabled && (
+                        <button
+                          onClick={() => {
+                            if (!galleryDownloadPin) {
+                              setDownloadEnabled(true);
+                              showToast({
+                                message: '¡Descargas habilitadas exitosamente!',
+                                type: 'success'
+                              });
+                            } else {
+                              setShowDownloadModal(true);
+                            }
+                            setShowMobileMenu(false);
+                          }}
+                          className="w-full px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left"
+                        >
+                          <Download size={16} className="text-black/70" strokeWidth={1.5} />
+                          <span className="font-fira text-sm text-black">Descargar</span>
+                        </button>
+                      )}
+
+                      {/* Testimonio */}
+                      {allowComments && (
+                        <button
+                          onClick={() => {
+                            setShowTestimonialModal(true);
+                            setShowMobileMenu(false);
+                          }}
+                          className="w-full px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left"
+                        >
+                          <Star size={16} className="fill-yellow-400 text-black" strokeWidth={0.5} />
+                          <span className="font-fira text-sm text-black">Dejar testimonio</span>
+                        </button>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </motion.header>
@@ -1026,15 +1215,17 @@ export default function PublicGalleryView({ gallery, token }) {
 
       {/* ===== GRID DE FOTOS ===== */}
       <main className="px-4 pb-8">
-        {photos.length === 0 ? (
+        {filteredPhotos.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-black/40 font-light">
-              Esta galería aún no tiene fotos.
+              {selectedSection === 'all'
+                ? 'Esta galería aún no tiene fotos.'
+                : 'Esta sección no tiene fotos.'}
             </p>
           </div>
         ) : (
           <PhotoGrid
-            photos={photos}
+            photos={filteredPhotos}
             galleryTitle={title}
             gallerySlug={gallerySlug}
             onPhotoClick={openLightbox}
@@ -1521,7 +1712,7 @@ export default function PublicGalleryView({ gallery, token }) {
             {/* Contador */}
             <div className="absolute top-6 left-6 z-10">
               <span className="text-sm text-white/60 font-light">
-                {selectedPhoto.index + 1} / {photos.length}
+                {selectedPhoto.index + 1} / {filteredPhotos.length}
               </span>
             </div>
 
@@ -1553,11 +1744,11 @@ export default function PublicGalleryView({ gallery, token }) {
                 }}
                 className="absolute left-6 p-3 hover:bg-white/10 rounded-full transition-colors z-10"
               >
-                <ChevronLeft size={32} strokeWidth={1} className="text-white/80" />
+                <ChevronLeft size={32} strokeWidth={2} className="text-white" />
               </button>
             )}
 
-            {selectedPhoto.index < photos.length - 1 && (
+            {selectedPhoto.index < filteredPhotos.length - 1 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -1565,7 +1756,7 @@ export default function PublicGalleryView({ gallery, token }) {
                 }}
                 className="absolute right-6 p-3 hover:bg-white/10 rounded-full transition-colors z-10"
               >
-                <ChevronRight size={32} strokeWidth={1} className="text-white/80" />
+                <ChevronRight size={32} strokeWidth={2} className="text-white" />
               </button>
             )}
 
@@ -1583,7 +1774,7 @@ export default function PublicGalleryView({ gallery, token }) {
                 const swipe = Math.abs(offset.x) * velocity.x;
 
                 // Si se arrastró hacia la izquierda (swipe left) → siguiente foto
-                if (swipe < -500 && selectedPhoto.index < photos.length - 1) {
+                if (swipe < -500 && selectedPhoto.index < filteredPhotos.length - 1) {
                   goToNext();
                 }
                 // Si se arrastró hacia la derecha (swipe right) → foto anterior

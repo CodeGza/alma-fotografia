@@ -16,15 +16,17 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabaseClient';
 import NotificationBell from '@/components/ui/NotificationBell';
+import { ToastProvider } from '@/components/ui/Toast';
 
 /**
  * DashboardLayoutClient - Layout del dashboard con sidebar oscuro
- * 
+ *
  * Maneja:
  * - Navegación con animaciones
  * - Sidebar mobile con framer-motion
  * - Logout
  * - Notificaciones (nuevo)
+ * - ToastProvider para notificaciones toast
  */
 export default function DashboardLayoutClient({ children, userName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -60,6 +62,7 @@ export default function DashboardLayoutClient({ children, userName }) {
   };
 
   return (
+    <ToastProvider>
     <div className="min-h-screen bg-white flex">
       {/* ============================================ */}
       {/* SIDEBAR DESKTOP */}
@@ -349,5 +352,6 @@ export default function DashboardLayoutClient({ children, userName }) {
         </div>
       </main>
     </div>
+    </ToastProvider>
   );
 }

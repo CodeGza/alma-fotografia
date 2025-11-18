@@ -27,7 +27,8 @@ import {
   Briefcase,
   GripVertical,
   MessageSquare,
-  Heart
+  Heart,
+  Folder
 } from 'lucide-react';
 import {
   DndContext,
@@ -46,11 +47,13 @@ import { CSS } from '@dnd-kit/utilities';
 import ShareGalleryModal from './ShareGalleryModal';
 import EditGalleryModal from './EditGalleryModal';
 import PhotoUploader from './PhotoUploader';
+import SectionsManager from './SectionsManager';
 import Modal from '@/components/ui/Modal';
 import { useModal } from '@/hooks/useModal';
 import { createClient } from '@/lib/supabaseClient';
 import { iconMap } from '@/lib/validations/gallery';
 import { deleteCloudinaryImage, deleteGalleries } from '@/app/actions/gallery-actions';
+import { assignPhotosToSection } from '@/app/actions/photo-sections-actions';
 
 // Componente SortablePhoto para drag & drop
 function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsCover, changingCover }) {
@@ -167,6 +170,9 @@ export default function GalleryDetailView({ gallery }) {
   const [serviceName, setServiceName] = useState(null);
   const [coverImageSize, setCoverImageSize] = useState(0);
   const [favoritesCount, setFavoritesCount] = useState(null);
+  const [sections, setSections] = useState([]);
+  const [showSectionsModal, setShowSectionsModal] = useState(false);
+  const [selectedSection, setSelectedSection] = useState('all');
   const { modalState, showModal, closeModal } = useModal();
 
   // Sensores para drag & drop (desktop + mobile) - OPTIMIZADO PARA MOBILE
@@ -209,10 +215,16 @@ export default function GalleryDetailView({ gallery }) {
     max_favorites,
     has_active_link,
     download_pin,
+    show_all_sections,
   } = gallery;
 
   // Usar localPhotos para permitir reordenar antes de guardar
-  const workingPhotos = localPhotos;
+  let workingPhotos = localPhotos;
+
+  // Filtrar por sección si hay una seleccionada
+  if (selectedSection && selectedSection !== 'all') {
+    workingPhotos = workingPhotos.filter(photo => photo.section_id === selectedSection);
+  }
 
   const photosSize = workingPhotos?.reduce((sum, photo) => sum + (photo.file_size || 0), 0) || 0;
   const totalSize = photosSize + coverImageSize;
@@ -262,6 +274,32 @@ export default function GalleryDetailView({ gallery }) {
     };
 
     loadFavoritesCount();
+  }, [id]);
+
+  // Cargar secciones de la galería
+  useEffect(() => {
+    const loadSections = async () => {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('photo_sections')
+          .select('*')
+          .eq('gallery_id', id)
+          .order('display_order', { ascending: true });
+
+        if (error) {
+          console.error('Error loading sections:', error);
+          setSections([]);
+        } else {
+          setSections(data || []);
+        }
+      } catch (error) {
+        console.error('Error loading sections:', error);
+        setSections([]);
+      }
+    };
+
+    loadSections();
   }, [id]);
 
   // Cargar ícono del servicio si existe
@@ -317,6 +355,49 @@ export default function GalleryDetailView({ gallery }) {
   };
 
   const handleUploadComplete = () => router.refresh();
+
+  // Handler para cuando cambian las secciones
+  const handleSectionsChange = (updatedSections) => {
+    setSections(updatedSections);
+  };
+
+  // Handler para asignar fotos seleccionadas a una sección
+  const handleAssignToSection = async (sectionId) => {
+    if (selectedPhotos.size === 0) {
+      showModal({
+        title: 'Sin fotos seleccionadas',
+        message: 'Selecciona al menos una foto para asignar a la sección.',
+        type: 'error'
+      });
+      return;
+    }
+
+    try {
+      const photoIds = Array.from(selectedPhotos);
+      const result = await assignPhotosToSection(photoIds, sectionId);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Error al asignar fotos');
+      }
+
+      showModal({
+        title: '¡Fotos asignadas!',
+        message: `${photoIds.length} foto${photoIds.length === 1 ? '' : 's'} asignada${photoIds.length === 1 ? '' : 's'} exitosamente.`,
+        type: 'success'
+      });
+
+      setSelectedPhotos(new Set());
+      setSelectionMode(false);
+      router.refresh();
+    } catch (error) {
+      console.error('Error asignando fotos a sección:', error);
+      showModal({
+        title: 'Error',
+        message: error.message || 'No se pudieron asignar las fotos a la sección.',
+        type: 'error'
+      });
+    }
+  };
 
   // Manejar drag and drop
   const handleDragEnd = (event) => {
@@ -1186,11 +1267,12 @@ export default function GalleryDetailView({ gallery }) {
                 Subir fotos
               </h2>
             </div>
-            <PhotoUploader 
-              galleryId={id} 
+            <PhotoUploader
+              galleryId={id}
               gallerySlug={slug}
               galleryTitle={title}
-              onUploadComplete={handleUploadComplete} 
+              sections={sections}
+              onUploadComplete={handleUploadComplete}
             />
           </div>
 
@@ -1199,10 +1281,59 @@ export default function GalleryDetailView({ gallery }) {
             {/* Toolbar */}
             <div className="py-4 sm:py-6 px-2 sm:px-6 lg:px-8 border-b border-gray-200">
               <div className="flex flex-col gap-3">
-                <h2 className="font-fira text-base sm:text-lg font-semibold text-black flex items-center gap-2">
-                  <ImageIcon size={18} className="text-gray-400" />
-                  {workingPhotos.length} {workingPhotos.length === 1 ? 'foto' : 'fotos'}
-                </h2>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h2 className="font-fira text-base sm:text-lg font-semibold text-black flex items-center gap-2">
+                    <ImageIcon size={18} className="text-gray-400" />
+                    {workingPhotos.length} {workingPhotos.length === 1 ? 'foto' : 'fotos'}
+                  </h2>
+
+                  {/* Secciones con formato de galería compartida */}
+                  {sections.length > 0 && (
+                    sections.length <= 3 ? (
+                      <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-[10px] md:text-xs font-fira font-medium">
+                        {show_all_sections && (
+                          <>
+                            <button
+                              onClick={() => setSelectedSection('all')}
+                              className={`uppercase tracking-wide transition-colors hover:text-[#79502A] ${
+                                selectedSection === 'all' ? 'text-black' : 'text-black/40'
+                              }`}
+                            >
+                              TODAS
+                            </button>
+                            <span className="text-black/30">\</span>
+                          </>
+                        )}
+                        {sections.map((section, index) => (
+                          <div key={section.id} className="flex items-center gap-1 sm:gap-2">
+                            {index > 0 && <span className="text-black/30">\</span>}
+                            <button
+                              onClick={() => setSelectedSection(section.id)}
+                              className={`uppercase tracking-wide transition-colors hover:text-[#79502A] ${
+                                selectedSection === section.id ? 'text-black' : 'text-black/40'
+                              }`}
+                            >
+                              {section.name}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <select
+                        value={selectedSection || (show_all_sections ? 'all' : sections[0]?.id)}
+                        onChange={(e) => setSelectedSection(e.target.value)}
+                        className="appearance-none px-3 py-1 pr-8 border border-gray-200 rounded-lg font-fira text-xs text-black focus:outline-none bg-white shadow-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                      >
+                        {show_all_sections && <option value="all">TODAS</option>}
+                        {sections.map(section => (
+                          <option key={section.id} value={section.id}>
+                            {section.name.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    )
+                  )}
+                </div>
 
                 <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   {!selectionMode && !reorderMode && (
@@ -1223,6 +1354,13 @@ export default function GalleryDetailView({ gallery }) {
                           <span>Reordenar</span>
                         </button>
                       )}
+                      <button
+                        onClick={() => setShowSectionsModal(true)}
+                        className="!text-white p-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-center whitespace-nowrap flex-shrink-0"
+                        title="Gestionar secciones"
+                      >
+                        <Folder size={16} />
+                      </button>
                     </>
                   )}
 
@@ -1234,6 +1372,30 @@ export default function GalleryDetailView({ gallery }) {
                       >
                         {selectedPhotos.size === photosToShow.length ? 'Deseleccionar' : 'Todo'}
                       </button>
+
+                      {/* Asignar a sección */}
+                      {sections.length > 0 && selectedPhotos.size > 0 && (
+                        <div className="relative group">
+                          <select
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                handleAssignToSection(e.target.value);
+                                e.target.value = '';
+                              }
+                            }}
+                            className="!text-white px-3 py-2 bg-[#79502A] hover:bg-[#8B5A2F] rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 cursor-pointer appearance-none pr-8"
+                            defaultValue=""
+                          >
+                            <option value="" disabled>Asignar a sección</option>
+                            {sections.map(section => (
+                              <option key={section.id} value={section.id}>
+                                {section.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
                       <button
                         onClick={handleDeleteSelected}
                         disabled={selectedPhotos.size === 0 || deletingPhotos}
@@ -1329,7 +1491,7 @@ export default function GalleryDetailView({ gallery }) {
                     items={workingPhotos.map(p => p.id)}
                     strategy={rectSortingStrategy}
                   >
-                    <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+                    <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
                       {workingPhotos.map((photo, index) => (
                         <SortablePhoto
                           key={photo.id}
@@ -1348,7 +1510,7 @@ export default function GalleryDetailView({ gallery }) {
             ) : selectionMode ? (
               /* Modo selección: checkboxes */
               <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4">
-                <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+                <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
                   {photosToShow.map((photo, index) => {
                     const photoIndex = startIdx + index;
                     const isSelected = selectedPhotos.has(photo.id);
@@ -1399,7 +1561,7 @@ export default function GalleryDetailView({ gallery }) {
             ) : (
               /* Modo normal: solo visualización con paginación */
               <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4">
-                <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+                <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
                   {photosToShow.map((photo, index) => (
                     <SortablePhoto
                       key={photo.id}
@@ -1449,6 +1611,55 @@ export default function GalleryDetailView({ gallery }) {
           onSuccess={() => router.refresh()}
         />
       )}
+
+      {/* Modal de Secciones */}
+      <AnimatePresence>
+        {showSectionsModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              onClick={() => setShowSectionsModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-2xl bg-white rounded-xl shadow-2xl z-50 max-h-[90vh] overflow-hidden flex flex-col"
+            >
+              {/* Header del Modal */}
+              <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 flex-shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Folder size={20} className="text-gray-600" />
+                  </div>
+                  <h2 className="font-voga text-xl sm:text-2xl text-black">
+                    Gestionar Secciones
+                  </h2>
+                </div>
+                <button
+                  onClick={() => setShowSectionsModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X size={20} className="text-black/60" />
+                </button>
+              </div>
+
+              {/* Contenido del Modal */}
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+                <SectionsManager
+                  galleryId={id}
+                  sections={sections}
+                  onSectionsChange={handleSectionsChange}
+                  initialShowAll={show_all_sections}
+                />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <Modal
         isOpen={modalState.isOpen}

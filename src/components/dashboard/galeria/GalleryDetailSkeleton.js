@@ -80,35 +80,14 @@ export default function GalleryDetailSkeleton() {
               <div className="h-9 w-28 bg-gray-200 rounded-lg" />
             </div>
 
-            {/* Masonry grid skeleton */}
+            {/* Grid skeleton */}
             <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4 animate-pulse">
-              <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-6 2xl:columns-8 gap-0.5 sm:gap-2">
-                {/* Fotos con diferentes alturas para simular masonry */}
-                {[
-                  'aspect-[3/4]',   // Vertical
-                  'aspect-square',  // Cuadrada
-                  'aspect-[4/3]',   // Horizontal
-                  'aspect-[3/4]',
-                  'aspect-[4/5]',
-                  'aspect-square',
-                  'aspect-[4/3]',
-                  'aspect-[3/4]',
-                  'aspect-[5/4]',
-                  'aspect-square',
-                  'aspect-[3/4]',
-                  'aspect-[4/3]',
-                  'aspect-[3/4]',
-                  'aspect-square',
-                  'aspect-[4/3]',
-                  'aspect-[3/4]',
-                  'aspect-[5/4]',
-                  'aspect-square',
-                  'aspect-[4/3]',
-                  'aspect-[3/4]',
-                ].map((aspectRatio, i) => (
+              <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
+                {/* Fotos skeleton */}
+                {Array.from({ length: 20 }).map((_, i) => (
                   <div
                     key={i}
-                    className={`mb-0.5 sm:mb-2 break-inside-avoid ${aspectRatio} bg-gray-200 rounded`}
+                    className="aspect-square bg-gray-200 rounded break-inside-avoid"
                   />
                 ))}
               </div>

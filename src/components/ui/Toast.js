@@ -106,6 +106,11 @@ function ToastItem({ id, message, type, onClose }) {
 export function useToast() {
   const context = useContext(ToastContext);
   if (!context) {
+    // Durante SSR o fuera del provider, retornar función vacía
+    // Esto previene errores durante server rendering
+    if (typeof window === 'undefined') {
+      return { showToast: () => {} };
+    }
     throw new Error('useToast must be used within ToastProvider');
   }
   return context;

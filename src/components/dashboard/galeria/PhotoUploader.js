@@ -3,10 +3,10 @@
 import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
-import { Upload, X, Loader2, AlertCircle, ChevronLeft, ChevronRight, CheckSquare, Trash2, Eye, Plus } from 'lucide-react';
+import { Upload, X, Loader2, AlertCircle, ChevronLeft, ChevronRight, CheckSquare, Trash2, Eye, Plus, Folder } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 
-export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, onUploadComplete }) {
+export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, onUploadComplete, sections = [] }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
@@ -16,6 +16,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
   const [selectedPreviews, setSelectedPreviews] = useState(new Set());
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [selectedSection, setSelectedSection] = useState(null); // null = sin sección
   const PREVIEWS_PER_PAGE = 30;
   const { showToast } = useToast();
 
@@ -303,6 +304,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
           file_name: prettyFileName,
           file_size: optimizedBlob.size,
           display_order: index,
+          section_id: selectedSection || null, // Incluir sección seleccionada
         });
 
       if (dbError) {
@@ -357,6 +359,15 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
 
   const handleUploadAll = async () => {
     if (selectedFiles.length === 0) return;
+
+    // Validar que se haya seleccionado una sección si hay secciones disponibles
+    if (sections.length > 0 && !selectedSection) {
+      showToast({
+        message: 'Debes seleccionar una sección antes de subir las fotos',
+        type: 'error'
+      });
+      return;
+    }
 
     setUploading(true);
 
@@ -466,6 +477,34 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
             <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
               {!uploading && !selectionMode && (
                 <>
+                  {/* Selector de sección */}
+                  {sections.length > 0 && (
+                    <div className="relative flex items-center gap-2">
+                      <Folder size={16} className="text-black/70" strokeWidth={1.5} />
+                      <select
+                        value={selectedSection || ''}
+                        onChange={(e) => setSelectedSection(e.target.value || null)}
+                        className={`appearance-none px-4 py-2 pr-8 border rounded-lg font-fira text-sm text-black focus:outline-none bg-white shadow-sm hover:bg-gray-50 transition-colors cursor-pointer relative z-50 ${
+                          !selectedSection ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                        }`}
+                        required
+                      >
+                        <option value="" disabled>Seleccionar sección...</option>
+                        {sections.map(section => (
+                          <option key={section.id} value={section.id}>
+                            {section.name}
+                          </option>
+                        ))}
+                      </select>
+                      {/* Icono de chevron personalizado */}
+                      <div className="absolute right-3 pointer-events-none">
+                        <svg className="w-4 h-4 text-black/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+
                   <button
                     onClick={() => setSelectionMode(true)}
                     className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 whitespace-nowrap flex-shrink-0"

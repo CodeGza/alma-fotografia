@@ -199,7 +199,7 @@ export default function FavoritesSelector({
                       ¡Selección enviada!
                     </h3>
                     <p className="font-fira text-sm text-gray-600 text-center">
-                      El fotógrafo recibirá tu selección de {favoritesCount} fotos favoritas.
+                      La fotógrafa recibirá tu selección de {favoritesCount} fotos favoritas.
                     </p>
                   </motion.div>
                 ) : selectedPhotos.length === 0 ? (
@@ -242,7 +242,7 @@ export default function FavoritesSelector({
                       <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3 flex items-center gap-2">
                         <CheckCircle size={18} className="text-green-600" />
                         <p className="font-fira text-sm text-green-800 font-semibold">
-                          Selección enviada al fotógrafo
+                          Selección enviada a la fotógrafa
                         </p>
                       </div>
                       <button
@@ -290,8 +290,8 @@ export default function FavoritesSelector({
 
                       <p className="font-fira text-xs text-gray-500 text-center mt-3">
                         {isEditingAfterSubmit
-                          ? 'El fotógrafo recibirá una notificación con tus cambios'
-                          : 'Al enviar, el fotógrafo recibirá tu selección de fotos favoritas'
+                          ? 'La fotógrafa recibirá una notificación con tus cambios'
+                          : 'Al enviar, la fotógrafa recibirá tu selección de fotos favoritas'
                         }
                       </p>
                     </>

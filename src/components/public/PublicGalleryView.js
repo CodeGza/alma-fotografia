@@ -14,6 +14,29 @@ import { getGallerySections, getPhotosGroupedBySections } from '@/app/actions/ph
 import { useToast } from '@/components/ui/Toast';
 
 /**
+ * SectionHeader - Componente para mostrar headers de secciones
+ */
+const SectionHeader = memo(({ section }) => {
+  return (
+    <div className="w-full mb-6 mt-8 text-center">
+      <h3 className="font-voga text-2xl text-black mb-2">
+        {section.name}
+      </h3>
+      <div className="flex justify-center mb-3">
+        <div className="w-16 h-[1px] bg-black/30"></div>
+      </div>
+      {section.description && (
+        <p className="font-fira text-sm text-black/60 max-w-2xl mx-auto">
+          {section.description}
+        </p>
+      )}
+    </div>
+  );
+});
+
+SectionHeader.displayName = 'SectionHeader';
+
+/**
  * PhotoGrid - Grid masonry responsivo tipo Pixieset
  */
 const PhotoGrid = memo(({
@@ -28,7 +51,7 @@ const PhotoGrid = memo(({
   onDownloadPhoto,
 }) => {
   return (
-    <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
+    <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
       {photos.map((photo, index) => {
         const isFavorite = favoritePhotoIds.includes(photo.id);
 
@@ -139,7 +162,7 @@ export default function PublicGalleryView({ gallery, token }) {
   const [hasSeenMessage, setHasSeenMessage] = useState(false);
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
   const [sections, setSections] = useState([]);
-  const [selectedSection, setSelectedSection] = useState('all');
+  const [selectedSection, setSelectedSection] = useState(null); // Auto-selección de primera sección
   const favoritesDebounceRef = useRef(null);
   const lastNotificationSentRef = useRef(false);
   const { showToast } = useToast();
@@ -333,13 +356,18 @@ export default function PublicGalleryView({ gallery, token }) {
     };
   }, []);
 
-  // Cargar secciones de la galería
+  // Cargar secciones de la galería y auto-seleccionar primera
   useEffect(() => {
     const loadSections = async () => {
       try {
         const result = await getGallerySections(galleryId);
         if (result.success && result.sections) {
           setSections(result.sections);
+
+          // Auto-seleccionar primera sección si no hay ninguna seleccionada
+          if (result.sections.length > 0 && !selectedSection) {
+            setSelectedSection(result.sections[0].id);
+          }
         }
       } catch (error) {
         console.error('Error loading sections:', error);
@@ -351,11 +379,11 @@ export default function PublicGalleryView({ gallery, token }) {
 
   // Filtrar fotos según sección seleccionada
   useEffect(() => {
-    if (selectedSection === 'all') {
-      setFilteredPhotos(photos);
-    } else {
+    if (selectedSection) {
       const filtered = photos.filter(photo => photo.section_id === selectedSection);
       setFilteredPhotos(filtered);
+    } else {
+      setFilteredPhotos([]);
     }
   }, [selectedSection, photos]);
 
@@ -943,19 +971,6 @@ export default function PublicGalleryView({ gallery, token }) {
                   sections.length <= 3 ? (
                     // Mostrar en línea si son pocas
                     <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-[10px] md:text-xs font-fira font-medium">
-                      {showAllSections && (
-                        <>
-                          <button
-                            onClick={() => setSelectedSection('all')}
-                            className={`uppercase tracking-wide transition-colors hover:text-[#79502A] ${
-                              selectedSection === 'all' ? 'text-black' : 'text-black/40'
-                            }`}
-                          >
-                            TODAS
-                          </button>
-                          <span className="text-black/30">\</span>
-                        </>
-                      )}
                       {sections.map((section, index) => (
                         <div key={section.id} className="flex items-center gap-1 sm:gap-2">
                           {index > 0 && <span className="text-black/30">\</span>}
@@ -973,11 +988,10 @@ export default function PublicGalleryView({ gallery, token }) {
                   ) : (
                     // Mostrar como select si son muchas
                     <select
-                      value={selectedSection || (showAllSections ? 'all' : sections[0]?.id)}
+                      value={selectedSection || sections[0]?.id}
                       onChange={(e) => setSelectedSection(e.target.value)}
                       className="appearance-none px-3 py-1 pr-8 border border-gray-200 rounded-lg font-fira text-xs text-black focus:outline-none bg-white shadow-sm hover:bg-gray-50 transition-colors cursor-pointer"
                     >
-                      {showAllSections && <option value="all">TODAS</option>}
                       {sections.map(section => (
                         <option key={section.id} value={section.id}>
                           {section.name.toUpperCase()}
@@ -1223,7 +1237,122 @@ export default function PublicGalleryView({ gallery, token }) {
                 : 'Esta sección no tiene fotos.'}
             </p>
           </div>
+        ) : selectedSection === 'all' && sections.length > 0 ? (
+          /* Vista mixta: fotos sin sección + secciones con sus fotos */
+          <div>
+            {(() => {
+              // Crear array mixto de items (fotos sin sección + headers de sección)
+              const photosWithoutSection = photos
+                .filter(p => !p.section_id)
+                .map(p => ({ type: 'photo', data: p, order: p.display_order ?? -1000 }));
+
+              const sectionItems = sections
+                .map(s => ({ type: 'section', data: s, order: s.display_order ?? 1000000 }));
+
+              const mixedItems = [...photosWithoutSection, ...sectionItems]
+                .sort((a, b) => a.order - b.order);
+
+              let photoIndexCounter = 0;
+
+              return mixedItems.map((item, idx) => {
+                if (item.type === 'photo') {
+                  const photo = item.data;
+                  const isFavorite = favoritePhotoIds.includes(photo.id);
+                  const currentIndex = photoIndexCounter++;
+
+                  return (
+                    <div key={`photo-${photo.id}`} className="mb-2">
+                      <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2">
+                        <div className="group relative break-inside-avoid">
+                          <div
+                            className="relative w-full bg-gray-100 overflow-hidden cursor-pointer"
+                            onClick={() => openLightbox(photo, currentIndex)}
+                          >
+                            <Image
+                              src={photo.file_path}
+                              alt={`${title} - ${photo.file_name || `Foto ${currentIndex + 1}`}`}
+                              width={1200}
+                              height={1200}
+                              className="w-full h-auto object-cover transition-all duration-700 group-hover:scale-105"
+                              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                              loading="lazy"
+                              quality={90}
+                              unoptimized
+                            />
+
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+
+                            {maxFavorites > 0 && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleFavorite(photo.id);
+                                }}
+                                className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 ${
+                                  isFavorite
+                                    ? 'bg-white shadow-md opacity-100'
+                                    : 'bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100'
+                                }`}
+                                title={isFavorite ? 'Quitar de favoritas' : 'Agregar a favoritas'}
+                              >
+                                <Heart
+                                  size={18}
+                                  className={isFavorite ? 'fill-rose-500 text-rose-500' : 'text-gray-700'}
+                                  strokeWidth={1.5}
+                                />
+                              </button>
+                            )}
+
+                            {downloadEnabled && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownloadPhoto(photo, currentIndex, gallerySlug);
+                                }}
+                                className="absolute bottom-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-sm shadow-md opacity-0 group-hover:opacity-100 hover:bg-white transition-all duration-300"
+                                title="Descargar foto"
+                              >
+                                <Download
+                                  size={18}
+                                  className="text-gray-700"
+                                  strokeWidth={1.5}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  // Renderizar header de sección + sus fotos
+                  const section = item.data;
+                  const sectionPhotos = photos.filter(p => p.section_id === section.id);
+
+                  return (
+                    <div key={`section-${section.id}`}>
+                      <SectionHeader section={section} />
+                      {sectionPhotos.length > 0 && (
+                        <PhotoGrid
+                          photos={sectionPhotos}
+                          galleryTitle={title}
+                          gallerySlug={gallerySlug}
+                          onPhotoClick={openLightbox}
+                          onToggleFavorite={handleToggleFavorite}
+                          favoritePhotoIds={favoritePhotoIds}
+                          maxFavorites={maxFavorites}
+                          downloadEnabled={downloadEnabled}
+                          onDownloadPhoto={handleDownloadPhoto}
+                        />
+                      )}
+                    </div>
+                  );
+                }
+              });
+            })()}
+          </div>
         ) : (
+          /* Vista normal de sección específica o todas sin secciones */
           <PhotoGrid
             photos={filteredPhotos}
             galleryTitle={title}

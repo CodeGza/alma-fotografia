@@ -10,9 +10,7 @@ import {
   Check,
   X,
   Folder,
-  AlertCircle,
-  Eye,
-  EyeOff
+  AlertCircle
 } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import {
@@ -22,22 +20,19 @@ import {
   deleteSection,
   reorderSections
 } from '@/app/actions/photo-sections-actions';
-import { updateShowAllSections } from '@/app/actions/gallery-actions';
 
 /**
  * SectionsManager - Gestor de secciones de fotos
  *
  * Permite crear, editar, eliminar y reordenar secciones
  */
-export default function SectionsManager({ galleryId, onSectionsChange, initialShowAll = true }) {
+export default function SectionsManager({ galleryId, onSectionsChange }) {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingSection, setEditingSection] = useState(null);
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [deletingSection, setDeletingSection] = useState(null);
-  const [showAllSections, setShowAllSections] = useState(initialShowAll);
-  const [updatingShowAll, setUpdatingShowAll] = useState(false);
   const { showToast } = useToast();
 
   // Cargar secciones
@@ -136,24 +131,6 @@ export default function SectionsManager({ galleryId, onSectionsChange, initialSh
     setFormData({ name: '', description: '' });
   };
 
-  // Actualizar show_all_sections
-  const handleToggleShowAll = async (newValue) => {
-    setUpdatingShowAll(true);
-    const result = await updateShowAllSections(galleryId, newValue);
-    if (result.success) {
-      setShowAllSections(newValue);
-      showToast({
-        message: newValue
-          ? 'Se mostrará la sección "Todas"'
-          : 'Solo se mostrarán las secciones específicas',
-        type: 'success'
-      });
-    } else {
-      showToast({ message: result.error || 'Error al actualizar', type: 'error' });
-    }
-    setUpdatingShowAll(false);
-  };
-
   if (loading) {
     return (
       <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-xl p-4 sm:p-6">
@@ -193,38 +170,6 @@ export default function SectionsManager({ galleryId, onSectionsChange, initialSh
           </motion.button>
         )}
       </div>
-
-      {/* Toggle "Mostrar todas las fotos" */}
-      {sections.length > 0 && (
-        <div className="mb-4 p-3 bg-white/5 rounded-lg border border-white/10">
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={showAllSections}
-              onChange={(e) => handleToggleShowAll(e.target.checked)}
-              disabled={updatingShowAll}
-              className="mt-1 w-4 h-4 text-[#C6A97D] bg-white/10 border-white/20 rounded focus:ring-[#C6A97D] focus:ring-offset-0 disabled:opacity-50"
-            />
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                {showAllSections ? (
-                  <Eye size={16} className="text-white/70" />
-                ) : (
-                  <EyeOff size={16} className="text-white/70" />
-                )}
-                <span className="font-fira text-sm font-medium text-white">
-                  Mostrar todas las fotos
-                </span>
-              </div>
-              <p className="font-fira text-xs text-white/50 mt-1">
-                {showAllSections
-                  ? 'Los clientes verán una sección "TODAS" con todas las fotos'
-                  : 'Solo se mostrarán las secciones específicas'}
-              </p>
-            </div>
-          </label>
-        </div>
-      )}
 
       {/* Info */}
       {sections.length === 0 && !showCreateForm && (

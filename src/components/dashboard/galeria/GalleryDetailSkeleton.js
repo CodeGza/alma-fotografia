@@ -82,7 +82,7 @@ export default function GalleryDetailSkeleton() {
 
             {/* Grid skeleton */}
             <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4 animate-pulse">
-              <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
+              <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
                 {/* Fotos skeleton */}
                 {Array.from({ length: 20 }).map((_, i) => (
                   <div

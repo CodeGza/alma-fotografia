@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Trash2,
   Upload,
   X,
@@ -37,11 +38,13 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
+  DragOverlay,
 } from '@dnd-kit/core';
 import {
   SortableContext,
   rectSortingStrategy,
   useSortable,
+  arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import ShareGalleryModal from './ShareGalleryModal';
@@ -55,8 +58,8 @@ import { iconMap } from '@/lib/validations/gallery';
 import { deleteCloudinaryImage, deleteGalleries } from '@/app/actions/gallery-actions';
 import { assignPhotosToSection } from '@/app/actions/photo-sections-actions';
 
-// Componente SortablePhoto para drag & drop
-function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsCover, changingCover }) {
+// Componente SortableSectionHeader para drag & drop de secciones (OLD - sin fotos)
+function SortableSectionHeader({ section }) {
   const {
     attributes,
     listeners,
@@ -64,7 +67,7 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: photo.id });
+  } = useSortable({ id: `section-${section.id}` });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -77,11 +80,162 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative mb-0.5 sm:mb-2 break-inside-avoid ${
-        isDragging ? 'ring-4 ring-[#79502A] shadow-2xl scale-105' : ''
+      className={`relative mb-2 break-inside-avoid ${
+        isDragging ? 'ring-4 ring-[#C6A97D] shadow-2xl scale-102' : ''
       }`}
     >
-      <div className="relative w-full bg-gray-100 overflow-hidden">
+      <div className="relative w-full bg-gradient-to-r from-[#C6A97D] to-[#B8985F] rounded-lg p-4 shadow-md">
+        {/* Drag handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="absolute top-1/2 -translate-y-1/2 left-3 p-2 bg-black/20 backdrop-blur-sm rounded-lg cursor-grab active:cursor-grabbing z-20 touch-none hover:bg-black/30 transition-colors"
+        >
+          <GripVertical size={20} className="text-white" />
+        </div>
+
+        {/* Contenido */}
+        <div className="pl-12">
+          <div className="flex items-center gap-2 mb-1">
+            <Folder size={18} className="text-black/80" />
+            <h3 className="font-voga text-lg text-black font-semibold">
+              {section.name}
+            </h3>
+          </div>
+          {section.description && (
+            <p className="font-fira text-sm text-black/70">
+              {section.description}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Componente SortableSectionBlock - Bloque colapsable con fotos de una sección
+function SortableSectionBlock({ section, photos, sections, cover_image, handleSetAsCover, changingCover, isCollapsed, onToggleCollapse }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: `section-${section.id}` });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 999 : 1,
+  };
+
+  // Estilos para secciones
+  const bgColor = 'bg-gradient-to-r from-[#C6A97D] to-[#B8985F]';
+  const borderColor = '';
+  const dragHandleBg = 'bg-black/20 hover:bg-black/30';
+  const textColor = 'text-black';
+  const iconColor = 'text-white';
+  const ringColor = 'ring-[#C6A97D]';
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`mb-4 ${
+        isDragging ? `ring-4 ${ringColor} shadow-2xl scale-[1.01]` : ''
+      }`}
+    >
+      <div className={`${bgColor} ${borderColor} rounded-lg shadow-md overflow-hidden`}>
+        {/* Header del bloque */}
+        <div className="relative p-4 flex items-center gap-3">
+          <div
+            {...attributes}
+            {...listeners}
+            className={`p-2 ${dragHandleBg} backdrop-blur-sm rounded-lg cursor-grab active:cursor-grabbing z-20 touch-none transition-colors`}
+          >
+            <GripVertical size={20} className={iconColor} />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <Folder size={18} className="text-black/80" />
+              <h3 className={`font-voga text-lg ${textColor} font-semibold`}>
+                {section.name}
+              </h3>
+              <span className="font-fira text-sm text-black/60">
+                ({photos.length} {photos.length === 1 ? 'foto' : 'fotos'})
+              </span>
+            </div>
+            {section.description && !isCollapsed && (
+              <p className="font-fira text-sm text-black/70 mt-1">
+                {section.description}
+              </p>
+            )}
+          </div>
+          <button
+            onClick={onToggleCollapse}
+            className="p-2 hover:bg-black/10 rounded-lg transition-colors"
+          >
+            <ChevronDown
+              size={20}
+              className={`text-black transition-transform ${
+                isCollapsed ? '-rotate-90' : ''
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* Contenido colapsable */}
+        {!isCollapsed && photos.length > 0 && (
+          <div className="p-4 pt-0">
+            <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
+              {photos.map((photo) => (
+                <SortablePhoto
+                  key={photo.id}
+                  photo={photo}
+                  photoIndex={0}
+                  isCover={cover_image === photo.file_path}
+                  isReorderMode={true}
+                  handleSetAsCover={handleSetAsCover}
+                  changingCover={changingCover}
+                  sections={sections}
+                  showSectionBadge={false}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Componente SortablePhoto para drag & drop
+function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsCover, changingCover, sections = [] }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: photo.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition: transition || 'transform 200ms cubic-bezier(0.25, 1, 0.5, 1)',
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group relative mb-0.5 sm:mb-2 break-inside-avoid ${
+        isDragging ? 'opacity-40' : 'opacity-100'
+      }`}
+    >
+      <div className="relative w-full bg-gray-200 overflow-hidden">
         <Image
           src={photo.file_path}
           alt={photo.file_name || `Foto ${photoIndex + 1}`}
@@ -89,27 +243,28 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
           height={800}
           className="w-full h-auto"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+          unoptimized={true}
+          loading="lazy"
+          placeholder="blur"
+          blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
         />
 
         {/* Drag handle - SOLO desde el icono para permitir scroll */}
         {isReorderMode && (
           <>
-            {/* Overlay visual (sin drag) */}
-            <div className="absolute inset-0 bg-[#79502A]/10 border-2 border-[#79502A]/50 sm:border-none sm:bg-transparent pointer-events-none">
-            </div>
-
-            {/* Icono de agarre - ÚNICO punto draggable */}
+            {/* Icono de agarre - ÚNICO punto draggable - COMPACTO Y PROFESIONAL */}
             <div
               {...attributes}
               {...listeners}
-              className="absolute top-2 left-2 p-3 sm:p-3.5 bg-[#79502A] backdrop-blur-sm rounded-lg shadow-lg cursor-grab active:cursor-grabbing z-20 touch-none hover:bg-[#8B5A2F] transition-colors"
+              className="absolute top-2 left-2 p-1.5 bg-[#79502A] rounded shadow-md cursor-grab active:cursor-grabbing z-20 touch-none hover:bg-[#8B5A2F] hover:scale-110 active:scale-95 transition-all duration-150"
             >
-              <GripVertical size={28} className="sm:w-6 sm:h-6 text-white" />
+              <GripVertical size={18} className="text-white" />
             </div>
           </>
         )}
 
-        {/* Badge de portada */}
+
+        {/* Badge de portada - arriba izquierda (prioridad sobre sección) */}
         {isCover && !isReorderMode && (
           <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-black/70 backdrop-blur-sm rounded">
             <span className="font-fira text-[8px] sm:text-[9px] font-bold text-white flex items-center gap-1">
@@ -165,27 +320,34 @@ export default function GalleryDetailView({ gallery }) {
   const [changingCover, setChangingCover] = useState(false);
   const [localPhotos, setLocalPhotos] = useState(gallery.photos);
   const [savingOrder, setSavingOrder] = useState(false);
+  const [collapsedBlocks, setCollapsedBlocks] = useState(new Set()); // Para trackear bloques colapsados
   const [deletingGallery, setDeletingGallery] = useState(false);
   const [serviceIcon, setServiceIcon] = useState(null);
   const [serviceName, setServiceName] = useState(null);
   const [coverImageSize, setCoverImageSize] = useState(0);
+
+  // Actualizar localPhotos cuando cambien las fotos desde el servidor
+  useEffect(() => {
+    setLocalPhotos(gallery.photos);
+  }, [gallery.photos]);
   const [favoritesCount, setFavoritesCount] = useState(null);
   const [sections, setSections] = useState([]);
   const [showSectionsModal, setShowSectionsModal] = useState(false);
-  const [selectedSection, setSelectedSection] = useState('all');
+  const [selectedSection, setSelectedSection] = useState(null); // Se auto-seleccionará primera sección
+  const [activeId, setActiveId] = useState(null); // Para DragOverlay
   const { modalState, showModal, closeModal } = useModal();
 
-  // Sensores para drag & drop (desktop + mobile) - OPTIMIZADO PARA MOBILE
+  // Sensores para drag & drop (desktop + mobile) - CONFIGURACIÓN PROFESIONAL
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 8, // Distancia mínima para activar drag (evita clicks accidentales)
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 100, // Reducido de 200 a 100ms para respuesta más rápida
-        tolerance: 5, // Reducido de 8 a 5px para mayor sensibilidad
+        delay: 100, // Delay corto para mejor respuesta
+        tolerance: 5,
       },
     })
   );
@@ -219,11 +381,14 @@ export default function GalleryDetailView({ gallery }) {
   } = gallery;
 
   // Usar localPhotos para permitir reordenar antes de guardar
-  let workingPhotos = localPhotos;
+  let workingPhotos = [...localPhotos];
 
-  // Filtrar por sección si hay una seleccionada
-  if (selectedSection && selectedSection !== 'all') {
+  // Filtrar por sección seleccionada (siempre debe haber una sección seleccionada)
+  if (selectedSection) {
     workingPhotos = workingPhotos.filter(photo => photo.section_id === selectedSection);
+  } else {
+    // Si no hay sección seleccionada aún, mostrar vacío hasta que cargue
+    workingPhotos = [];
   }
 
   const photosSize = workingPhotos?.reduce((sum, photo) => sum + (photo.file_size || 0), 0) || 0;
@@ -276,12 +441,12 @@ export default function GalleryDetailView({ gallery }) {
     loadFavoritesCount();
   }, [id]);
 
-  // Cargar secciones de la galería
+  // Cargar secciones de la galería y auto-seleccionar la primera
   useEffect(() => {
     const loadSections = async () => {
       try {
         const supabase = createClient();
-        const { data, error } = await supabase
+        const { data, error} = await supabase
           .from('photo_sections')
           .select('*')
           .eq('gallery_id', id)
@@ -291,7 +456,13 @@ export default function GalleryDetailView({ gallery }) {
           console.error('Error loading sections:', error);
           setSections([]);
         } else {
-          setSections(data || []);
+          const loadedSections = data || [];
+          setSections(loadedSections);
+
+          // Auto-seleccionar la primera sección si no hay ninguna seleccionada
+          if (loadedSections.length > 0 && !selectedSection) {
+            setSelectedSection(loadedSections[0].id);
+          }
         }
       } catch (error) {
         console.error('Error loading sections:', error);
@@ -301,6 +472,46 @@ export default function GalleryDetailView({ gallery }) {
 
     loadSections();
   }, [id]);
+
+  // Auto-asignar fotos sin section_id a la primera sección
+  useEffect(() => {
+    const autoAssignPhotos = async () => {
+      if (sections.length === 0 || localPhotos.length === 0) return;
+
+      const photosWithoutSection = localPhotos.filter(photo => !photo.section_id);
+
+      if (photosWithoutSection.length > 0) {
+        console.log(`📸 Encontradas ${photosWithoutSection.length} fotos sin sección, asignando a primera sección...`);
+
+        try {
+          const supabase = createClient();
+          const firstSectionId = sections[0].id;
+
+          // Asignar todas las fotos sin sección a la primera sección
+          const { error } = await supabase
+            .from('photos')
+            .update({ section_id: firstSectionId })
+            .in('id', photosWithoutSection.map(p => p.id));
+
+          if (error) {
+            console.error('❌ Error asignando fotos a sección:', error);
+          } else {
+            console.log('✅ Fotos asignadas automáticamente a la primera sección');
+            // Actualizar localPhotos para reflejar el cambio
+            setLocalPhotos(prev => prev.map(photo =>
+              photosWithoutSection.some(p => p.id === photo.id)
+                ? { ...photo, section_id: firstSectionId }
+                : photo
+            ));
+          }
+        } catch (error) {
+          console.error('❌ Error en auto-asignación:', error);
+        }
+      }
+    };
+
+    autoAssignPhotos();
+  }, [sections, localPhotos.length]);
 
   // Cargar ícono del servicio si existe
   useEffect(() => {
@@ -354,7 +565,29 @@ export default function GalleryDetailView({ gallery }) {
     }
   };
 
-  const handleUploadComplete = () => router.refresh();
+  const handleUploadComplete = async () => {
+    // Dar un breve tiempo para que Cloudinary procese las imágenes
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Forzar refresh completo de la página
+    router.refresh();
+
+    // Si las imágenes aún no cargan, hacer un hard refresh después de 1 segundo
+    setTimeout(() => {
+      const images = document.querySelectorAll('img[src*="cloudinary"]');
+      let allLoaded = true;
+      images.forEach(img => {
+        if (!img.complete) {
+          allLoaded = false;
+        }
+      });
+
+      if (!allLoaded) {
+        console.log('🔄 Algunas imágenes no cargaron, refrescando nuevamente...');
+        router.refresh();
+      }
+    }, 1000);
+  };
 
   // Handler para cuando cambian las secciones
   const handleSectionsChange = (updatedSections) => {
@@ -399,25 +632,54 @@ export default function GalleryDetailView({ gallery }) {
     }
   };
 
-  // Manejar drag and drop
+  // Toggle collapse de bloques
+  const toggleBlockCollapse = (blockId) => {
+    setCollapsedBlocks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(blockId)) {
+        newSet.delete(blockId);
+      } else {
+        newSet.add(blockId);
+      }
+      return newSet;
+    });
+  };
+
+  // Manejar inicio de drag
+  const handleDragStart = (event) => {
+    setActiveId(event.active.id);
+  };
+
+  // Manejar cancelación de drag
+  const handleDragCancel = () => {
+    setActiveId(null);
+  };
+
+  // Manejar fin de drag
   const handleDragEnd = (event) => {
     const { active, over } = event;
+
+    // Limpiar activeId
+    setActiveId(null);
 
     if (!over || active.id === over.id) {
       return;
     }
 
+    // Encontrar índices en workingPhotos
     const oldIndex = workingPhotos.findIndex((p) => p.id === active.id);
     const newIndex = workingPhotos.findIndex((p) => p.id === over.id);
 
     if (oldIndex === -1 || newIndex === -1) return;
 
-    // Reordenar array localmente
-    const newPhotos = [...workingPhotos];
-    const [movedPhoto] = newPhotos.splice(oldIndex, 1);
-    newPhotos.splice(newIndex, 0, movedPhoto);
+    // Usar arrayMove para reordenar
+    const reorderedPhotos = arrayMove(workingPhotos, oldIndex, newIndex);
 
-    setLocalPhotos(newPhotos);
+    // Reconstruir localPhotos: mantener fotos de otras secciones + fotos reordenadas
+    const photosFromOtherSections = localPhotos.filter(p => p.section_id !== selectedSection);
+    const updatedLocalPhotos = [...photosFromOtherSections, ...reorderedPhotos];
+
+    setLocalPhotos(updatedLocalPhotos);
   };
 
   // Guardar nuevo orden en BD - OPTIMIZADO con Promise.all
@@ -425,9 +687,9 @@ export default function GalleryDetailView({ gallery }) {
     setSavingOrder(true);
 
     try {
-      const supabase = createClient(); // NO usar await - createClient() no es async
+      const supabase = createClient();
 
-      // Crear array de promesas - se ejecutan en paralelo
+      // Actualizar display_order de fotos de la sección actual
       const updatePromises = workingPhotos.map((photo, index) =>
         supabase
           .from('photos')
@@ -435,7 +697,7 @@ export default function GalleryDetailView({ gallery }) {
           .eq('id', photo.id)
       );
 
-      // Ejecutar todas las actualizaciones en paralelo (mucho más rápido que secuencial)
+      // Ejecutar todas las actualizaciones en paralelo
       const results = await Promise.all(updatePromises);
 
       // Verificar si hubo errores
@@ -447,7 +709,7 @@ export default function GalleryDetailView({ gallery }) {
 
       showModal({
         title: '¡Orden guardado!',
-        message: 'El nuevo orden de las fotos se ha guardado exitosamente.',
+        message: 'El nuevo orden se ha guardado exitosamente.',
         type: 'success'
       });
 
@@ -1287,23 +1549,10 @@ export default function GalleryDetailView({ gallery }) {
                     {workingPhotos.length} {workingPhotos.length === 1 ? 'foto' : 'fotos'}
                   </h2>
 
-                  {/* Secciones con formato de galería compartida */}
+                  {/* Selector de secciones */}
                   {sections.length > 0 && (
                     sections.length <= 3 ? (
                       <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-[10px] md:text-xs font-fira font-medium">
-                        {show_all_sections && (
-                          <>
-                            <button
-                              onClick={() => setSelectedSection('all')}
-                              className={`uppercase tracking-wide transition-colors hover:text-[#79502A] ${
-                                selectedSection === 'all' ? 'text-black' : 'text-black/40'
-                              }`}
-                            >
-                              TODAS
-                            </button>
-                            <span className="text-black/30">\</span>
-                          </>
-                        )}
                         {sections.map((section, index) => (
                           <div key={section.id} className="flex items-center gap-1 sm:gap-2">
                             {index > 0 && <span className="text-black/30">\</span>}
@@ -1320,11 +1569,10 @@ export default function GalleryDetailView({ gallery }) {
                       </div>
                     ) : (
                       <select
-                        value={selectedSection || (show_all_sections ? 'all' : sections[0]?.id)}
+                        value={selectedSection || sections[0]?.id}
                         onChange={(e) => setSelectedSection(e.target.value)}
                         className="appearance-none px-3 py-1 pr-8 border border-gray-200 rounded-lg font-fira text-xs text-black focus:outline-none bg-white shadow-sm hover:bg-gray-50 transition-colors cursor-pointer"
                       >
-                        {show_all_sections && <option value="all">TODAS</option>}
                         {sections.map(section => (
                           <option key={section.id} value={section.id}>
                             {section.name.toUpperCase()}
@@ -1485,13 +1733,15 @@ export default function GalleryDetailView({ gallery }) {
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
+                  onDragCancel={handleDragCancel}
                 >
                   <SortableContext
                     items={workingPhotos.map(p => p.id)}
                     strategy={rectSortingStrategy}
                   >
-                    <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
+                    <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
                       {workingPhotos.map((photo, index) => (
                         <SortablePhoto
                           key={photo.id}
@@ -1505,12 +1755,33 @@ export default function GalleryDetailView({ gallery }) {
                       ))}
                     </div>
                   </SortableContext>
+
+                  {/* DragOverlay: Preview flotante durante el drag */}
+                  <DragOverlay
+                    dropAnimation={{
+                      duration: 300,
+                      easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+                    }}
+                  >
+                    {activeId ? (
+                      <div className="shadow-2xl ring-2 ring-[#79502A] rotate-3 opacity-95">
+                        <Image
+                          src={workingPhotos.find(p => p.id === activeId)?.file_path}
+                          alt="Arrastrando"
+                          width={400}
+                          height={400}
+                          className="w-[250px] sm:w-[300px] h-auto rounded-lg"
+                          unoptimized={true}
+                        />
+                      </div>
+                    ) : null}
+                  </DragOverlay>
                 </DndContext>
               </div>
             ) : selectionMode ? (
               /* Modo selección: checkboxes */
               <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4">
-                <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
+                <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
                   {photosToShow.map((photo, index) => {
                     const photoIndex = startIdx + index;
                     const isSelected = selectedPhotos.has(photo.id);
@@ -1524,7 +1795,7 @@ export default function GalleryDetailView({ gallery }) {
                           isSelected ? 'ring-2 sm:ring-4 ring-[#79502A]' : ''
                         }`}
                       >
-                        <div className="relative w-full bg-gray-100 overflow-hidden">
+                        <div className="relative w-full bg-gray-200 overflow-hidden">
                           <Image
                             src={photo.file_path}
                             alt={photo.file_name || `Foto ${photoIndex + 1}`}
@@ -1532,6 +1803,10 @@ export default function GalleryDetailView({ gallery }) {
                             height={800}
                             className="w-full h-auto"
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                            unoptimized={true}
+                            loading="lazy"
+                            placeholder="blur"
+                            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
                           />
 
                           <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 z-10">
@@ -1561,7 +1836,7 @@ export default function GalleryDetailView({ gallery }) {
             ) : (
               /* Modo normal: solo visualización con paginación */
               <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4">
-                <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
+                <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
                   {photosToShow.map((photo, index) => (
                     <SortablePhoto
                       key={photo.id}
@@ -1571,6 +1846,7 @@ export default function GalleryDetailView({ gallery }) {
                       isReorderMode={false}
                       handleSetAsCover={handleSetAsCover}
                       changingCover={changingCover}
+                      sections={sections}
                     />
                   ))}
                 </div>
@@ -1653,7 +1929,6 @@ export default function GalleryDetailView({ gallery }) {
                   galleryId={id}
                   sections={sections}
                   onSectionsChange={handleSectionsChange}
-                  initialShowAll={show_all_sections}
                 />
               </div>
             </motion.div>

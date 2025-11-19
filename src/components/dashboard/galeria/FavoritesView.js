@@ -641,7 +641,7 @@ function ClientFavoritesSection({
           </div>
         ) : (
           <div className="px-0 sm:px-2 lg:px-4">
-          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 space-y-2">
+          <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
             {paginatedPhotos.map((photo) => {
               const photoUrl = photo.cloudinary_url || photo.file_path;
               const isSelected = selectedPhotos.has(photo.id);

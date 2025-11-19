@@ -424,6 +424,27 @@ export default function CreateGalleryForm() {
 
             console.log('✅ Galería creada exitosamente:', gallery);
 
+            // Crear sección por defecto "Galería"
+            try {
+                console.log('📁 Creando sección por defecto...');
+                const { error: sectionError } = await supabase
+                    .from('photo_sections')
+                    .insert({
+                        gallery_id: gallery.id,
+                        name: 'Galería',
+                        description: null,
+                        display_order: 0,
+                    });
+
+                if (sectionError) {
+                    console.error('⚠️ Error creando sección por defecto:', sectionError);
+                } else {
+                    console.log('✅ Sección por defecto creada');
+                }
+            } catch (sectionError) {
+                console.error('⚠️ Error creando sección por defecto:', sectionError);
+            }
+
             // Enviar notificación de creación de galería
             try {
                 console.log('📬 Enviando notificación de creación...');

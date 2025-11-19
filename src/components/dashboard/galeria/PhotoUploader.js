@@ -16,7 +16,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
   const [selectedPreviews, setSelectedPreviews] = useState(new Set());
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
-  const [selectedSection, setSelectedSection] = useState(null); // null = sin sección
+  const [selectedSection, setSelectedSection] = useState(sections[0]?.id || null); // Auto-seleccionar primera sección
   const PREVIEWS_PER_PAGE = 30;
   const { showToast } = useToast();
 
@@ -360,15 +360,6 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
   const handleUploadAll = async () => {
     if (selectedFiles.length === 0) return;
 
-    // Validar que se haya seleccionado una sección si hay secciones disponibles
-    if (sections.length > 0 && !selectedSection) {
-      showToast({
-        message: 'Debes seleccionar una sección antes de subir las fotos',
-        type: 'error'
-      });
-      return;
-    }
-
     setUploading(true);
 
     // ✅ Batch size de 3 para evitar saturar servidor y Cloudinary
@@ -482,14 +473,10 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
                     <div className="relative flex items-center gap-2">
                       <Folder size={16} className="text-black/70" strokeWidth={1.5} />
                       <select
-                        value={selectedSection || ''}
-                        onChange={(e) => setSelectedSection(e.target.value || null)}
-                        className={`appearance-none px-4 py-2 pr-8 border rounded-lg font-fira text-sm text-black focus:outline-none bg-white shadow-sm hover:bg-gray-50 transition-colors cursor-pointer relative z-50 ${
-                          !selectedSection ? 'border-red-300 bg-red-50' : 'border-gray-200'
-                        }`}
-                        required
+                        value={selectedSection || sections[0]?.id}
+                        onChange={(e) => setSelectedSection(e.target.value)}
+                        className="appearance-none px-4 py-2 pr-8 border border-gray-200 rounded-lg font-fira text-sm text-black focus:outline-none bg-white shadow-sm hover:bg-gray-50 transition-colors cursor-pointer relative z-50"
                       >
-                        <option value="" disabled>Seleccionar sección...</option>
                         {sections.map(section => (
                           <option key={section.id} value={section.id}>
                             {section.name}

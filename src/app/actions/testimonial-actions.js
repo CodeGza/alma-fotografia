@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/server';
+import { notifyTestimonialReceived } from '@/lib/notifications/notification-helpers';
 
 /**
  * ============================================
@@ -116,6 +117,11 @@ export async function createTestimonial({ galleryId, clientName, clientEmail, me
 
     if (error) throw error;
 
+    // Enviar notificación (sin bloquear la respuesta)
+    notifyTestimonialReceived(data.id).catch((err) => {
+      console.error('[createTestimonial] Error enviando notificación:', err);
+    });
+
     return {
       success: true,
       testimonial: data,
@@ -175,7 +181,7 @@ export async function getGalleryTestimonials(galleryId) {
       .from('testimonials')
       .select('id, client_name, message, rating, created_at')
       .eq('gallery_id', galleryId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false});
 
     if (error) throw error;
 
@@ -186,5 +192,191 @@ export async function getGalleryTestimonials(galleryId) {
   } catch (error) {
     console.error('[getGalleryTestimonials] Error:', error);
     return { success: false, error: error.message };
+  }
+}
+
+/**
+ * ============================================
+ * DASHBOARD ACTIONS - GESTIÓN DE TESTIMONIOS
+ * ============================================
+ */
+
+/**
+ * Obtener TODOS los testimonios (para el dashboard)
+ */
+export async function getAllTestimonials() {
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from('testimonials')
+      .select(`
+        id,
+        client_name,
+        client_email,
+        message,
+        rating,
+        is_featured,
+        created_at,
+        gallery:galleries(id, title, slug)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      testimonials: data || [],
+    };
+  } catch (error) {
+    console.error('[getAllTestimonials] Error:', error);
+    return { success: false, error: error.message, testimonials: [] };
+  }
+}
+
+/**
+ * Marcar/desmarcar testimonio como destacado
+ * Valida que no haya más de 10 destacados
+ */
+export async function toggleFeaturedTestimonial(testimonialId, isFeatured) {
+  try {
+    const supabase = await createClient();
+
+    // Si se quiere marcar como destacado, verificar límite de 10
+    if (isFeatured) {
+      const { data: featured, error: countError } = await supabase
+        .from('testimonials')
+        .select('id')
+        .eq('is_featured', true);
+
+      if (countError) throw countError;
+
+      if (featured && featured.length >= 10) {
+        return {
+          success: false,
+          error: 'Ya hay 10 testimonios destacados. Desmarca uno primero.',
+        };
+      }
+    }
+
+    // Actualizar el testimonio
+    const { data, error } = await supabase
+      .from('testimonials')
+      .update({ is_featured: isFeatured })
+      .eq('id', testimonialId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      testimonial: data,
+    };
+  } catch (error) {
+    console.error('[toggleFeaturedTestimonial] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Actualizar un testimonio
+ */
+export async function updateTestimonial(testimonialId, updates) {
+  try {
+    const supabase = await createClient();
+
+    // Validar datos
+    if (updates.client_name && updates.client_name.trim().length < 2) {
+      return {
+        success: false,
+        error: 'El nombre debe tener al menos 2 caracteres',
+      };
+    }
+
+    if (updates.message && updates.message.trim().length < 10) {
+      return {
+        success: false,
+        error: 'El mensaje debe tener al menos 10 caracteres',
+      };
+    }
+
+    if (updates.rating !== undefined && (updates.rating < 1 || updates.rating > 5)) {
+      return {
+        success: false,
+        error: 'La calificación debe ser entre 1 y 5',
+      };
+    }
+
+    const { data, error } = await supabase
+      .from('testimonials')
+      .update(updates)
+      .eq('id', testimonialId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      testimonial: data,
+    };
+  } catch (error) {
+    console.error('[updateTestimonial] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Eliminar un testimonio
+ */
+export async function deleteTestimonial(testimonialId) {
+  try {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+      .from('testimonials')
+      .delete()
+      .eq('id', testimonialId);
+
+    if (error) throw error;
+
+    return { success: true };
+  } catch (error) {
+    console.error('[deleteTestimonial] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Obtener testimonios destacados para la landing
+ */
+export async function getFeaturedTestimonials() {
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from('testimonials')
+      .select(`
+        id,
+        client_name,
+        message,
+        rating,
+        created_at,
+        gallery:galleries(title, slug)
+      `)
+      .eq('is_featured', true)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      testimonials: data || [],
+    };
+  } catch (error) {
+    console.error('[getFeaturedTestimonials] Error:', error);
+    return { success: false, error: error.message, testimonials: [] };
   }
 }

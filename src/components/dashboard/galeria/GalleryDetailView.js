@@ -80,30 +80,30 @@ function SortableSectionHeader({ section }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative mb-2 break-inside-avoid ${
-        isDragging ? 'ring-4 ring-[#C6A97D] shadow-2xl scale-102' : ''
+      className={`relative mb-3 break-inside-avoid ${
+        isDragging ? 'ring-2 ring-[#8B5A2F] shadow-xl scale-[1.01]' : ''
       }`}
     >
-      <div className="relative w-full bg-gradient-to-r from-[#C6A97D] to-[#B8985F] rounded-lg p-4 shadow-md">
+      <div className="relative w-full bg-gradient-to-r from-[#8B5A2F] to-[#79502A] rounded-xl p-5 shadow-sm border border-[#79502A]/30">
         {/* Drag handle */}
         <div
           {...attributes}
           {...listeners}
-          className="absolute top-1/2 -translate-y-1/2 left-3 p-2 bg-black/20 backdrop-blur-sm rounded-lg cursor-grab active:cursor-grabbing z-20 touch-none hover:bg-black/30 transition-colors"
+          className="absolute top-1/2 -translate-y-1/2 left-4 p-2 bg-black/10 backdrop-blur-sm rounded-lg cursor-grab active:cursor-grabbing z-20 touch-none hover:bg-black/20 transition-all duration-200"
         >
-          <GripVertical size={20} className="text-white" />
+          <GripVertical size={18} className="text-white" />
         </div>
 
         {/* Contenido */}
         <div className="pl-12">
-          <div className="flex items-center gap-2 mb-1">
-            <Folder size={18} className="text-black/80" />
-            <h3 className="font-voga text-lg text-black font-semibold">
+          <div className="flex items-center gap-2.5 mb-1">
+            <Folder size={18} className="text-white/90" />
+            <h3 className="font-voga text-lg text-white font-medium">
               {section.name}
             </h3>
           </div>
           {section.description && (
-            <p className="font-fira text-sm text-black/70">
+            <p className="font-fira text-sm text-white/80 font-light">
               {section.description}
             </p>
           )}
@@ -132,54 +132,54 @@ function SortableSectionBlock({ section, photos, sections, cover_image, handleSe
   };
 
   // Estilos para secciones
-  const bgColor = 'bg-gradient-to-r from-[#C6A97D] to-[#B8985F]';
-  const borderColor = '';
-  const dragHandleBg = 'bg-black/20 hover:bg-black/30';
-  const textColor = 'text-black';
+  const bgColor = 'bg-gradient-to-r from-[#8B5A2F] to-[#79502A]';
+  const borderColor = 'border border-[#79502A]/30';
+  const dragHandleBg = 'bg-black/10 hover:bg-black/20';
+  const textColor = 'text-white';
   const iconColor = 'text-white';
-  const ringColor = 'ring-[#C6A97D]';
+  const ringColor = 'ring-[#8B5A2F]';
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`mb-4 ${
-        isDragging ? `ring-4 ${ringColor} shadow-2xl scale-[1.01]` : ''
+      className={`mb-5 ${
+        isDragging ? `ring-2 ${ringColor} shadow-xl scale-[1.01]` : ''
       }`}
     >
-      <div className={`${bgColor} ${borderColor} rounded-lg shadow-md overflow-hidden`}>
+      <div className={`${bgColor} ${borderColor} rounded-xl shadow-sm overflow-hidden`}>
         {/* Header del bloque */}
-        <div className="relative p-4 flex items-center gap-3">
+        <div className="relative p-5 flex items-center gap-3">
           <div
             {...attributes}
             {...listeners}
-            className={`p-2 ${dragHandleBg} backdrop-blur-sm rounded-lg cursor-grab active:cursor-grabbing z-20 touch-none transition-colors`}
+            className={`p-2 ${dragHandleBg} backdrop-blur-sm rounded-lg cursor-grab active:cursor-grabbing z-20 touch-none transition-all duration-200`}
           >
-            <GripVertical size={20} className={iconColor} />
+            <GripVertical size={18} className={iconColor} />
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <Folder size={18} className="text-black/80" />
-              <h3 className={`font-voga text-lg ${textColor} font-semibold`}>
+            <div className="flex items-center gap-2.5">
+              <Folder size={18} className="text-white/90" />
+              <h3 className={`font-voga text-lg ${textColor} font-medium`}>
                 {section.name}
               </h3>
-              <span className="font-fira text-sm text-black/60">
+              <span className="font-fira text-sm text-white/70 font-light">
                 ({photos.length} {photos.length === 1 ? 'foto' : 'fotos'})
               </span>
             </div>
             {section.description && !isCollapsed && (
-              <p className="font-fira text-sm text-black/70 mt-1">
+              <p className="font-fira text-sm text-white/80 font-light mt-1.5">
                 {section.description}
               </p>
             )}
           </div>
           <button
             onClick={onToggleCollapse}
-            className="p-2 hover:bg-black/10 rounded-lg transition-colors"
+            className="p-2 hover:bg-black/10 rounded-lg transition-all duration-200"
           >
             <ChevronDown
               size={20}
-              className={`text-black transition-transform ${
+              className={`text-white transition-transform duration-200 ${
                 isCollapsed ? '-rotate-90' : ''
               }`}
             />
@@ -188,8 +188,8 @@ function SortableSectionBlock({ section, photos, sections, cover_image, handleSe
 
         {/* Contenido colapsable */}
         {!isCollapsed && photos.length > 0 && (
-          <div className="p-4 pt-0">
-            <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
+          <div className="px-5 pb-5 pt-2">
+            <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2.5 space-y-2.5">
               {photos.map((photo) => (
                 <SortablePhoto
                   key={photo.id}
@@ -1145,10 +1145,10 @@ export default function GalleryDetailView({ gallery }) {
   // Si está eliminando, mostrar solo el overlay para evitar flash de 404
   if (deletingGallery) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-6 flex flex-col items-center gap-3 shadow-2xl max-w-sm mx-4">
-          <Loader2 size={32} className="text-red-600 animate-spin" />
-          <p className="font-fira text-sm text-black/80 text-center">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl border border-gray-200/60 max-w-sm mx-4">
+          <Loader2 size={36} className="text-red-600 animate-spin" />
+          <p className="font-fira text-sm text-gray-700 font-medium text-center">
             Eliminando galería y todos sus archivos...
           </p>
         </div>
@@ -1157,12 +1157,12 @@ export default function GalleryDetailView({ gallery }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
-      <div className="max-w-[2000px] mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-[2000px] mx-auto px-4 sm:px-6 py-6 space-y-6">
 
         {/* Header oscuro */}
-        <div className="bg-[#2d2d2d] text-white rounded-xl">
-          <div className="px-5 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="bg-gradient-to-br from-[#2d2d2d] to-[#1a1a1a] text-white rounded-2xl shadow-sm border border-gray-800/50">
+          <div className="px-6 sm:px-8 lg:px-10 py-6 sm:py-8">
 
             <button
               onClick={() => router.push('/dashboard/galerias')}
@@ -1266,17 +1266,17 @@ export default function GalleryDetailView({ gallery }) {
                   </div>
                 </div>
 
-                <div className="flex gap-2 flex-shrink-0 flex-wrap">
+                <div className="flex gap-2.5 flex-shrink-0 flex-wrap">
                   <motion.button
                     onClick={() => favoritesCount > 0 && router.push(`/dashboard/galerias/${gallery.id}/favoritos`)}
                     whileHover={favoritesCount > 0 ? { scale: 1.02 } : {}}
                     whileTap={favoritesCount > 0 ? { scale: 0.98 } : {}}
                     disabled={favoritesCount === 0}
                     title={favoritesCount === 0 ? 'No hay favoritas aún' : `Ver ${favoritesCount} foto${favoritesCount === 1 ? '' : 's'} favorita${favoritesCount === 1 ? '' : 's'}`}
-                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 ${
+                    className={`flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center justify-center gap-2 shadow-sm ${
                       favoritesCount === 0
                         ? '!text-neutral-500 bg-neutral-800/30 cursor-not-allowed opacity-50'
-                        : '!text-pink-300 bg-pink-500/20 hover:bg-pink-500/30 cursor-pointer'
+                        : '!text-pink-300 bg-pink-500/20 hover:bg-pink-500/30 cursor-pointer border border-pink-500/20'
                     }`}
                   >
                     <Heart size={16} className={favoritesCount > 0 ? 'fill-pink-300' : ''} />
@@ -1286,7 +1286,7 @@ export default function GalleryDetailView({ gallery }) {
                     onClick={() => setShowShareModal(true)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="!text-white flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 bg-[#1a1a1a] hover:bg-[#3a3a3a] rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+                    className="!text-white flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-[#1a1a1a] hover:bg-[#2a2a2a] rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center justify-center gap-2 border border-white/10 shadow-sm"
                   >
                     <Share2 size={16} />
                     <span>Compartir</span>
@@ -1295,7 +1295,7 @@ export default function GalleryDetailView({ gallery }) {
                     onClick={() => setShowEditModal(true)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="!text-white flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+                    className="!text-white flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-white/10 hover:bg-white/15 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center justify-center gap-2 border border-white/20 shadow-sm"
                   >
                     <Edit size={16} />
                     <span>Editar</span>
@@ -1304,10 +1304,10 @@ export default function GalleryDetailView({ gallery }) {
                     onClick={handleDeleteGallery}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="!text-white flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 rounded-lg transition-colors font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+                    className="!text-white flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-red-600/90 hover:bg-red-600 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center justify-center gap-2 border border-red-500/30 shadow-sm"
                   >
                     <Trash2 size={16} />
-                    <span className="hidden sm:inline ">Eliminar</span>
+                    <span className="hidden sm:inline">Eliminar</span>
                   </motion.button>
                 </div>
               </div>
@@ -1327,7 +1327,7 @@ export default function GalleryDetailView({ gallery }) {
                   <ImageIcon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#d5975b]" />
                 </motion.div>
                 <div>
-                  <p className="font-fira text-base sm:text-lg font-semibold">{workingPhotos.length}</p>
+                  <p className="font-fira text-base sm:text-lg font-semibold">{localPhotos.length}</p>
                   <p className="font-fira text-xs text-white/60">Fotos</p>
                 </div>
               </motion.div>
@@ -1450,12 +1450,13 @@ export default function GalleryDetailView({ gallery }) {
         </div>
 
         {/* Contenido principal */}
-        <div className="space-y-1">
+        <div className="space-y-6">
 
           {/* Portada */}
           {cover_image ? (
-            <div className="bg-white py-4 sm:py-6 px-2 sm:px-6 lg:px-8 border-b border-gray-200">
-              <div className="relative w-full max-w-2xl mx-auto aspect-[3/2] bg-gray-200 rounded-lg overflow-hidden shadow-md">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/60 overflow-hidden">
+              <div className="py-6 sm:py-8 px-4 sm:px-8">
+                <div className="relative w-full max-w-3xl mx-auto aspect-[3/2] bg-gray-100 rounded-xl overflow-hidden shadow-md border border-gray-200/40">
                 <Image
                   src={cover_image}
                   alt="Portada"
@@ -1477,77 +1478,88 @@ export default function GalleryDetailView({ gallery }) {
                 >
                   <X size={14} className="sm:w-4 sm:h-4 text-white" />
                 </button>
+                </div>
+                <p className="text-center mt-4 font-fira text-xs text-gray-500 font-light">
+                  Imagen de portada de la galería
+                </p>
               </div>
-              <p className="text-center mt-2 font-fira text-xs text-gray-500">
-                Esta es la imagen de portada de la galería
-              </p>
             </div>
           ) : (
-            <div className="bg-white py-4 sm:py-6 px-2 sm:px-6 lg:px-8 border-b border-gray-200">
-              <div className="max-w-2xl mx-auto border-2 border-dashed border-gray-300 rounded-lg p-6 sm:p-8 text-center">
-                <div className="inline-flex p-3 bg-gray-100 rounded-full mb-3">
-                  <ImageIcon size={32} className="text-gray-400" />
-                </div>
-                <h3 className="font-fira text-base font-semibold text-black mb-1">
-                  Sin portada
-                </h3>
-                <p className="font-fira text-sm text-gray-500 mb-4">
-                  Sube una imagen o selecciona una de la galería
-                </p>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/60 overflow-hidden">
+              <div className="py-6 sm:py-8 px-4 sm:px-8">
+                <div className="max-w-3xl mx-auto border-2 border-dashed border-gray-300/70 rounded-xl p-8 sm:p-10 text-center bg-gray-50/30">
+                  <div className="inline-flex p-3 bg-gray-100 rounded-full mb-3">
+                    <ImageIcon size={32} className="text-gray-400" />
+                  </div>
+                  <h3 className="font-fira text-base font-semibold text-black mb-1">
+                    Sin portada
+                  </h3>
+                  <p className="font-fira text-sm text-gray-500 mb-4">
+                    Sube una imagen o selecciona una de la galería
+                  </p>
 
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <label className="flex-1 sm:flex-none px-6 py-3 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-colors font-fira text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer">
-                    <Upload size={16} />
-                    Subir portada
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/jpg,image/png,image/webp"
-                      onChange={handleUploadCoverFromPlaceholder}
-                      className="hidden"
-                    />
-                  </label>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <label className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-r from-[#8B5A2F] to-[#79502A] hover:from-[#9c6b3f] hover:to-[#8B5A2F] text-white rounded-lg transition-all duration-200 font-fira text-sm font-medium flex items-center justify-center gap-2 cursor-pointer shadow-sm border border-[#79502A]/30">
+                      <Upload size={16} />
+                      Subir portada
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        onChange={handleUploadCoverFromPlaceholder}
+                        className="hidden"
+                      />
+                    </label>
 
-                  {photos.length > 0 && (
-                    <button
-                      onClick={() => handleSetAsCover(photos[0].file_path)}
-                      className="flex-1 sm:flex-none px-6 py-3 bg-white hover:bg-gray-50 border-2 border-gray-300 text-black rounded-lg transition-colors font-fira text-sm font-semibold flex items-center justify-center gap-2"
-                    >
-                      <Star size={16} />
-                      Usar primera foto
-                    </button>
-                  )}
+                    {photos.length > 0 && (
+                      <button
+                        onClick={() => handleSetAsCover(photos[0].file_path)}
+                        className="flex-1 sm:flex-none px-6 py-3 bg-white hover:bg-gray-50 border border-gray-300/70 text-gray-700 rounded-lg transition-all duration-200 font-fira text-sm font-medium flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <Star size={16} />
+                        Usar primera foto
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {/* Uploader */}
-          <div className="bg-white py-4 sm:py-6 px-2 sm:px-6 lg:px-8 border-b border-gray-200">
-            <div className="flex items-center gap-2 mb-4">
-              <Upload size={18} className="text-[#79502A]" />
-              <h2 className="font-fira text-base sm:text-lg font-semibold text-black">
-                Subir fotos
-              </h2>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200/60 overflow-hidden">
+            <div className="py-6 sm:py-8 px-4 sm:px-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-gradient-to-br from-[#8B5A2F]/10 to-[#79502A]/10 rounded-lg">
+                  <Upload size={20} className="text-[#79502A]" />
+                </div>
+                <h2 className="font-voga text-lg sm:text-xl text-gray-900">
+                  Subir fotos
+                </h2>
+              </div>
+              <PhotoUploader
+                galleryId={id}
+                gallerySlug={slug}
+                galleryTitle={title}
+                sections={sections}
+                onUploadComplete={handleUploadComplete}
+              />
             </div>
-            <PhotoUploader
-              galleryId={id}
-              gallerySlug={slug}
-              galleryTitle={title}
-              sections={sections}
-              onUploadComplete={handleUploadComplete}
-            />
           </div>
 
           {/* Grid de fotos con MASONRY */}
-          <div className="bg-white">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200/60 overflow-hidden">
             {/* Toolbar */}
-            <div className="py-4 sm:py-6 px-2 sm:px-6 lg:px-8 border-b border-gray-200">
-              <div className="flex flex-col gap-3">
+            <div className="py-6 sm:py-8 px-4 sm:px-8 border-b border-gray-200/50">
+              <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h2 className="font-fira text-base sm:text-lg font-semibold text-black flex items-center gap-2">
-                    <ImageIcon size={18} className="text-gray-400" />
-                    {workingPhotos.length} {workingPhotos.length === 1 ? 'foto' : 'fotos'}
-                  </h2>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-100/70 rounded-lg">
+                      <ImageIcon size={18} className="text-gray-500" />
+                    </div>
+                    <h2 className="font-voga text-lg sm:text-xl text-gray-900">
+                      {workingPhotos.length} {workingPhotos.length === 1 ? 'foto' : 'fotos'}
+                    </h2>
+                  </div>
 
                   {/* Selector de secciones */}
                   {sections.length > 0 && (
@@ -1583,12 +1595,12 @@ export default function GalleryDetailView({ gallery }) {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                <div className="flex items-center gap-2.5 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   {!selectionMode && !reorderMode && (
                     <>
                       <button
                         onClick={() => setSelectionMode(true)}
-                        className="!text-white px-3 sm:px-4 py-2 bg-[#8b5a2fff] hover:bg-[#9c6b3fff] rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+                        className="!text-white px-4 sm:px-5 py-2.5 bg-gradient-to-r from-[#8B5A2F] to-[#79502A] hover:from-[#9c6b3f] hover:to-[#8B5A2F] rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center gap-2 whitespace-nowrap flex-shrink-0 shadow-sm border border-[#79502A]/30"
                       >
                         <CheckSquare size={16} />
                         <span>Seleccionar</span>
@@ -1596,7 +1608,7 @@ export default function GalleryDetailView({ gallery }) {
                       {workingPhotos.length > 1 && (
                         <button
                           onClick={() => setReorderMode(true)}
-                          className="!text-white px-3 sm:px-4 py-2 bg-[#C6A97D] hover:bg-[#D7B98E] rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+                          className="!text-gray-700 px-4 sm:px-5 py-2.5 bg-white hover:bg-gray-50 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center gap-2 whitespace-nowrap flex-shrink-0 shadow-sm border border-gray-300/70"
                         >
                           <GripVertical size={16} />
                           <span>Reordenar</span>
@@ -1604,7 +1616,7 @@ export default function GalleryDetailView({ gallery }) {
                       )}
                       <button
                         onClick={() => setShowSectionsModal(true)}
-                        className="!text-white p-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-center whitespace-nowrap flex-shrink-0"
+                        className="!text-gray-700 p-2.5 bg-white hover:bg-gray-50 rounded-lg transition-all duration-200 flex items-center justify-center whitespace-nowrap flex-shrink-0 shadow-sm border border-gray-300/70"
                         title="Gestionar secciones"
                       >
                         <Folder size={16} />
@@ -1616,7 +1628,7 @@ export default function GalleryDetailView({ gallery }) {
                     <>
                       <button
                         onClick={toggleSelectAll}
-                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0"
+                        className="!text-gray-700 bg-white hover:bg-gray-50 px-4 py-2.5 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 shadow-sm border border-gray-300/70"
                       >
                         {selectedPhotos.size === photosToShow.length ? 'Deseleccionar' : 'Todo'}
                       </button>
@@ -1631,7 +1643,7 @@ export default function GalleryDetailView({ gallery }) {
                                 e.target.value = '';
                               }
                             }}
-                            className="!text-white px-3 py-2 bg-[#79502A] hover:bg-[#8B5A2F] rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 cursor-pointer appearance-none pr-8"
+                            className="!text-white px-4 py-2.5 bg-gradient-to-r from-[#8B5A2F] to-[#79502A] hover:from-[#9c6b3f] hover:to-[#8B5A2F] rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 cursor-pointer appearance-none pr-8 shadow-sm border border-[#79502A]/30"
                             defaultValue=""
                           >
                             <option value="" disabled>Asignar a sección</option>
@@ -1647,7 +1659,7 @@ export default function GalleryDetailView({ gallery }) {
                       <button
                         onClick={handleDeleteSelected}
                         disabled={selectedPhotos.size === 0 || deletingPhotos}
-                        className="!text-white px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex-shrink-0"
+                        className="!text-white px-4 py-2.5 bg-red-600/90 hover:bg-red-600 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex-shrink-0 shadow-sm border border-red-500/30"
                       >
                         {deletingPhotos ? (
                           <Loader2 size={14} className="animate-spin" />
@@ -1662,7 +1674,7 @@ export default function GalleryDetailView({ gallery }) {
                           setSelectionMode(false);
                           setSelectedPhotos(new Set());
                         }}
-                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0"
+                        className="!text-gray-700 bg-white hover:bg-gray-50 px-4 py-2.5 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 shadow-sm border border-gray-300/70"
                       >
                         Cancelar
                       </button>
@@ -1674,7 +1686,7 @@ export default function GalleryDetailView({ gallery }) {
                       <button
                         onClick={saveNewOrder}
                         disabled={savingOrder}
-                        className="!text-white px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 whitespace-nowrap flex-shrink-0"
+                        className="!text-white px-4 sm:px-5 py-2.5 bg-green-600/90 hover:bg-green-600 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 whitespace-nowrap flex-shrink-0 shadow-sm border border-green-500/30"
                       >
                         {savingOrder ? (
                           <Loader2 size={14} className="animate-spin" />
@@ -1686,11 +1698,11 @@ export default function GalleryDetailView({ gallery }) {
                       <button
                         onClick={cancelReorder}
                         disabled={savingOrder}
-                        className="!text-black/80 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors font-fira text-xs sm:text-sm font-medium disabled:opacity-50 whitespace-nowrap flex-shrink-0"
+                        className="!text-gray-700 bg-white hover:bg-gray-50 px-4 py-2.5 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium disabled:opacity-50 whitespace-nowrap flex-shrink-0 shadow-sm border border-gray-300/70"
                       >
                         Cancelar
                       </button>
-                      <span className="font-fira text-xs text-gray-500 ml-2 hidden md:inline whitespace-nowrap">
+                      <span className="font-fira text-xs text-gray-500 font-light ml-2 hidden md:inline whitespace-nowrap">
                         Arrastra las fotos para cambiar el orden
                       </span>
                     </>
@@ -1723,13 +1735,15 @@ export default function GalleryDetailView({ gallery }) {
 
             {/* 🎨 MASONRY LAYOUT con Drag & Drop */}
             {workingPhotos.length === 0 ? (
-              <div className="py-12 px-2 text-center">
-                <ImageIcon size={40} className="sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
-                <p className="font-fira text-sm text-gray-500">No hay fotos en esta galería</p>
+              <div className="py-16 px-4 text-center">
+                <div className="inline-flex p-4 bg-gray-100/70 rounded-2xl mb-4">
+                  <ImageIcon size={48} className="text-gray-400" />
+                </div>
+                <p className="font-fira text-sm text-gray-500 font-light">No hay fotos en esta sección</p>
               </div>
             ) : reorderMode ? (
               /* Modo reordenar: Drag & Drop activo */
-              <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4">
+              <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
@@ -1780,7 +1794,7 @@ export default function GalleryDetailView({ gallery }) {
               </div>
             ) : selectionMode ? (
               /* Modo selección: checkboxes */
-              <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4">
+              <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
                   {photosToShow.map((photo, index) => {
                     const photoIndex = startIdx + index;
@@ -1835,7 +1849,7 @@ export default function GalleryDetailView({ gallery }) {
               </div>
             ) : (
               /* Modo normal: solo visualización con paginación */
-              <div className="px-0 sm:px-2 lg:px-4 py-2 sm:py-4">
+              <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
                   {photosToShow.map((photo, index) => (
                     <SortablePhoto
@@ -1858,10 +1872,10 @@ export default function GalleryDetailView({ gallery }) {
       </div>
 
       {changingCover && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 flex flex-col items-center gap-3 shadow-2xl">
-            <Loader2 size={32} className="text-[#79502A] animate-spin" />
-            <p className="font-fira text-sm text-black font-medium">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl border border-gray-200/60 max-w-sm mx-4">
+            <Loader2 size={36} className="text-[#79502A] animate-spin" />
+            <p className="font-fira text-sm text-gray-700 font-medium text-center">
               Subiendo portada...
             </p>
           </div>
@@ -1896,35 +1910,35 @@ export default function GalleryDetailView({ gallery }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
               onClick={() => setShowSectionsModal(false)}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-2xl bg-white rounded-xl shadow-2xl z-50 max-h-[90vh] overflow-hidden flex flex-col"
+              className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-200/60 z-50 max-h-[90vh] overflow-hidden flex flex-col"
             >
               {/* Header del Modal */}
-              <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 flex-shrink-0">
+              <div className="flex items-center justify-between p-6 sm:p-8 border-b border-gray-200/50 flex-shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Folder size={20} className="text-gray-600" />
+                  <div className="p-2.5 bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl">
+                    <Folder size={22} className="text-gray-600" />
                   </div>
-                  <h2 className="font-voga text-xl sm:text-2xl text-black">
+                  <h2 className="font-voga text-xl sm:text-2xl text-gray-900">
                     Gestionar Secciones
                   </h2>
                 </div>
                 <button
                   onClick={() => setShowSectionsModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200"
                 >
-                  <X size={20} className="text-black/60" />
+                  <X size={20} className="text-gray-600" />
                 </button>
               </div>
 
               {/* Contenido del Modal */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              <div className="flex-1 overflow-y-auto p-6 sm:p-8">
                 <SectionsManager
                   galleryId={id}
                   sections={sections}

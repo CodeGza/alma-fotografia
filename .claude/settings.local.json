@@ -32,7 +32,13 @@
       "Bash(xargs:*)",
       "WebFetch(domain:help.pixieset.com)",
       "WebFetch(domain:almafotografiauy.pixieset.com)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(powershell -Command \"Stop-Process -Id 9948 -Force\")",
+      "Bash(powershell -Command \"Remove-Item -Path ''.\\nul'' -Force -ErrorAction SilentlyContinue\")",
+      "Bash(node scripts/run-migration.js:*)",
+      "Bash(clip)",
+      "Bash(node temp-fix-notifications.js:*)",
+      "Bash(.gitignore)"
     ],
     "deny": [],
     "ask": []

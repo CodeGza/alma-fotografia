@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Image as ImageIcon,
   MessageSquare,
+  Calendar,
   Settings,
   LogOut,
   Menu,
@@ -47,6 +48,11 @@ export default function DashboardLayoutClient({ children, userName }) {
       label: 'Testimonios',
       href: '/dashboard/testimonios',
       icon: MessageSquare,
+    },
+    {
+      label: 'Agenda',
+      href: '/dashboard/agenda',
+      icon: Calendar,
     },
     {
       label: 'Configuración',

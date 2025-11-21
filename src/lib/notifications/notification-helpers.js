@@ -45,14 +45,14 @@ export async function notifyLinkExpired(shareId) {
     // Verificar preferencias
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, email_enabled, notification_email, email_on_link_expired')
+      .select('inapp_on_link_expired, email_on_link_expired, notification_email')
       .eq('user_id', gallery.created_by)
       .maybeSingle();
 
     let notificationResult = null;
 
-    // Crear notificación in-app solo si está habilitada Y la opción específica está marcada
-    if (prefs && prefs.inapp_enabled && prefs.email_on_link_expired) {
+    // Crear notificación in-app si está habilitada
+    if (prefs && prefs.inapp_on_link_expired) {
       notificationResult = await createNotification({
         userId: gallery.created_by,
         type: 'link_expired',
@@ -63,8 +63,8 @@ export async function notifyLinkExpired(shareId) {
       });
     }
 
-    // Enviar email si: email_enabled está activado Y la opción está marcada Y hay email configurado
-    if (prefs && prefs.email_enabled && prefs.email_on_link_expired && prefs.notification_email) {
+    // Enviar email si está habilitado y hay email configurado
+    if (prefs && prefs.email_on_link_expired && prefs.notification_email) {
       const emailTemplate = getEmailTemplate('link_expired', {
         galleryTitle: gallery.title,
         galleryUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/galerias/${gallery.id}`,
@@ -119,14 +119,14 @@ export async function notifyLinkDeactivated(shareId, userId) {
     // Verificar preferencias
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, email_enabled, notification_email, email_on_link_deactivated')
+      .select('inapp_on_link_deactivated, email_on_link_deactivated, notification_email')
       .eq('user_id', userId)
       .maybeSingle();
 
     let notificationResult = null;
 
     // Crear notificación in-app solo si está habilitada Y la opción específica está marcada
-    if (prefs && prefs.inapp_enabled && prefs.email_on_link_deactivated) {
+    if (prefs && prefs.inapp_on_link_deactivated) {
       notificationResult = await createNotification({
         userId,
         type: 'link_deactivated',
@@ -138,7 +138,7 @@ export async function notifyLinkDeactivated(shareId, userId) {
     }
 
     // Enviar email si: email_enabled está activado Y la opción está marcada Y hay email configurado
-    if (prefs && prefs.email_enabled && prefs.email_on_link_deactivated && prefs.notification_email) {
+    if (prefs && prefs.email_on_link_deactivated && prefs.notification_email) {
       const emailTemplate = getEmailTemplate('link_deactivated', {
         galleryTitle: gallery.title,
         galleryUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/galerias/${gallery.id}`,
@@ -183,15 +183,15 @@ export async function notifyGalleryArchived(galleryId, userId) {
 
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, notification_email, email_on_gallery_archived, email_enabled')
+      .select('inapp_on_gallery_archived, email_on_gallery_archived, notification_email')
       .eq('user_id', userId)
       .maybeSingle();
 
-    const shouldCreateInApp = prefs && prefs.inapp_enabled && prefs.email_on_gallery_archived;
+    const shouldCreateInApp = prefs && prefs.inapp_on_gallery_archived;
 
     if (!shouldCreateInApp) {
       // Solo enviar email si está configurado
-      const shouldSendEmail = prefs && prefs.email_enabled && prefs.email_on_gallery_archived && prefs.notification_email;
+      const shouldSendEmail = prefs && prefs.email_on_gallery_archived && prefs.notification_email;
       if (shouldSendEmail) {
         const emailTemplate = getEmailTemplate('gallery_archived', {
           galleryTitle: gallery.title,
@@ -216,7 +216,7 @@ export async function notifyGalleryArchived(galleryId, userId) {
     });
 
     // Enviar email si está configurado
-    const shouldSendEmail = prefs && prefs.email_enabled && prefs.email_on_gallery_archived && prefs.notification_email;
+    const shouldSendEmail = prefs && prefs.email_on_gallery_archived && prefs.notification_email;
     if (shouldSendEmail) {
       const emailTemplate = getEmailTemplate('gallery_archived', {
         galleryTitle: gallery.title,
@@ -262,14 +262,14 @@ export async function notifyGalleryRestored(galleryId, userId) {
     // Verificar preferencias
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, email_enabled, notification_email, email_on_gallery_restored')
+      .select('inapp_on_gallery_restored, email_on_gallery_restored, notification_email')
       .eq('user_id', userId)
       .maybeSingle();
 
     let notificationResult = null;
 
     // Crear notificación in-app solo si está habilitada Y la opción específica está marcada
-    if (prefs && prefs.inapp_enabled && prefs.email_on_gallery_restored) {
+    if (prefs && prefs.inapp_on_gallery_restored) {
       notificationResult = await createNotification({
         userId,
         type: 'gallery_restored',
@@ -280,7 +280,7 @@ export async function notifyGalleryRestored(galleryId, userId) {
     }
 
     // Enviar email si: email_enabled está activado Y la opción está marcada Y hay email configurado
-    if (prefs && prefs.email_enabled && prefs.email_on_gallery_restored && prefs.notification_email) {
+    if (prefs && prefs.email_on_gallery_restored && prefs.notification_email) {
       const emailTemplate = getEmailTemplate('gallery_restored', {
         galleryTitle: gallery.title,
         galleryUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/galerias/${gallery.id}`,
@@ -315,14 +315,14 @@ export async function notifyGalleryDeleted(galleryTitle, userId) {
     // Verificar preferencias
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, email_enabled, notification_email, email_on_gallery_deleted')
+      .select('inapp_on_gallery_deleted, email_on_gallery_deleted, notification_email')
       .eq('user_id', userId)
       .maybeSingle();
 
     let notificationResult = null;
 
     // Crear notificación in-app solo si está habilitada Y la opción específica está marcada
-    if (prefs && prefs.inapp_enabled && prefs.email_on_gallery_deleted) {
+    if (prefs && prefs.inapp_on_gallery_deleted) {
       notificationResult = await createNotification({
         userId,
         type: 'gallery_deleted',
@@ -332,7 +332,7 @@ export async function notifyGalleryDeleted(galleryTitle, userId) {
     }
 
     // Enviar email si: email_enabled está activado Y la opción está marcada Y hay email configurado
-    if (prefs && prefs.email_enabled && prefs.email_on_gallery_deleted && prefs.notification_email) {
+    if (prefs && prefs.email_on_gallery_deleted && prefs.notification_email) {
       const emailTemplate = getEmailTemplate('gallery_deleted', {
         galleryTitle,
       });
@@ -424,7 +424,7 @@ export async function notifyGalleryView(galleryId, clientInfo = null, isFavorite
     // Verificar si el usuario tiene habilitadas las notificaciones de vistas
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, email_enabled, email_on_gallery_view, notification_email')
+      .select('inapp_on_gallery_view, email_on_gallery_view, notification_email')
       .eq('user_id', gallery.created_by)
       .maybeSingle();
 
@@ -460,7 +460,7 @@ export async function notifyGalleryView(galleryId, clientInfo = null, isFavorite
     let notificationResult = null;
 
     // Crear notificación in-app solo si está habilitada Y la opción específica está marcada
-    if (prefs && prefs.inapp_enabled && prefs.email_on_gallery_view) {
+    if (prefs && prefs.inapp_on_gallery_view) {
       notificationResult = await createNotification({
         userId: gallery.created_by,
         type: notificationType,
@@ -473,7 +473,7 @@ export async function notifyGalleryView(galleryId, clientInfo = null, isFavorite
     }
 
     // Enviar email si: email_enabled está activado Y la opción está marcada Y hay email configurado
-    if (prefs && prefs.email_enabled && prefs.email_on_gallery_view && prefs.notification_email) {
+    if (prefs && prefs.email_on_gallery_view && prefs.notification_email) {
       const emailTemplate = getEmailTemplate('gallery_view', {
         galleryTitle: gallery.title,
         galleryUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/galerias/${gallery.id}`,
@@ -534,7 +534,7 @@ export async function notifyFavoritesSelected(galleryId, favoritesCount, clientE
     // Verificar preferencias
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, email_enabled, email_on_favorites, notification_email')
+      .select('inapp_on_favorites, email_on_favorites, notification_email')
       .eq('user_id', gallery.created_by)
       .maybeSingle();
 
@@ -548,7 +548,7 @@ export async function notifyFavoritesSelected(galleryId, favoritesCount, clientE
     let notificationResult = null;
 
     // Crear notificación in-app solo si está habilitada Y la opción específica está marcada
-    if (prefs && prefs.inapp_enabled && prefs.email_on_favorites) {
+    if (prefs && prefs.inapp_on_favorites) {
       notificationResult = await createNotification({
         userId: gallery.created_by,
         type: 'favorites_selected',
@@ -559,7 +559,7 @@ export async function notifyFavoritesSelected(galleryId, favoritesCount, clientE
     }
 
     // Enviar email si: email_enabled está activado Y la opción está marcada Y hay email configurado
-    if (prefs && prefs.email_enabled && prefs.email_on_favorites && prefs.notification_email) {
+    if (prefs && prefs.email_on_favorites && prefs.notification_email) {
       const emailTemplate = getEmailTemplate(isFirstTime ? 'favorites_selected' : 'favorites_added', {
         galleryTitle: gallery.title,
         galleryUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/galerias/${gallery.id}/favoritos`,
@@ -626,7 +626,7 @@ export async function notifyFavoritesSubmitted(
     // Verificar preferencias
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, email_enabled, email_on_favorites, notification_email')
+      .select('inapp_on_favorites, email_on_favorites, notification_email')
       .eq('user_id', gallery.created_by)
       .maybeSingle();
 
@@ -660,7 +660,7 @@ export async function notifyFavoritesSubmitted(
     let notificationResult = null;
 
     // Crear notificación in-app solo si está habilitada
-    if (prefs && prefs.inapp_enabled && prefs.email_on_favorites) {
+    if (prefs && prefs.inapp_on_favorites) {
       notificationResult = await createNotification({
         userId: gallery.created_by,
         type: notifType,
@@ -671,7 +671,7 @@ export async function notifyFavoritesSubmitted(
     }
 
     // Enviar email si está configurado
-    if (prefs && prefs.email_enabled && prefs.email_on_favorites && prefs.notification_email) {
+    if (prefs && prefs.email_on_favorites && prefs.notification_email) {
       const emailTemplate = getEmailTemplate(notifType, {
         galleryTitle: gallery.title,
         galleryUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/galerias/${gallery.id}/favoritos`,
@@ -740,7 +740,7 @@ export async function notifyFavoriteAdded(galleryId, clientEmail, currentCount) 
     // Verificar preferencias
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, email_enabled, email_on_favorites, notification_email')
+      .select('inapp_on_favorites, email_on_favorites, notification_email')
       .eq('user_id', gallery.created_by)
       .maybeSingle();
 
@@ -754,7 +754,7 @@ export async function notifyFavoriteAdded(galleryId, clientEmail, currentCount) 
     let notificationResult = null;
 
     // Crear notificación in-app solo si está habilitada
-    if (prefs && prefs.inapp_enabled && prefs.email_on_favorites) {
+    if (prefs && prefs.inapp_on_favorites) {
       notificationResult = await createNotification({
         userId: gallery.created_by,
         type: isFirstFavorite ? 'favorites_selected' : 'favorite_added',
@@ -765,7 +765,7 @@ export async function notifyFavoriteAdded(galleryId, clientEmail, currentCount) 
     }
 
     // Enviar email si está configurado
-    if (prefs && prefs.email_enabled && prefs.email_on_favorites && prefs.notification_email) {
+    if (prefs && prefs.email_on_favorites && prefs.notification_email) {
       const emailTemplate = getEmailTemplate(isFirstFavorite ? 'favorites_selected' : 'favorite_added', {
         galleryTitle: gallery.title,
         galleryUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/galerias/${gallery.id}/favoritos`,
@@ -820,7 +820,7 @@ export async function notifyFavoriteRemoved(galleryId, clientEmail, remainingCou
     // Verificar preferencias
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, email_enabled, email_on_favorites, notification_email')
+      .select('inapp_on_favorites, email_on_favorites, notification_email')
       .eq('user_id', gallery.created_by)
       .maybeSingle();
 
@@ -830,7 +830,7 @@ export async function notifyFavoriteRemoved(galleryId, clientEmail, remainingCou
     let notificationResult = null;
 
     // Crear notificación in-app solo si está habilitada
-    if (prefs && prefs.inapp_enabled && prefs.email_on_favorites) {
+    if (prefs && prefs.inapp_on_favorites) {
       notificationResult = await createNotification({
         userId: gallery.created_by,
         type: 'favorite_removed',
@@ -841,7 +841,7 @@ export async function notifyFavoriteRemoved(galleryId, clientEmail, remainingCou
     }
 
     // Enviar email si está configurado
-    if (prefs && prefs.email_enabled && prefs.email_on_favorites && prefs.notification_email) {
+    if (prefs && prefs.email_on_favorites && prefs.notification_email) {
       const emailTemplate = getEmailTemplate('favorite_removed', {
         galleryTitle: gallery.title,
         galleryUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/galerias/${gallery.id}/favoritos`,
@@ -888,7 +888,7 @@ export async function notifyGalleryCreated(galleryId) {
     // Verificar si el usuario tiene habilitadas las notificaciones de nuevas galerías
     const { data: prefs } = await supabase
       .from('notification_preferences')
-      .select('inapp_enabled, email_enabled, email_on_new_gallery, notification_email')
+      .select('inapp_on_new_gallery, email_on_new_gallery, notification_email')
       .eq('user_id', gallery.created_by)
       .maybeSingle();
 
@@ -917,7 +917,7 @@ export async function notifyGalleryCreated(galleryId) {
     let notificationResult = null;
 
     // Crear notificación in-app solo si está habilitada Y la opción específica está marcada
-    if (prefs && prefs.inapp_enabled && prefs.email_on_new_gallery) {
+    if (prefs && prefs.inapp_on_new_gallery) {
       notificationResult = await createNotification({
         userId: gallery.created_by,
         type: 'gallery_created',
@@ -928,7 +928,7 @@ export async function notifyGalleryCreated(galleryId) {
     }
 
     // Enviar email si: email_enabled está activado Y la opción está marcada Y hay email configurado
-    if (prefs && prefs.email_enabled && prefs.email_on_new_gallery && prefs.notification_email) {
+    if (prefs && prefs.email_on_new_gallery && prefs.notification_email) {
       const emailTemplate = getEmailTemplate('gallery_created', {
         galleryTitle: gallery.title,
         galleryUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/galerias/${gallery.id}`,
@@ -947,6 +947,385 @@ export async function notifyGalleryCreated(galleryId) {
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
     console.error('[notifyGalleryCreated] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Notificar cuando un cliente deja un testimonio
+ *
+ * @param {string} testimonialId - ID del testimonio creado
+ */
+export async function notifyTestimonialReceived(testimonialId) {
+  try {
+    const supabase = await createClient();
+
+    // Obtener el testimonio con la información de la galería
+    const { data: testimonial, error } = await supabase
+      .from('testimonials')
+      .select(`
+        id,
+        client_name,
+        client_email,
+        message,
+        rating,
+        gallery_id,
+        galleries (
+          id,
+          title,
+          created_by
+        )
+      `)
+      .eq('id', testimonialId)
+      .single();
+
+    if (error || !testimonial) {
+      console.error('[notifyTestimonialReceived] Testimonial not found:', testimonialId, error);
+      return { success: false, error: 'Testimonial not found' };
+    }
+
+    const gallery = testimonial.galleries;
+
+    // Verificar preferencias del usuario
+    const { data: prefs } = await supabase
+      .from('notification_preferences')
+      .select('inapp_on_testimonial, email_on_testimonial, notification_email')
+      .eq('user_id', gallery.created_by)
+      .maybeSingle();
+
+    // Si no tiene preferencias, crear con defaults
+    if (!prefs) {
+      const { error: insertError } = await supabase
+        .from('notification_preferences')
+        .insert({
+          user_id: gallery.created_by,
+          inapp_enabled: true,
+          email_on_testimonial: true, // Activado por default
+        });
+
+      if (insertError) {
+        console.error('[notifyTestimonialReceived] Error creando preferencias:', insertError);
+      }
+    }
+
+    const stars = testimonial.rating ? `⭐ ${testimonial.rating}/5` : '';
+    const message = `${testimonial.client_name} dejó un testimonio en "${gallery.title}" ${stars}`;
+
+    let notificationResult = null;
+
+    // Crear notificación in-app solo si está habilitada
+    if (prefs && prefs.inapp_on_testimonial !== false) {
+      notificationResult = await createNotification({
+        userId: gallery.created_by,
+        type: 'testimonial_received',
+        message,
+        galleryId: gallery.id,
+        actionUrl: `/dashboard/testimonios`,
+      });
+    }
+
+    // Enviar email si está configurado
+    if (prefs && prefs.email_on_testimonial !== false && prefs.notification_email) {
+      const emailTemplate = getEmailTemplate('testimonial_received', {
+        galleryTitle: gallery.title,
+        clientName: testimonial.client_name,
+        rating: testimonial.rating,
+        message: testimonial.message,
+        testimonialUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/testimonios`,
+      });
+
+      if (emailTemplate) {
+        await sendEmail({
+          to: prefs.notification_email,
+          subject: emailTemplate.subject,
+          html: emailTemplate.html,
+        });
+      }
+    }
+
+    return notificationResult || { success: true, skipped: 'In-app disabled' };
+  } catch (error) {
+    console.error('[notifyTestimonialReceived] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================
+// NOTIFICACIONES DE AGENDA PÚBLICA
+// ============================================
+
+/**
+ * Notificar cuando llega una nueva reserva pública pendiente
+ *
+ * @param {string} bookingId - ID de la reserva creada
+ */
+export async function notifyNewPublicBooking(bookingId) {
+  try {
+    const supabase = await createClient();
+
+    // Obtener la reserva con el tipo
+    const { data: booking, error } = await supabase
+      .from('public_bookings')
+      .select(`
+        id,
+        client_name,
+        client_email,
+        booking_date,
+        start_time,
+        end_time,
+        booking_type:public_booking_types(id, name, slug)
+      `)
+      .eq('id', bookingId)
+      .single();
+
+    if (error || !booking) {
+      console.error('[notifyNewPublicBooking] Booking not found:', bookingId, error);
+      return { success: false, error: 'Booking not found' };
+    }
+
+    // Obtener el usuario admin (el primero que se registró)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.error('[notifyNewPublicBooking] No authenticated user');
+      return { success: false, error: 'No authenticated user' };
+    }
+
+    // Verificar preferencias
+    const { data: prefs } = await supabase
+      .from('notification_preferences')
+      .select('inapp_on_booking_pending, email_on_booking_pending, notification_email')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    const bookingTypeName = booking.booking_type?.name || 'Reunión';
+    const formattedDate = new Date(booking.booking_date + 'T00:00:00').toLocaleDateString('es-UY', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    const message = `Nueva reserva de ${bookingTypeName}: ${booking.client_name} para el ${formattedDate} a las ${booking.start_time.substring(0, 5)}`;
+
+    let notificationResult = null;
+
+    // Crear notificación in-app
+    if (prefs && prefs.inapp_on_booking_pending !== false) {
+      notificationResult = await createNotification({
+        userId: user.id,
+        type: 'booking_pending',
+        message,
+        actionUrl: '/dashboard/agenda',
+      });
+    }
+
+    // Enviar email
+    if (prefs && prefs.email_on_booking_pending !== false && prefs.notification_email) {
+      const emailTemplate = getEmailTemplate('booking_pending', {
+        bookingType: bookingTypeName,
+        clientName: booking.client_name,
+        clientEmail: booking.client_email,
+        bookingDate: formattedDate,
+        startTime: booking.start_time.substring(0, 5),
+        endTime: booking.end_time.substring(0, 5),
+        agendaUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/agenda`,
+      });
+
+      if (emailTemplate) {
+        await sendEmail({
+          to: prefs.notification_email,
+          subject: emailTemplate.subject,
+          html: emailTemplate.html,
+        });
+      }
+    }
+
+    return notificationResult || { success: true, skipped: 'In-app disabled' };
+  } catch (error) {
+    console.error('[notifyNewPublicBooking] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Notificar cuando se confirma una reserva pública
+ *
+ * @param {string} bookingId - ID de la reserva confirmada
+ */
+export async function notifyBookingConfirmed(bookingId) {
+  try {
+    const supabase = await createClient();
+
+    const { data: booking, error } = await supabase
+      .from('public_bookings')
+      .select(`
+        id,
+        client_name,
+        client_email,
+        booking_date,
+        start_time,
+        end_time,
+        booking_type:public_booking_types(id, name, slug)
+      `)
+      .eq('id', bookingId)
+      .single();
+
+    if (error || !booking) {
+      console.error('[notifyBookingConfirmed] Booking not found:', bookingId, error);
+      return { success: false, error: 'Booking not found' };
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return { success: false, error: 'No authenticated user' };
+    }
+
+    const { data: prefs } = await supabase
+      .from('notification_preferences')
+      .select('inapp_on_booking_confirmed, email_on_booking_confirmed, notification_email')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    const bookingTypeName = booking.booking_type?.name || 'Reunión';
+    const formattedDate = new Date(booking.booking_date + 'T00:00:00').toLocaleDateString('es-UY', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    const message = `Confirmaste la reserva de ${bookingTypeName} con ${booking.client_name} para el ${formattedDate} a las ${booking.start_time.substring(0, 5)}`;
+
+    let notificationResult = null;
+
+    if (prefs && prefs.inapp_on_booking_confirmed !== false) {
+      notificationResult = await createNotification({
+        userId: user.id,
+        type: 'booking_confirmed',
+        message,
+        actionUrl: '/dashboard/agenda',
+      });
+    }
+
+    if (prefs && prefs.email_on_booking_confirmed !== false && prefs.notification_email) {
+      const emailTemplate = getEmailTemplate('booking_confirmed', {
+        bookingType: bookingTypeName,
+        clientName: booking.client_name,
+        clientEmail: booking.client_email,
+        bookingDate: formattedDate,
+        startTime: booking.start_time.substring(0, 5),
+        endTime: booking.end_time.substring(0, 5),
+        agendaUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/agenda`,
+      });
+
+      if (emailTemplate) {
+        await sendEmail({
+          to: prefs.notification_email,
+          subject: emailTemplate.subject,
+          html: emailTemplate.html,
+        });
+      }
+    }
+
+    return notificationResult || { success: true, skipped: 'In-app disabled' };
+  } catch (error) {
+    console.error('[notifyBookingConfirmed] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * CRON JOB: Notificar reservas próximas (24 horas antes)
+ *
+ * Ejecutar diariamente a las 9 AM.
+ */
+export async function notifyUpcomingBookings() {
+  try {
+    const supabase = await createClient();
+
+    // Calcular fecha de mañana
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+    // Obtener reservas confirmadas para mañana
+    const { data: bookings, error } = await supabase
+      .from('public_bookings')
+      .select(`
+        id,
+        client_name,
+        client_email,
+        booking_date,
+        start_time,
+        end_time,
+        booking_type:public_booking_types(id, name, slug)
+      `)
+      .eq('booking_date', tomorrowStr)
+      .eq('status', 'confirmed');
+
+    if (error) throw error;
+
+    if (!bookings || bookings.length === 0) {
+      console.log('[notifyUpcomingBookings] No bookings for tomorrow');
+      return { success: true, notified: 0 };
+    }
+
+    // Obtener el usuario admin
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return { success: false, error: 'No authenticated user' };
+    }
+
+    // Verificar preferencias
+    const { data: prefs } = await supabase
+      .from('notification_preferences')
+      .select('inapp_on_booking_reminder, email_on_booking_reminder, notification_email')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    let notifiedCount = 0;
+
+    for (const booking of bookings) {
+      const bookingTypeName = booking.booking_type?.name || 'Reunión';
+      const message = `Recordatorio: Mañana tienes ${bookingTypeName} con ${booking.client_name} a las ${booking.start_time.substring(0, 5)}`;
+
+      // Crear notificación in-app
+      if (prefs && prefs.inapp_on_booking_reminder !== false) {
+        await createNotification({
+          userId: user.id,
+          type: 'booking_reminder',
+          message,
+          actionUrl: '/dashboard/agenda',
+        });
+        notifiedCount++;
+      }
+
+      // Enviar email
+      if (prefs && prefs.email_on_booking_reminder !== false && prefs.notification_email) {
+        const emailTemplate = getEmailTemplate('booking_reminder', {
+          bookingType: bookingTypeName,
+          clientName: booking.client_name,
+          clientEmail: booking.client_email,
+          bookingDate: new Date(booking.booking_date + 'T00:00:00').toLocaleDateString('es-UY', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          }),
+          startTime: booking.start_time.substring(0, 5),
+          endTime: booking.end_time.substring(0, 5),
+          agendaUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/agenda`,
+        });
+
+        if (emailTemplate) {
+          await sendEmail({
+            to: prefs.notification_email,
+            subject: emailTemplate.subject,
+            html: emailTemplate.html,
+          });
+        }
+      }
+    }
+
+    console.log(`[notifyUpcomingBookings] Notified ${notifiedCount} upcoming bookings`);
+    return { success: true, notified: notifiedCount };
+  } catch (error) {
+    console.error('[notifyUpcomingBookings] Error:', error);
     return { success: false, error: error.message };
   }
 }

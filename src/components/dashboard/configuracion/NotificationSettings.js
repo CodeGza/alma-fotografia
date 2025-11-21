@@ -17,6 +17,7 @@ import {
   Archive,
   Trash2,
   XCircle,
+  MessageSquare,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
@@ -24,9 +25,14 @@ import { useRouter } from 'next/navigation';
 export default function NotificationSettings() {
   const router = useRouter();
   const [preferences, setPreferences] = useState({
-    email_enabled: true,
+    notification_email: '',
+    // Email notifications
     email_on_gallery_view: false,
     email_on_favorites: false,
+    email_on_testimonial: true,
+    email_on_booking_pending: true,
+    email_on_booking_confirmed: true,
+    email_on_booking_reminder: true,
     email_on_link_expiring: true,
     email_on_link_expired: true,
     email_on_new_gallery: false,
@@ -34,8 +40,20 @@ export default function NotificationSettings() {
     email_on_gallery_archived: false,
     email_on_gallery_restored: false,
     email_on_gallery_deleted: true,
-    inapp_enabled: true,
-    notification_email: '',
+    // In-app notifications
+    inapp_on_gallery_view: true,
+    inapp_on_favorites: true,
+    inapp_on_testimonial: true,
+    inapp_on_booking_pending: true,
+    inapp_on_booking_confirmed: true,
+    inapp_on_booking_reminder: true,
+    inapp_on_link_expiring: true,
+    inapp_on_link_expired: true,
+    inapp_on_new_gallery: true,
+    inapp_on_link_deactivated: true,
+    inapp_on_gallery_archived: true,
+    inapp_on_gallery_restored: true,
+    inapp_on_gallery_deleted: true,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -68,18 +86,35 @@ export default function NotificationSettings() {
 
       if (data) {
         setPreferences({
-          email_enabled: data.email_enabled ?? true,
-          email_on_gallery_view: data.email_on_gallery_view || false,
-          email_on_favorites: data.email_on_favorites || false,
+          notification_email: data.notification_email || '',
+          // Email notifications
+          email_on_gallery_view: data.email_on_gallery_view ?? false,
+          email_on_favorites: data.email_on_favorites ?? false,
+          email_on_testimonial: data.email_on_testimonial ?? true,
+          email_on_booking_pending: data.email_on_booking_pending ?? true,
+          email_on_booking_confirmed: data.email_on_booking_confirmed ?? true,
+          email_on_booking_reminder: data.email_on_booking_reminder ?? true,
           email_on_link_expiring: data.email_on_link_expiring ?? true,
           email_on_link_expired: data.email_on_link_expired ?? true,
-          email_on_new_gallery: data.email_on_new_gallery || false,
-          email_on_link_deactivated: data.email_on_link_deactivated || false,
-          email_on_gallery_archived: data.email_on_gallery_archived || false,
-          email_on_gallery_restored: data.email_on_gallery_restored || false,
+          email_on_new_gallery: data.email_on_new_gallery ?? false,
+          email_on_link_deactivated: data.email_on_link_deactivated ?? false,
+          email_on_gallery_archived: data.email_on_gallery_archived ?? false,
+          email_on_gallery_restored: data.email_on_gallery_restored ?? false,
           email_on_gallery_deleted: data.email_on_gallery_deleted ?? true,
-          inapp_enabled: data.inapp_enabled ?? true,
-          notification_email: data.notification_email || '',
+          // In-app notifications
+          inapp_on_gallery_view: data.inapp_on_gallery_view ?? true,
+          inapp_on_favorites: data.inapp_on_favorites ?? true,
+          inapp_on_testimonial: data.inapp_on_testimonial ?? true,
+          inapp_on_booking_pending: data.inapp_on_booking_pending ?? true,
+          inapp_on_booking_confirmed: data.inapp_on_booking_confirmed ?? true,
+          inapp_on_booking_reminder: data.inapp_on_booking_reminder ?? true,
+          inapp_on_link_expiring: data.inapp_on_link_expiring ?? true,
+          inapp_on_link_expired: data.inapp_on_link_expired ?? true,
+          inapp_on_new_gallery: data.inapp_on_new_gallery ?? true,
+          inapp_on_link_deactivated: data.inapp_on_link_deactivated ?? true,
+          inapp_on_gallery_archived: data.inapp_on_gallery_archived ?? true,
+          inapp_on_gallery_restored: data.inapp_on_gallery_restored ?? true,
+          inapp_on_gallery_deleted: data.inapp_on_gallery_deleted ?? true,
         });
       } else {
         // Crear preferencias por defecto
@@ -116,9 +151,14 @@ export default function NotificationSettings() {
 
       // Preparar datos para actualizar (solo los campos que existen en la tabla)
       const updateData = {
-        email_enabled: preferences.email_enabled,
+        notification_email: preferences.notification_email,
+        // Email notifications
         email_on_gallery_view: preferences.email_on_gallery_view,
         email_on_favorites: preferences.email_on_favorites,
+        email_on_testimonial: preferences.email_on_testimonial,
+        email_on_booking_pending: preferences.email_on_booking_pending,
+        email_on_booking_confirmed: preferences.email_on_booking_confirmed,
+        email_on_booking_reminder: preferences.email_on_booking_reminder,
         email_on_link_expiring: preferences.email_on_link_expiring,
         email_on_link_expired: preferences.email_on_link_expired,
         email_on_new_gallery: preferences.email_on_new_gallery,
@@ -126,8 +166,20 @@ export default function NotificationSettings() {
         email_on_gallery_archived: preferences.email_on_gallery_archived,
         email_on_gallery_restored: preferences.email_on_gallery_restored,
         email_on_gallery_deleted: preferences.email_on_gallery_deleted,
-        inapp_enabled: preferences.inapp_enabled,
-        notification_email: preferences.notification_email,
+        // In-app notifications
+        inapp_on_gallery_view: preferences.inapp_on_gallery_view,
+        inapp_on_favorites: preferences.inapp_on_favorites,
+        inapp_on_testimonial: preferences.inapp_on_testimonial,
+        inapp_on_booking_pending: preferences.inapp_on_booking_pending,
+        inapp_on_booking_confirmed: preferences.inapp_on_booking_confirmed,
+        inapp_on_booking_reminder: preferences.inapp_on_booking_reminder,
+        inapp_on_link_expiring: preferences.inapp_on_link_expiring,
+        inapp_on_link_expired: preferences.inapp_on_link_expired,
+        inapp_on_new_gallery: preferences.inapp_on_new_gallery,
+        inapp_on_link_deactivated: preferences.inapp_on_link_deactivated,
+        inapp_on_gallery_archived: preferences.inapp_on_gallery_archived,
+        inapp_on_gallery_restored: preferences.inapp_on_gallery_restored,
+        inapp_on_gallery_deleted: preferences.inapp_on_gallery_deleted,
       };
 
       const { error } = await supabase
@@ -176,57 +228,94 @@ export default function NotificationSettings() {
     );
   }
 
-  const emailNotifications = [
+  const notificationTypes = [
     {
-      key: 'email_on_new_gallery',
+      emailKey: 'email_on_new_gallery',
+      inappKey: 'inapp_on_new_gallery',
       icon: ImagePlus,
       title: 'Cuando crees una nueva galería',
       description: 'Confirmación cada vez que subas una nueva galería',
     },
     {
-      key: 'email_on_gallery_view',
+      emailKey: 'email_on_gallery_view',
+      inappKey: 'inapp_on_gallery_view',
       icon: Eye,
       title: 'Cuando un cliente vea una galería',
-      description: 'Recibirás un email cada vez que alguien abra un enlace compartido',
+      description: 'Notificación cada vez que alguien abra un enlace compartido',
     },
     {
-      key: 'email_on_favorites',
+      emailKey: 'email_on_favorites',
+      inappKey: 'inapp_on_favorites',
       icon: Heart,
       title: 'Cuando un cliente seleccione o edite favoritos',
       description: 'Te avisaremos cuando un cliente envíe o modifique su selección de fotos favoritas',
     },
     {
-      key: 'email_on_link_expiring',
+      emailKey: 'email_on_testimonial',
+      inappKey: 'inapp_on_testimonial',
+      icon: MessageSquare,
+      title: 'Cuando un cliente deje un testimonio',
+      description: 'Te notificaremos cuando un cliente envíe un testimonio sobre una galería',
+    },
+    {
+      emailKey: 'email_on_booking_pending',
+      inappKey: 'inapp_on_booking_pending',
+      icon: Calendar,
+      title: 'Cuando recibas una nueva reserva pendiente',
+      description: 'Te avisaremos cuando un cliente haga una reserva que requiera aprobación',
+    },
+    {
+      emailKey: 'email_on_booking_confirmed',
+      inappKey: 'inapp_on_booking_confirmed',
+      icon: Calendar,
+      title: 'Cuando confirmes una reserva',
+      description: 'Confirmación cada vez que apruebes una reserva de un cliente',
+    },
+    {
+      emailKey: 'email_on_booking_reminder',
+      inappKey: 'inapp_on_booking_reminder',
+      icon: Calendar,
+      title: 'Recordatorio de reservas próximas',
+      description: 'Te recordaremos 24 horas antes de cada reunión confirmada',
+    },
+    {
+      emailKey: 'email_on_link_expiring',
+      inappKey: 'inapp_on_link_expiring',
       icon: Calendar,
       title: 'Cuando un enlace esté por vencer',
       description: 'Te recordaremos 7 días antes de que expire un enlace compartido',
     },
     {
-      key: 'email_on_link_expired',
+      emailKey: 'email_on_link_expired',
+      inappKey: 'inapp_on_link_expired',
       icon: LinkIcon,
       title: 'Cuando un enlace expire',
       description: 'Te avisaremos cuando un enlace compartido haya vencido y se desactive automáticamente',
     },
     {
-      key: 'email_on_link_deactivated',
+      emailKey: 'email_on_link_deactivated',
+      inappKey: 'inapp_on_link_deactivated',
       icon: XCircle,
       title: 'Cuando desactives un enlace manualmente',
       description: 'Te confirmaremos cuando desactives un enlace compartido',
     },
     {
-      key: 'email_on_gallery_archived',
+      emailKey: 'email_on_gallery_archived',
+      inappKey: 'inapp_on_gallery_archived',
       icon: Archive,
       title: 'Cuando archives una galería',
       description: 'Te avisaremos cuando una galería sea archivada',
     },
     {
-      key: 'email_on_gallery_restored',
+      emailKey: 'email_on_gallery_restored',
+      inappKey: 'inapp_on_gallery_restored',
       icon: Archive,
       title: 'Cuando restaures una galería archivada',
       description: 'Te confirmaremos cuando vuelvas a activar una galería archivada',
     },
     {
-      key: 'email_on_gallery_deleted',
+      emailKey: 'email_on_gallery_deleted',
+      inappKey: 'inapp_on_gallery_deleted',
       icon: Trash2,
       title: 'Cuando elimines una galería',
       description: 'Te confirmaremos cuando elimines permanentemente una galería',
@@ -256,11 +345,11 @@ export default function NotificationSettings() {
         </motion.div>
       )}
 
-      {/* Notificaciones por Email */}
+      {/* Campo de email para notificaciones */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border-2 border-gray-200 rounded-xl p-5 sm:p-6 space-y-5"
+        className="bg-white border-2 border-gray-200 rounded-xl p-5 sm:p-6 space-y-3"
       >
         <div className="flex items-start gap-3">
           <div className="p-2.5 bg-[#79502A]/10 rounded-lg">
@@ -268,85 +357,31 @@ export default function NotificationSettings() {
           </div>
           <div className="flex-1">
             <h3 className="font-voga text-lg sm:text-xl text-black mb-1">
-              Notificaciones por Email
+              Email para notificaciones
             </h3>
             <p className="font-fira text-sm text-gray-600">
-              Recibe actualizaciones importantes directamente en tu correo electrónico
+              Configura el email donde recibirás las notificaciones
             </p>
           </div>
         </div>
 
-        {/* Campo de email para notificaciones */}
         <div className="space-y-2 pt-1">
-          <label className="block font-fira text-xs sm:text-sm font-medium text-black">
-            Email para recibir notificaciones
-          </label>
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-            <input
-              type="email"
-              value={preferences.notification_email}
-              onChange={(e) => handleChange('notification_email', e.target.value)}
-              placeholder="tu-email@ejemplo.com"
-              className="flex-1 px-3 sm:px-4 py-2.5 border-2 border-gray-200 rounded-lg font-fira text-sm text-black
-                focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 focus:border-[#79502A] transition-all
-                hover:border-gray-300 w-full"
-            />
-            <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
-              <input
-                type="checkbox"
-                checked={preferences.email_enabled}
-                onChange={() => handleChange('email_enabled')}
-                className="w-5 h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer flex-shrink-0"
-              />
-              <span className="font-fira text-xs sm:text-sm font-medium text-black">
-                Habilitar emails
-              </span>
-            </label>
-          </div>
+          <input
+            type="email"
+            value={preferences.notification_email}
+            onChange={(e) => handleChange('notification_email', e.target.value)}
+            placeholder="tu-email@ejemplo.com"
+            className="w-full px-3 sm:px-4 py-2.5 border-2 border-gray-200 rounded-lg font-fira text-sm text-black
+              focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 focus:border-[#79502A] transition-all
+              hover:border-gray-300"
+          />
           <p className="font-fira text-xs text-gray-500 leading-relaxed">
-            {preferences.email_enabled
-              ? 'Los emails están habilitados. Las notificaciones seleccionadas abajo se enviarán a este correo.'
-              : 'Los emails están deshabilitados. No se enviará ningún email aunque estén marcadas las opciones.'}
+            Configura qué notificaciones quieres recibir por email y cuáles en la plataforma
           </p>
-        </div>
-
-        <div className="border-t border-gray-200 my-4"></div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          {emailNotifications.map((item) => {
-            const IconComponent = item.icon;
-            return (
-              <label
-                key={item.key}
-                className="flex items-start gap-2 sm:gap-3 cursor-pointer group p-2.5 sm:p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
-              >
-                <input
-                  type="checkbox"
-                  checked={preferences[item.key]}
-                  onChange={() => handleChange(item.key)}
-                  className="mt-0.5 sm:mt-1 w-4 h-4 sm:w-5 sm:h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer flex-shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-                    <IconComponent
-                      size={14}
-                      className="text-[#79502A] flex-shrink-0 sm:w-4 sm:h-4"
-                    />
-                    <span className="font-fira text-xs sm:text-sm font-medium text-black leading-tight">
-                      {item.title}
-                    </span>
-                  </div>
-                  <p className="font-fira text-xs text-gray-600 leading-relaxed">
-                    {item.description}
-                  </p>
-                </div>
-              </label>
-            );
-          })}
         </div>
       </motion.div>
 
-      {/* Notificaciones en la Plataforma */}
+      {/* Configuración de notificaciones */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -359,30 +394,68 @@ export default function NotificationSettings() {
           </div>
           <div>
             <h3 className="font-voga text-lg sm:text-xl text-black mb-1">
-              Notificaciones en la Plataforma
+              Tipos de notificaciones
             </h3>
             <p className="font-fira text-sm text-gray-600">
-              Recibe notificaciones directamente en el dashboard cuando estés conectado
+              Elige cómo quieres recibir cada tipo de notificación
             </p>
           </div>
         </div>
 
-        <label className="flex items-start gap-2 sm:gap-3 md:gap-4 cursor-pointer group p-2.5 sm:p-3 rounded-lg hover:bg-gray-50 transition-colors">
-          <input
-            type="checkbox"
-            checked={preferences.inapp_enabled}
-            onChange={() => handleChange('inapp_enabled')}
-            className="mt-0.5 sm:mt-1 w-4 h-4 sm:w-5 sm:h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer flex-shrink-0"
-          />
-          <div>
-            <span className="font-fira text-xs sm:text-sm font-medium text-black block mb-0.5 sm:mb-1 leading-tight">
-              Habilitar notificaciones en la plataforma
-            </span>
-            <p className="font-fira text-xs text-gray-600 leading-relaxed">
-              Verás todas las actualizaciones en tiempo real en el ícono de campana
-            </p>
-          </div>
-        </label>
+        <div className="space-y-3">
+          {notificationTypes.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <div
+                key={item.emailKey}
+                className="p-3 sm:p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+              >
+                <div className="flex items-start gap-3 mb-3">
+                  <IconComponent
+                    size={18}
+                    className="text-[#79502A] flex-shrink-0 mt-0.5"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-fira text-sm font-semibold text-black mb-1 leading-tight">
+                      {item.title}
+                    </h4>
+                    <p className="font-fira text-xs text-gray-600 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 sm:gap-6 ml-9">
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={preferences[item.emailKey]}
+                      onChange={() => handleChange(item.emailKey)}
+                      className="w-4 h-4 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer"
+                    />
+                    <span className="font-fira text-xs font-medium text-gray-700 group-hover:text-black transition-colors flex items-center gap-1.5">
+                      <Mail size={14} className="text-[#79502A]" />
+                      Email
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={preferences[item.inappKey]}
+                      onChange={() => handleChange(item.inappKey)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                    />
+                    <span className="font-fira text-xs font-medium text-gray-700 group-hover:text-black transition-colors flex items-center gap-1.5">
+                      <Bell size={14} className="text-blue-600" />
+                      In-app
+                    </span>
+                  </label>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </motion.div>
 
       {/* Botón Guardar */}

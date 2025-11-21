@@ -430,6 +430,203 @@ export function galleryDeletedEmail({ galleryTitle }) {
   };
 }
 
+// ============================================
+// TEMPLATES DE AGENDA
+// ============================================
+
+/**
+ * Template: Nueva reserva pendiente
+ */
+function bookingPendingEmail({ bookingType, clientName, clientEmail, bookingDate, startTime, endTime, agendaUrl }) {
+  const content = `
+    <div class="highlight">
+      <p style="font-size: 18px; font-weight: 600; color: #79502A; margin-bottom: 12px;">
+        📅 Nueva reserva pendiente de aprobación
+      </p>
+      <p><strong>Tipo de reunión:</strong> ${bookingType}</p>
+      <p><strong>Cliente:</strong> ${clientName}</p>
+      <p><strong>Email:</strong> ${clientEmail}</p>
+      <p><strong>Fecha:</strong> ${bookingDate}</p>
+      <p><strong>Horario:</strong> ${startTime} - ${endTime}</p>
+    </div>
+
+    <p>Un cliente ha solicitado una reunión. Revisa los detalles y apruébala o recházala desde tu agenda.</p>
+
+    <div style="text-align: center;">
+      <a href="${agendaUrl}" class="button">Ver en Agenda</a>
+    </div>
+  `;
+
+  return {
+    subject: `Nueva reserva de ${bookingType} - ${clientName}`,
+    html: wrapTemplate(content, 'Nueva Reserva Pendiente'),
+  };
+}
+
+/**
+ * Template: Reserva confirmada
+ */
+function bookingConfirmedEmail({ bookingType, clientName, clientEmail, bookingDate, startTime, endTime, agendaUrl }) {
+  const content = `
+    <div class="highlight">
+      <p style="font-size: 18px; font-weight: 600; color: #79502A; margin-bottom: 12px;">
+        ✅ Reserva confirmada
+      </p>
+      <p><strong>Tipo de reunión:</strong> ${bookingType}</p>
+      <p><strong>Cliente:</strong> ${clientName}</p>
+      <p><strong>Email:</strong> ${clientEmail}</p>
+      <p><strong>Fecha:</strong> ${bookingDate}</p>
+      <p><strong>Horario:</strong> ${startTime} - ${endTime}</p>
+    </div>
+
+    <p>Has confirmado esta reunión. El cliente ha sido notificado y la cita está agregada a tu agenda.</p>
+
+    <div style="text-align: center;">
+      <a href="${agendaUrl}" class="button">Ver Agenda Completa</a>
+    </div>
+  `;
+
+  return {
+    subject: `Reserva confirmada: ${bookingType} con ${clientName}`,
+    html: wrapTemplate(content, 'Reserva Confirmada'),
+  };
+}
+
+/**
+ * Template: Recordatorio de reserva próxima
+ */
+function bookingReminderEmail({ bookingType, clientName, clientEmail, bookingDate, startTime, endTime, agendaUrl }) {
+  const content = `
+    <div class="highlight">
+      <p style="font-size: 18px; font-weight: 600; color: #79502A; margin-bottom: 12px;">
+        ⏰ Recordatorio: Reunión mañana
+      </p>
+      <p><strong>Tipo de reunión:</strong> ${bookingType}</p>
+      <p><strong>Cliente:</strong> ${clientName}</p>
+      <p><strong>Email:</strong> ${clientEmail}</p>
+      <p><strong>Fecha:</strong> ${bookingDate}</p>
+      <p><strong>Horario:</strong> ${startTime} - ${endTime}</p>
+    </div>
+
+    <p>Este es un recordatorio de que mañana tienes una reunión confirmada. No olvides prepararte con anticipación.</p>
+
+    <div style="text-align: center;">
+      <a href="${agendaUrl}" class="button">Ver Detalles</a>
+    </div>
+  `;
+
+  return {
+    subject: `Recordatorio: ${bookingType} mañana a las ${startTime}`,
+    html: wrapTemplate(content, 'Recordatorio de Reunión'),
+  };
+}
+
+// ============================================
+// TEMPLATES PARA CLIENTES (AGENDA PÚBLICA)
+// ============================================
+
+/**
+ * Template: Solicitud de reserva recibida (para el cliente)
+ */
+function clientBookingRequestedEmail({ bookingType, clientName, bookingDate, startTime, endTime }) {
+  const content = `
+    <p>Hola <strong>${clientName}</strong>,</p>
+
+    <p>¡Gracias por tu solicitud! Hemos recibido tu pedido de reserva y te confirmamos los siguientes datos:</p>
+
+    <div class="highlight">
+      <p style="font-size: 18px; font-weight: 600; color: #79502A; margin-bottom: 12px;">
+        📋 Solicitud recibida
+      </p>
+      <p><strong>Tipo de reunión:</strong> ${bookingType}</p>
+      <p><strong>Fecha solicitada:</strong> ${bookingDate}</p>
+      <p><strong>Horario solicitado:</strong> ${startTime} - ${endTime}</p>
+    </div>
+
+    <p><strong>¿Qué sigue?</strong></p>
+    <p>Tu solicitud está pendiente de confirmación. Revisaremos tu pedido y te enviaremos un email confirmando si podemos atenderte en el horario solicitado.</p>
+
+    <p>Si tienes alguna consulta mientras tanto, no dudes en contactarnos.</p>
+
+    <p style="margin-top: 24px;">
+      Saludos,<br>
+      <strong style="color: #79502A;">Alma Fotografía</strong>
+    </p>
+  `;
+
+  return {
+    subject: `Solicitud recibida - ${bookingType} el ${bookingDate}`,
+    html: wrapTemplate(content, 'Solicitud de Reserva Recibida'),
+  };
+}
+
+/**
+ * Template: Reserva confirmada (para el cliente)
+ */
+function clientBookingConfirmedEmail({ bookingType, clientName, bookingDate, startTime, endTime }) {
+  const content = `
+    <p>Hola <strong>${clientName}</strong>,</p>
+
+    <p>¡Excelente noticia! Tu reserva ha sido confirmada.</p>
+
+    <div class="highlight">
+      <p style="font-size: 18px; font-weight: 600; color: #79502A; margin-bottom: 12px;">
+        ✅ Reserva confirmada
+      </p>
+      <p><strong>Tipo de reunión:</strong> ${bookingType}</p>
+      <p><strong>Fecha:</strong> ${bookingDate}</p>
+      <p><strong>Horario:</strong> ${startTime} - ${endTime}</p>
+    </div>
+
+    <p>Te esperamos en el horario acordado. Si necesitas hacer algún cambio o tienes alguna consulta, no dudes en contactarnos.</p>
+
+    <p style="margin-top: 24px;">
+      Saludos,<br>
+      <strong style="color: #79502A;">Alma Fotografía</strong>
+    </p>
+  `;
+
+  return {
+    subject: `Reserva confirmada - ${bookingType} el ${bookingDate}`,
+    html: wrapTemplate(content, 'Reserva Confirmada'),
+  };
+}
+
+/**
+ * Template: Reserva rechazada (para el cliente)
+ */
+function clientBookingRejectedEmail({ bookingType, clientName, bookingDate, startTime, reason }) {
+  const content = `
+    <p>Hola <strong>${clientName}</strong>,</p>
+
+    <p>Lamentamos informarte que no pudimos confirmar tu solicitud de reserva para la siguiente fecha:</p>
+
+    <div class="highlight">
+      <p style="font-size: 18px; font-weight: 600; color: #79502A; margin-bottom: 12px;">
+        Reserva no disponible
+      </p>
+      <p><strong>Tipo de reunión:</strong> ${bookingType}</p>
+      <p><strong>Fecha solicitada:</strong> ${bookingDate}</p>
+      <p><strong>Horario solicitado:</strong> ${startTime}</p>
+      ${reason ? `<p><strong>Motivo:</strong> ${reason}</p>` : ''}
+    </div>
+
+    <p>Te invitamos a elegir otra fecha y horario disponible. Puedes hacer una nueva reserva en cualquier momento.</p>
+
+    <p>Si tienes alguna consulta o necesitas ayuda para encontrar un horario alternativo, no dudes en contactarnos.</p>
+
+    <p style="margin-top: 24px;">
+      Saludos,<br>
+      <strong style="color: #79502A;">Alma Fotografía</strong>
+    </p>
+  `;
+
+  return {
+    subject: `Reserva no disponible - ${bookingType} el ${bookingDate}`,
+    html: wrapTemplate(content, 'Reserva No Disponible'),
+  };
+}
+
 /**
  * Obtiene el template correcto según el tipo de notificación
  */
@@ -455,6 +652,18 @@ export function getEmailTemplate(type, data) {
       return galleryRestoredEmail(data);
     case 'gallery_deleted':
       return galleryDeletedEmail(data);
+    case 'booking_pending':
+      return bookingPendingEmail(data);
+    case 'booking_confirmed':
+      return bookingConfirmedEmail(data);
+    case 'booking_reminder':
+      return bookingReminderEmail(data);
+    case 'client_booking_requested':
+      return clientBookingRequestedEmail(data);
+    case 'client_booking_confirmed':
+      return clientBookingConfirmedEmail(data);
+    case 'client_booking_rejected':
+      return clientBookingRejectedEmail(data);
     default:
       return null;
   }

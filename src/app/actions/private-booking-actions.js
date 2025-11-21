@@ -1,0 +1,343 @@
+'use server';
+
+import { createClient } from '@/lib/server';
+
+/**
+ * ============================================
+ * SERVER ACTIONS - AGENDA PRIVADA (POR DÍA)
+ * ============================================
+ * Sistema de eventos por día completo desde el dashboard
+ * Máximo 2 eventos por día (2 salones disponibles)
+ */
+
+/**
+ * Obtener todas las reservas privadas
+ */
+export async function getAllPrivateBookings() {
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from('private_bookings')
+      .select(`
+        *,
+        service_type:service_types(id, name, slug, icon_name)
+      `)
+      .order('booking_date', { ascending: true });
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      bookings: data || [],
+    };
+  } catch (error) {
+    console.error('[getAllPrivateBookings] Error:', error);
+    return { success: false, error: error.message, bookings: [] };
+  }
+}
+
+/**
+ * Obtener reservas privadas por rango de fechas
+ */
+export async function getPrivateBookingsByDateRange(startDate, endDate) {
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from('private_bookings')
+      .select(`
+        *,
+        service_type:service_types(id, name, slug, icon_name)
+      `)
+      .eq('status', 'confirmed')
+      .gte('booking_date', startDate)
+      .lte('booking_date', endDate)
+      .order('booking_date', { ascending: true });
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      bookings: data || [],
+    };
+  } catch (error) {
+    console.error('[getPrivateBookingsByDateRange] Error:', error);
+    return { success: false, error: error.message, bookings: [] };
+  }
+}
+
+/**
+ * Crear una reserva privada (evento de día completo)
+ */
+export async function createPrivateBooking({
+  serviceTypeId,
+  clientName,
+  clientEmail,
+  clientPhone,
+  bookingDate,
+  notes,
+  internalNotes,
+}) {
+  try {
+    // Validaciones
+    if (!serviceTypeId || !clientName || !bookingDate) {
+      return {
+        success: false,
+        error: 'El tipo de servicio, nombre del cliente y fecha son requeridos',
+      };
+    }
+
+    const supabase = await createClient();
+
+    // Verificar autenticación
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'No autenticado' };
+    }
+
+    // Verificar que el servicio existe
+    const { data: service, error: serviceError } = await supabase
+      .from('service_types')
+      .select('id, name')
+      .eq('id', serviceTypeId)
+      .single();
+
+    if (serviceError || !service) {
+      return {
+        success: false,
+        error: 'Servicio no encontrado',
+      };
+    }
+
+    // Verificar que la fecha no esté bloqueada
+    const { data: blockedDate } = await supabase
+      .from('blocked_dates')
+      .select('id')
+      .eq('blocked_date', bookingDate)
+      .maybeSingle();
+
+    if (blockedDate) {
+      return {
+        success: false,
+        error: 'Esta fecha está bloqueada',
+      };
+    }
+
+    // Verificar que no haya más de 2 eventos ese día (MÁXIMO 2 SALONES)
+    const { data: existingBookings, error: countError } = await supabase
+      .from('private_bookings')
+      .select('id')
+      .eq('booking_date', bookingDate)
+      .eq('status', 'confirmed');
+
+    if (countError) throw countError;
+
+    if (existingBookings && existingBookings.length >= 2) {
+      return {
+        success: false,
+        error: 'Ya hay 2 eventos confirmados para esta fecha (límite alcanzado)',
+      };
+    }
+
+    // Crear la reserva
+    const { data, error } = await supabase
+      .from('private_bookings')
+      .insert({
+        service_type_id: serviceTypeId,
+        client_name: clientName.trim(),
+        client_email: clientEmail?.toLowerCase().trim() || null,
+        client_phone: clientPhone?.trim() || null,
+        booking_date: bookingDate,
+        notes: notes?.trim() || null,
+        internal_notes: internalNotes?.trim() || null,
+        status: 'confirmed',
+        created_by: user.id,
+      })
+      .select(`
+        *,
+        service_type:service_types(id, name, slug, icon_name)
+      `)
+      .single();
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      booking: data,
+    };
+  } catch (error) {
+    console.error('[createPrivateBooking] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Actualizar una reserva privada
+ */
+export async function updatePrivateBooking(bookingId, updates) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'No autenticado' };
+    }
+
+    // Si se está cambiando la fecha, verificar límite de 2 por día
+    if (updates.booking_date) {
+      const { data: existingBookings } = await supabase
+        .from('private_bookings')
+        .select('id')
+        .eq('booking_date', updates.booking_date)
+        .eq('status', 'confirmed')
+        .neq('id', bookingId);
+
+      if (existingBookings && existingBookings.length >= 2) {
+        return {
+          success: false,
+          error: 'Ya hay 2 eventos confirmados para esta fecha',
+        };
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('private_bookings')
+      .update(updates)
+      .eq('id', bookingId)
+      .select(`
+        *,
+        service_type:service_types(id, name, slug, icon_name)
+      `)
+      .single();
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      booking: data,
+    };
+  } catch (error) {
+    console.error('[updatePrivateBooking] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Cancelar una reserva privada
+ */
+export async function cancelPrivateBooking(bookingId) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'No autenticado' };
+    }
+
+    const { data, error } = await supabase
+      .from('private_bookings')
+      .update({ status: 'cancelled' })
+      .eq('id', bookingId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      booking: data,
+    };
+  } catch (error) {
+    console.error('[cancelPrivateBooking] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Eliminar una reserva privada
+ */
+export async function deletePrivateBooking(bookingId) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'No autenticado' };
+    }
+
+    const { error } = await supabase
+      .from('private_bookings')
+      .delete()
+      .eq('id', bookingId);
+
+    if (error) throw error;
+
+    return { success: true };
+  } catch (error) {
+    console.error('[deletePrivateBooking] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Verificar disponibilidad para una fecha (cuántos slots quedan)
+ */
+export async function checkDateAvailability(date) {
+  try {
+    const supabase = await createClient();
+
+    // Verificar si está bloqueada
+    const { data: blockedDate } = await supabase
+      .from('blocked_dates')
+      .select('id, reason')
+      .eq('blocked_date', date)
+      .maybeSingle();
+
+    if (blockedDate) {
+      return {
+        success: true,
+        available: false,
+        reason: blockedDate.reason || 'Fecha bloqueada',
+        slotsRemaining: 0,
+      };
+    }
+
+    // Contar eventos confirmados
+    const { data: bookings, error } = await supabase
+      .from('private_bookings')
+      .select('id')
+      .eq('booking_date', date)
+      .eq('status', 'confirmed');
+
+    if (error) throw error;
+
+    const count = bookings?.length || 0;
+    const slotsRemaining = 2 - count;
+
+    return {
+      success: true,
+      available: slotsRemaining > 0,
+      slotsRemaining: slotsRemaining,
+      message:
+        slotsRemaining === 0
+          ? 'Sin cupos disponibles'
+          : `${slotsRemaining} ${slotsRemaining === 1 ? 'cupo disponible' : 'cupos disponibles'}`,
+    };
+  } catch (error) {
+    console.error('[checkDateAvailability] Error:', error);
+    return { success: false, error: error.message };
+  }
+}

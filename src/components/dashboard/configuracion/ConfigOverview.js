@@ -9,6 +9,7 @@ import {
   Palette,
   Shield,
   Database,
+  Calendar,
   ArrowRight,
   Sparkles
 } from 'lucide-react';
@@ -23,6 +24,17 @@ const quickActions = [
     iconBg: 'bg-gradient-to-br from-[#79502A] to-[#8B5A2F]',
     iconColor: 'text-white',
     accentColor: 'text-[#79502A]',
+    disabled: false
+  },
+  {
+    icon: Calendar,
+    title: 'Agenda',
+    description: 'Horarios, bloqueos y tipos de reunión',
+    href: '/dashboard/configuracion/agenda',
+    gradient: 'from-blue-50 to-indigo-50',
+    iconBg: 'bg-gradient-to-br from-blue-600 to-indigo-600',
+    iconColor: 'text-white',
+    accentColor: 'text-blue-600',
     disabled: false
   },
   {

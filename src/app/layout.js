@@ -80,7 +80,7 @@ export default function RootLayout({ children }) {
               image: 'https://alma-fotografia.vercel.app/img/logos/logo_BN_SF.png',
               '@id': 'https://alma-fotografia.vercel.app',
               url: 'https://alma-fotografia.vercel.app',
-              telephone: '',
+              telephone: '+598 92021392',
               priceRange: '$$',
               address: {
                 '@type': 'PostalAddress',
@@ -104,9 +104,7 @@ export default function RootLayout({ children }) {
                 closes: '20:00',
               },
               sameAs: [
-                // Agregar redes sociales aquí cuando estén disponibles
-                // 'https://www.instagram.com/almafotografia',
-                // 'https://www.facebook.com/almafotografia',
+                'https://www.instagram.com/alma_fotografia.uy',
               ],
               potentialAction: {
                 '@type': 'SearchAction',

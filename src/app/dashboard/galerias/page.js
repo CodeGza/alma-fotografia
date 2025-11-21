@@ -5,9 +5,13 @@ import GalleriesView from '@/components/dashboard/galeria/GalleriesView';
 import GalleryGridSkeleton from '@/components/dashboard/galeria/GalleryGridSkeleton';
 import CreateGalleryButton from '@/components/dashboard/galeria/CreateGalleryButton';
 
+export const metadata = {
+  title: 'Galerías',
+};
+
 /**
  * Página principal de galerías - v3 FINAL
- * 
+ *
  * QUERY MEJORADA:
  * - Trae info de gallery_shares para saber si hay enlace activo
  * - Calcula vistas reales según enlaces activos

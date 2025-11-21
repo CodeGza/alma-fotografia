@@ -3,9 +3,21 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import DashboardLayoutClient from '@/components/dashboard/DashboardLayoutClient';
 
+export const metadata = {
+  title: {
+    default: 'Dashboard - Alma Fotografía',
+    template: '%s - Dashboard - Alma Fotografía'
+  },
+  description: 'Panel de administración de Alma Fotografía',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 /**
  * DashboardLayout - Layout base para todas las páginas del dashboard
- * 
+ *
  * Obtiene datos del usuario autenticado y los pasa a componentes hijos
  */
 export default async function DashboardLayout({ children }) {

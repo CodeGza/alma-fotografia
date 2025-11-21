@@ -38,7 +38,9 @@
       "Bash(node scripts/run-migration.js:*)",
       "Bash(clip)",
       "Bash(node temp-fix-notifications.js:*)",
-      "Bash(.gitignore)"
+      "Bash(.gitignore)",
+      "Bash(pnpm approve-builds:*)",
+      "Bash(node scripts/generate-favicons.js:*)"
     ],
     "deny": [],
     "ask": []

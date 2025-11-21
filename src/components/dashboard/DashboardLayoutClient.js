@@ -331,10 +331,13 @@ export default function DashboardLayoutClient({ children, userName }) {
         <header className="lg:hidden sticky top-0 z-30 bg-[#1a1a1a] border-b border-white/10 px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <img
+              <Image
                 src="/img/logos/logo_BN_SF.png"
                 alt="Alma Fotografía Logo"
+                width={120}
+                height={48}
                 className="w-auto h-12 object-contain brightness-0 invert"
+                priority
               />
             </Link>
 

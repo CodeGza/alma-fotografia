@@ -234,7 +234,7 @@ export default function AgendaPage() {
         <DashboardHeader title="Agenda" subtitle="Gestión de reservas y calendario" />
         <AnimatedSection>
           <div className="flex items-center justify-center py-12">
-            <Loader2 size={40} className="animate-spin text-[#79502A]" />
+            <Loader2 size={40} className="animate-spin text-[#8B5E3C]" />
           </div>
         </AnimatedSection>
       </PageTransition>
@@ -258,12 +258,12 @@ export default function AgendaPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0 }}
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#2D2D2D] rounded-xl border border-[#79502A]/30 shadow-sm hover:shadow-md transition-all duration-200"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
             >
-              <Users size={18} className="text-[#C6A97D]" />
+              <Users size={18} className="text-[#8B5E3C]" />
               <div>
-                <p className="font-fira text-xs text-[#FFF8E2]/70">Reuniones</p>
-                <p className="font-fira text-sm font-bold text-[#FFF8E2]">{publicConfirmedCount}</p>
+                <p className="font-fira text-xs text-gray-600/70">Reuniones</p>
+                <p className="font-fira text-sm font-bold text-gray-900">{publicConfirmedCount}</p>
               </div>
             </motion.div>
 
@@ -272,12 +272,12 @@ export default function AgendaPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="flex items-center gap-2 px-4 py-2.5 bg-[#2D2D2D] rounded-xl border border-[#C6A97D]/30 shadow-sm hover:shadow-md transition-all duration-200"
+                className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
               >
-                <Clock size={18} className="text-[#C6A97D]" />
+                <Clock size={18} className="text-[#8B5E3C]" />
                 <div>
-                  <p className="font-fira text-xs text-[#FFF8E2]/70">Pendientes</p>
-                  <p className="font-fira text-sm font-bold text-[#FFF8E2]">{publicPendingCount}</p>
+                  <p className="font-fira text-xs text-gray-600/70">Pendientes</p>
+                  <p className="font-fira text-sm font-bold text-gray-900">{publicPendingCount}</p>
                 </div>
               </motion.div>
             )}
@@ -286,12 +286,12 @@ export default function AgendaPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#2D2D2D] rounded-xl border border-[#79502A]/30 shadow-sm hover:shadow-md transition-all duration-200"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
             >
-              <Briefcase size={18} className="text-[#C6A97D]" />
+              <Briefcase size={18} className="text-[#8B5E3C]" />
               <div>
-                <p className="font-fira text-xs text-[#FFF8E2]/70">Eventos</p>
-                <p className="font-fira text-sm font-bold text-[#FFF8E2]">{privateConfirmedCount}</p>
+                <p className="font-fira text-xs text-gray-600/70">Eventos</p>
+                <p className="font-fira text-sm font-bold text-gray-900">{privateConfirmedCount}</p>
               </div>
             </motion.div>
           </div>
@@ -300,7 +300,7 @@ export default function AgendaPage() {
           <div className="flex gap-2">
             <Link
               href="/dashboard/configuracion/agenda"
-              className="px-4 py-2 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-xl font-fira text-sm font-semibold transition-all duration-200 flex items-center gap-2 hover:shadow-md"
+              className="px-4 py-2 bg-white border border-gray-200 hover:border-[#8B5E3C] text-gray-900 rounded-xl font-fira text-sm font-semibold transition-all duration-200 flex items-center gap-2 hover:shadow-md"
             >
               <Settings size={16} />
               <span className="hidden sm:inline">Configurar</span>
@@ -308,7 +308,7 @@ export default function AgendaPage() {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2.5 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-xl font-fira text-sm font-semibold transition-all duration-200 flex items-center gap-2 hover:shadow-xl hover:scale-105"
+              className="px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-xl font-fira text-sm font-semibold transition-all duration-200 flex items-center gap-2 hover:shadow-xl hover:scale-105"
             >
               <Plus size={16} />
               Nuevo Evento
@@ -318,35 +318,35 @@ export default function AgendaPage() {
 
         {/* Calendario principal */}
         <AnimatedSection>
-          <div className="bg-white rounded-2xl shadow-xl border border-[#79502A]/20 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
             {/* Header del calendario */}
             <div className="bg-[#2D2D2D] p-6">
               <div className="flex items-center justify-between">
                 <button
                   onClick={prevMonth}
-                  className="p-2 hover:bg-[#79502A]/20 rounded-lg transition-all duration-200"
+                  className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200"
                 >
-                  <ChevronLeft size={24} className="text-[#FFF8E2]" />
+                  <ChevronLeft size={24} className="text-white" />
                 </button>
 
-                <h2 className="font-voga text-2xl text-[#FFF8E2] uppercase">
+                <h2 className="font-voga text-2xl text-white uppercase">
                   {format(currentDate, 'MMMM yyyy', { locale: es })}
                 </h2>
 
                 <button
                   onClick={nextMonth}
-                  className="p-2 hover:bg-[#79502A]/20 rounded-lg transition-all duration-200"
+                  className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200"
                 >
-                  <ChevronRight size={24} className="text-[#FFF8E2]" />
+                  <ChevronRight size={24} className="text-white" />
                 </button>
               </div>
             </div>
 
             {/* Días de la semana */}
-            <div className="grid grid-cols-7 bg-[#FFF8E2] border-b border-[#79502A]/20">
+            <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
               {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
                 <div key={day} className="p-3 text-center">
-                  <span className="font-fira text-xs font-bold text-[#79502A] uppercase">
+                  <span className="font-fira text-xs font-bold text-[#8B5E3C] uppercase">
                     {day}
                   </span>
                 </div>
@@ -370,11 +370,11 @@ export default function AgendaPage() {
                     whileTap={{ scale: isCurrentMonth ? 0.98 : 1 }}
                     onClick={() => isCurrentMonth && setSelectedDate(day)}
                     className={`
-                      relative p-3 min-h-[100px] border-b border-r border-[#79502A]/10
+                      relative p-3 min-h-[100px] border-b border-r border-gray-100
                       transition-all duration-200
-                      ${!isCurrentMonth ? 'bg-[#FFF8E2]/30 cursor-default' : 'bg-white hover:bg-[#FFF8E2]/50 cursor-pointer'}
-                      ${isSelectedDay ? 'ring-2 ring-[#79502A] ring-inset bg-[#C6A97D]/10' : ''}
-                      ${isTodayDate && !isSelectedDay ? 'bg-[#C6A97D]/10' : ''}
+                      ${!isCurrentMonth ? 'bg-gray-50/30 cursor-default' : 'bg-white hover:bg-gray-50 cursor-pointer'}
+                      ${isSelectedDay ? 'ring-2 ring-[#8B5E3C] ring-inset bg-[#8B5E3C]/5' : ''}
+                      ${isTodayDate && !isSelectedDay ? 'bg-[#8B5E3C]/5' : ''}
                     `}
                   >
                     {/* Número del día */}
@@ -383,10 +383,10 @@ export default function AgendaPage() {
                         className={`
                           font-fira text-sm font-bold flex items-center justify-center w-7 h-7 rounded-full transition-all duration-200
                           ${!isCurrentMonth ? 'text-transparent select-none' : ''}
-                          ${isTodayDate && isCurrentMonth ? 'bg-[#C6A97D] text-white shadow-md' : ''}
-                          ${isSelectedDay && !isTodayDate && isCurrentMonth ? 'bg-[#79502A] text-white shadow-md' : ''}
+                          ${isTodayDate && isCurrentMonth ? 'bg-[#8B5E3C] text-white shadow-md' : ''}
+                          ${isSelectedDay && !isTodayDate && isCurrentMonth ? 'bg-[#8B5E3C] text-white shadow-md' : ''}
                           ${isPast && !isTodayDate && !isSelectedDay && isCurrentMonth ? 'text-gray-400' : ''}
-                          ${isCurrentMonth && !isTodayDate && !isSelectedDay && !isPast ? 'text-[#2D2D2D]' : ''}
+                          ${isCurrentMonth && !isTodayDate && !isSelectedDay && !isPast ? 'text-gray-900' : ''}
                         `}
                       >
                         {format(day, 'd')}
@@ -426,16 +426,16 @@ export default function AgendaPage() {
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: idx * 0.05 }}
-                                className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-[#79502A] hover:bg-[#5a3c1f] rounded-md shadow-sm transition-all duration-200"
+                                className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] rounded-md shadow-sm transition-all duration-200"
                               >
-                                <Briefcase size={10} className="text-[#FFF8E2] flex-shrink-0" />
-                                <span className="font-fira text-[10px] md:text-[9px] text-[#FFF8E2] font-medium truncate">
+                                <Briefcase size={10} className="text-white flex-shrink-0" />
+                                <span className="font-fira text-[10px] md:text-[9px] text-white font-medium truncate">
                                   {booking.client_name}
                                 </span>
                               </motion.div>
                             ))}
                             {dayBookings.private.length > 2 && (
-                              <div className="text-center font-fira text-[10px] md:text-[9px] text-[#79502A] font-medium">
+                              <div className="text-center font-fira text-[10px] md:text-[9px] text-[#8B5E3C] font-medium">
                                 +{dayBookings.private.length - 2} más
                               </div>
                             )}
@@ -450,8 +450,8 @@ export default function AgendaPage() {
                               animate={{ scale: 1 }}
                               className="flex items-center gap-1"
                             >
-                              <div className="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-[#C6A97D] shadow-sm" title="Reuniones pendientes" />
-                              <span className="font-fira text-[10px] md:text-[9px] text-[#79502A] font-semibold">
+                              <div className="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-amber-600 shadow-sm" title="Reuniones pendientes" />
+                              <span className="font-fira text-[10px] md:text-[9px] text-amber-700 font-semibold">
                                 {dayBookings.pending.length}
                               </span>
                             </motion.div>
@@ -481,14 +481,14 @@ export default function AgendaPage() {
         {/* Pendientes de confirmación */}
         {publicPendingCount > 0 && (
           <AnimatedSection delay={0.1}>
-            <div className="mt-6 bg-[#2D2D2D] rounded-2xl p-6 border border-[#79502A]/30 shadow-xl">
+            <div className="mt-6 bg-white rounded-2xl p-6 border border-gray-200 shadow-xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-[#C6A97D]/20 rounded-lg">
-                  <Clock size={24} className="text-[#C6A97D]" />
+                <div className="p-2 bg-amber-100 rounded-lg">
+                  <Clock size={24} className="text-amber-700" />
                 </div>
                 <div>
-                  <h3 className="font-voga text-xl text-[#FFF8E2]">Pendientes de Confirmación</h3>
-                  <p className="font-fira text-sm text-[#C6A97D]">
+                  <h3 className="font-voga text-xl text-gray-900">Pendientes de Confirmación</h3>
+                  <p className="font-fira text-sm text-amber-700">
                     {publicPendingCount} {publicPendingCount === 1 ? 'reunión' : 'reuniones'} esperando respuesta
                   </p>
                 </div>
@@ -586,38 +586,38 @@ function PendingBookingCard({ booking, onConfirm, onReject, processing }) {
         animate={{ opacity: 1, y: 0 }}
         whileHover={{ y: -2, boxShadow: "0 10px 30px -10px rgba(121, 80, 42, 0.3)" }}
         transition={{ duration: 0.2 }}
-        className="bg-white rounded-xl p-4 border border-[#79502A]/30 shadow-md"
+        className="bg-white rounded-xl p-4 border border-gray-200 shadow-md"
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               {booking.booking_type?.slug === 'videollamada' ? (
-                <Video size={16} className="text-[#79502A]" />
+                <Video size={16} className="text-[#8B5E3C]" />
               ) : (
-                <MapPin size={16} className="text-[#79502A]" />
+                <MapPin size={16} className="text-[#8B5E3C]" />
               )}
-              <h4 className="font-fira text-sm font-bold text-[#2D2D2D]">
+              <h4 className="font-fira text-sm font-bold text-gray-900">
                 {booking.booking_type?.name || 'Reunión'}
               </h4>
             </div>
 
-            <div className="space-y-1 text-xs text-[#2D2D2D]/70 font-fira">
+            <div className="space-y-1 text-xs text-gray-600/70 font-fira">
               <div className="flex items-center gap-2">
-                <User size={12} className="text-[#79502A]" />
+                <User size={12} className="text-[#8B5E3C]" />
                 {booking.client_name}
               </div>
               {booking.client_email && (
                 <div className="flex items-center gap-2">
-                  <Mail size={12} className="text-[#79502A]" />
+                  <Mail size={12} className="text-[#8B5E3C]" />
                   {booking.client_email}
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <CalendarIcon size={12} className="text-[#79502A]" />
+                <CalendarIcon size={12} className="text-[#8B5E3C]" />
                 {format(parseISO(booking.booking_date), "d 'de' MMMM, yyyy", { locale: es })}
               </div>
               <div className="flex items-center gap-2">
-                <Clock size={12} className="text-[#79502A]" />
+                <Clock size={12} className="text-[#8B5E3C]" />
                 {booking.start_time} - {booking.end_time}
               </div>
             </div>
@@ -667,21 +667,21 @@ function PendingBookingCard({ booking, onConfirm, onReject, processing }) {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
             >
-              <h3 className="font-voga text-xl text-[#2D2D2D] mb-2">¿Confirmar rechazo?</h3>
-              <p className="font-fira text-sm text-[#2D2D2D]/70 mb-4">
+              <h3 className="font-voga text-xl text-gray-900 mb-2">¿Confirmar rechazo?</h3>
+              <p className="font-fira text-sm text-gray-600/70 mb-4">
                 Motivo del rechazo (opcional):
               </p>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Ej: No tengo disponibilidad en ese horario"
-                className="w-full px-4 py-3 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] resize-none"
                 rows={3}
               />
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => setShowRejectModal(false)}
-                  className="flex-1 px-4 py-2.5 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-lg font-fira text-sm font-semibold transition-all duration-200"
+                  className="flex-1 px-4 py-2.5 bg-white border border-gray-200 hover:border-[#8B5E3C] text-gray-900 rounded-lg font-fira text-sm font-semibold transition-all duration-200"
                 >
                   Cancelar
                 </button>
@@ -736,17 +736,17 @@ function DayDetailDrawer({ date, bookings, isBlocked, onClose, onConfirm, onReje
           {/* Header */}
           <div className="sticky top-0 bg-[#2D2D2D] p-6 z-10 shadow-lg">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="font-voga text-2xl text-[#FFF8E2]">
+              <h2 className="font-voga text-2xl text-white">
                 {format(date, 'd', { locale: es })}
               </h2>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-[#79502A]/20 rounded-lg transition-all duration-200"
+                className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200"
               >
-                <X size={24} className="text-[#FFF8E2]" />
+                <X size={24} className="text-white" />
               </button>
             </div>
-            <p className="font-fira text-[#C6A97D]">
+            <p className="font-fira text-white/70">
               {format(date, "EEEE, d 'de' MMMM", { locale: es })}
             </p>
           </div>
@@ -775,8 +775,8 @@ function DayDetailDrawer({ date, bookings, isBlocked, onClose, onConfirm, onReje
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center py-12"
               >
-                <CalendarIcon size={48} className="mx-auto text-[#C6A97D]/30 mb-3" />
-                <p className="font-fira text-[#2D2D2D]/50">No hay eventos para este día</p>
+                <CalendarIcon size={48} className="mx-auto text-gray-400/30 mb-3" />
+                <p className="font-fira text-gray-500/50">No hay eventos para este día</p>
               </motion.div>
             )}
 
@@ -813,26 +813,26 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
   const getTypeStyles = () => {
     if (booking.type === 'pending') {
       return {
-        bg: 'bg-[#2D2D2D]',
-        border: 'border-[#C6A97D]/30',
-        icon: <Clock size={20} className="text-[#C6A97D]" />,
-        badge: 'bg-[#C6A97D]/20 text-[#C6A97D]',
+        bg: 'bg-white',
+        border: 'border-gray-200',
+        icon: <Clock size={20} className="text-amber-700" />,
+        badge: 'bg-amber-100 text-amber-700',
         badgeText: 'Pendiente',
       };
     }
     if (booking.type === 'private') {
       return {
-        bg: 'bg-[#2D2D2D]',
-        border: 'border-[#79502A]/30',
-        icon: <Briefcase size={20} className="text-[#79502A]" />,
-        badge: 'bg-[#79502A]/20 text-[#79502A]',
+        bg: 'bg-white',
+        border: 'border-gray-200',
+        icon: <Briefcase size={20} className="text-[#8B5E3C]" />,
+        badge: 'bg-amber-100 text-[#8B5E3C]',
         badgeText: 'Evento',
       };
     }
     return {
-      bg: 'bg-[#2D2D2D]',
-      border: 'border-[#79502A]/30',
-      icon: <Users size={20} className="text-[#C6A97D]" />,
+      bg: 'bg-white',
+      border: 'border-gray-200',
+      icon: <Users size={20} className="text-green-600" />,
       badge: 'bg-green-600/20 text-green-600',
       badgeText: 'Reunión',
     };
@@ -857,47 +857,47 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
                 {styles.badgeText}
               </span>
             </div>
-            <h4 className="font-fira text-sm font-bold text-[#FFF8E2]">
+            <h4 className="font-fira text-sm font-bold text-gray-900">
               {booking.booking_type?.name || booking.service_type?.name || 'Sin título'}
             </h4>
           </div>
         </div>
 
-        <div className="space-y-2 text-xs text-[#C6A97D] font-fira mb-3">
+        <div className="space-y-2 text-xs text-gray-600 font-fira mb-3">
           <div className="flex items-center gap-2">
-            <User size={12} className="text-[#FFF8E2]" />
+            <User size={12} className="text-gray-500" />
             <span className="font-medium">{booking.client_name}</span>
           </div>
           {booking.client_email && (
             <div className="flex items-center gap-2">
-              <Mail size={12} className="text-[#FFF8E2]" />
+              <Mail size={12} className="text-gray-500" />
               {booking.client_email}
             </div>
           )}
           {booking.client_phone && (
             <div className="flex items-center gap-2">
-              <Phone size={12} className="text-[#FFF8E2]" />
+              <Phone size={12} className="text-gray-500" />
               {booking.client_phone}
             </div>
           )}
           {booking.start_time && booking.end_time && (
             <div className="flex items-center gap-2">
-              <Clock size={12} className="text-[#FFF8E2]" />
+              <Clock size={12} className="text-gray-500" />
               <span className="font-medium">
                 {booking.start_time} - {booking.end_time}
               </span>
             </div>
           )}
           {booking.notes && (
-            <div className="flex items-start gap-2 mt-3 p-2 bg-[#79502A]/10 rounded-lg">
-              <MessageSquare size={12} className="mt-0.5 flex-shrink-0 text-[#FFF8E2]" />
-              <span className="text-[#FFF8E2]/80 italic">{booking.notes}</span>
+            <div className="flex items-start gap-2 mt-3 p-2 bg-gray-100 rounded-lg">
+              <MessageSquare size={12} className="mt-0.5 flex-shrink-0 text-gray-500" />
+              <span className="text-gray-600/80 italic">{booking.notes}</span>
             </div>
           )}
         </div>
 
         {booking.type === 'pending' && (
-          <div className="flex gap-2 pt-3 border-t border-[#79502A]/20">
+          <div className="flex gap-2 pt-3 border-t border-gray-200">
             <button
               onClick={() => onConfirm(booking.id)}
               disabled={processing === booking.id}
@@ -922,11 +922,11 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
         )}
 
         {booking.type === 'private' && (
-          <div className="flex gap-2 pt-3 border-t border-[#79502A]/20">
+          <div className="flex gap-2 pt-3 border-t border-gray-200">
             <button
               onClick={() => onEditPrivate(booking)}
               disabled={processing === booking.id}
-              className="flex-1 px-3 py-2 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
+              className="flex-1 px-3 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               <Edit2 size={14} />
               Editar
@@ -966,21 +966,21 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
             >
-              <h3 className="font-voga text-xl text-[#2D2D2D] mb-2">¿Confirmar rechazo?</h3>
-              <p className="font-fira text-sm text-[#2D2D2D]/70 mb-4">
+              <h3 className="font-voga text-xl text-gray-900 mb-2">¿Confirmar rechazo?</h3>
+              <p className="font-fira text-sm text-gray-600/70 mb-4">
                 Motivo del rechazo (opcional):
               </p>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Ej: No tengo disponibilidad en ese horario"
-                className="w-full px-4 py-3 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] resize-none"
                 rows={3}
               />
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => setShowRejectModal(false)}
-                  className="flex-1 px-4 py-2.5 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-lg font-fira text-sm font-semibold transition-all duration-200"
+                  className="flex-1 px-4 py-2.5 bg-white border border-gray-200 hover:border-[#8B5E3C] text-gray-900 rounded-lg font-fira text-sm font-semibold transition-all duration-200"
                 >
                   Cancelar
                 </button>
@@ -1074,26 +1074,26 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
         className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-[#79502A]/10 rounded-lg">
-            <Briefcase size={24} className="text-[#79502A]" />
+          <div className="p-2 bg-amber-100 rounded-lg">
+            <Briefcase size={24} className="text-[#8B5E3C]" />
           </div>
           <div>
-            <h3 className="font-voga text-xl text-[#2D2D2D]">Nuevo Evento</h3>
-            <p className="font-fira text-sm text-[#2D2D2D]/70">Bodas, quinceañeras, eventos empresariales</p>
+            <h3 className="font-voga text-xl text-gray-900">Nuevo Evento</h3>
+            <p className="font-fira text-sm text-gray-600/70">Bodas, quinceañeras, eventos empresariales</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Tipo de servicio */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Tipo de Evento *
             </label>
             <select
               required
               value={formData.serviceTypeId}
               onChange={(e) => handleInputChange('serviceTypeId', e.target.value)}
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             >
               <option value="">Seleccioná un tipo</option>
               {serviceTypes.map((type) => (
@@ -1106,7 +1106,7 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
 
           {/* Fecha */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Fecha del Evento *
             </label>
             <input
@@ -1115,12 +1115,12 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               value={formData.bookingDate}
               onChange={(e) => handleInputChange('bookingDate', e.target.value)}
               min={format(new Date(), 'yyyy-MM-dd')}
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             />
             {availabilityMessage && (
               <p
                 className={`mt-2 font-fira text-xs ${
-                  availabilityMessage.startsWith('✅') ? 'text-green-600' : 'text-[#C6A97D]'
+                  availabilityMessage.startsWith('✅') ? 'text-green-600' : 'text-amber-700'
                 }`}
               >
                 {availabilityMessage}
@@ -1130,7 +1130,7 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
 
           {/* Nombre del cliente */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Nombre del Cliente *
             </label>
             <input
@@ -1139,13 +1139,13 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               value={formData.clientName}
               onChange={(e) => handleInputChange('clientName', e.target.value)}
               placeholder="Ej: María González"
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Email
             </label>
             <input
@@ -1153,13 +1153,13 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               value={formData.clientEmail}
               onChange={(e) => handleInputChange('clientEmail', e.target.value)}
               placeholder="cliente@ejemplo.com"
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             />
           </div>
 
           {/* Teléfono */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Teléfono
             </label>
             <input
@@ -1167,13 +1167,13 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               value={formData.clientPhone}
               onChange={(e) => handleInputChange('clientPhone', e.target.value)}
               placeholder="+598 99 123 456"
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             />
           </div>
 
           {/* Notas del cliente */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Notas del Cliente
             </label>
             <textarea
@@ -1181,13 +1181,13 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               onChange={(e) => handleInputChange('notes', e.target.value)}
               placeholder="Información adicional visible para el cliente..."
               rows={3}
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] resize-none"
             />
           </div>
 
           {/* Notas internas */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Notas Internas
             </label>
             <textarea
@@ -1195,13 +1195,13 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               onChange={(e) => handleInputChange('internalNotes', e.target.value)}
               placeholder="Notas privadas (solo visibles para vos)..."
               rows={2}
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] resize-none"
             />
           </div>
 
           {/* Info */}
-          <div className="bg-[#FFF8E2] border border-[#C6A97D]/30 rounded-lg p-3">
-            <p className="font-fira text-xs text-[#79502A]">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+            <p className="font-fira text-xs text-[#8B5E3C]">
               <strong>Nota:</strong> Máximo 2 eventos por día (2 salones disponibles)
             </p>
           </div>
@@ -1211,14 +1211,14 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-lg font-fira text-sm font-semibold transition-all duration-200"
+              className="flex-1 px-4 py-2.5 bg-white border border-gray-200 hover:border-gray-200 text-gray-900 rounded-lg font-fira text-sm font-semibold transition-all duration-200"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 px-4 py-2.5 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -1316,26 +1316,26 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
         className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-[#79502A]/10 rounded-lg">
-            <Edit2 size={24} className="text-[#79502A]" />
+          <div className="p-2 bg-amber-100 rounded-lg">
+            <Edit2 size={24} className="text-[#8B5E3C]" />
           </div>
           <div>
-            <h3 className="font-voga text-xl text-[#2D2D2D]">Editar Evento</h3>
-            <p className="font-fira text-sm text-[#2D2D2D]/70">Modificar detalles del evento</p>
+            <h3 className="font-voga text-xl text-gray-900">Editar Evento</h3>
+            <p className="font-fira text-sm text-gray-900/70">Modificar detalles del evento</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Tipo de servicio */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Tipo de Evento *
             </label>
             <select
               required
               value={formData.serviceTypeId}
               onChange={(e) => handleInputChange('serviceTypeId', e.target.value)}
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             >
               <option value="">Seleccioná un tipo</option>
               {serviceTypes.map((type) => (
@@ -1348,7 +1348,7 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
 
           {/* Fecha */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Fecha del Evento *
             </label>
             <input
@@ -1357,12 +1357,12 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               value={formData.bookingDate}
               onChange={(e) => handleInputChange('bookingDate', e.target.value)}
               min={format(new Date(), 'yyyy-MM-dd')}
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             />
             {availabilityMessage && (
               <p
                 className={`mt-2 font-fira text-xs ${
-                  availabilityMessage.startsWith('✅') ? 'text-green-600' : 'text-[#C6A97D]'
+                  availabilityMessage.startsWith('✅') ? 'text-green-600' : 'text-amber-700'
                 }`}
               >
                 {availabilityMessage}
@@ -1372,7 +1372,7 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
 
           {/* Nombre del cliente */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Nombre del Cliente *
             </label>
             <input
@@ -1381,13 +1381,13 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               value={formData.clientName}
               onChange={(e) => handleInputChange('clientName', e.target.value)}
               placeholder="Ej: María González"
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Email
             </label>
             <input
@@ -1395,13 +1395,13 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               value={formData.clientEmail}
               onChange={(e) => handleInputChange('clientEmail', e.target.value)}
               placeholder="cliente@ejemplo.com"
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             />
           </div>
 
           {/* Teléfono */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Teléfono
             </label>
             <input
@@ -1409,13 +1409,13 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               value={formData.clientPhone}
               onChange={(e) => handleInputChange('clientPhone', e.target.value)}
               placeholder="+598 99 123 456"
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             />
           </div>
 
           {/* Notas del cliente */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Notas del Cliente
             </label>
             <textarea
@@ -1423,13 +1423,13 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               onChange={(e) => handleInputChange('notes', e.target.value)}
               placeholder="Información adicional visible para el cliente..."
               rows={3}
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] resize-none"
             />
           </div>
 
           {/* Notas internas */}
           <div>
-            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
+            <label className="block font-fira text-sm font-medium text-gray-900 mb-2">
               Notas Internas
             </label>
             <textarea
@@ -1437,7 +1437,7 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               onChange={(e) => handleInputChange('internalNotes', e.target.value)}
               placeholder="Notas privadas (solo visibles para vos)..."
               rows={2}
-              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] resize-none"
             />
           </div>
 
@@ -1446,14 +1446,14 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-lg font-fira text-sm font-semibold transition-all duration-200"
+              className="flex-1 px-4 py-2.5 bg-white border border-gray-200 hover:border-gray-200 text-gray-900 rounded-lg font-fira text-sm font-semibold transition-all duration-200"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 px-4 py-2.5 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -1500,24 +1500,24 @@ function DeleteConfirmationModal({ booking, onConfirm, onClose, processing }) {
               <AlertCircle size={24} className="text-red-600" />
             </div>
             <div>
-              <h3 className="font-voga text-xl text-[#2D2D2D]">¿Eliminar evento?</h3>
-              <p className="font-fira text-sm text-[#2D2D2D]/70">Esta acción no se puede deshacer</p>
+              <h3 className="font-voga text-xl text-gray-900">¿Eliminar evento?</h3>
+              <p className="font-fira text-sm text-gray-900/70">Esta acción no se puede deshacer</p>
             </div>
           </div>
 
           {/* Información del evento */}
-          <div className="bg-[#FFF8E2] rounded-lg p-4 mb-6">
-            <p className="font-fira text-sm text-[#2D2D2D]/70 mb-2">
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <p className="font-fira text-sm text-gray-900/70 mb-2">
               Estás por eliminar este evento:
             </p>
             <div className="space-y-1 font-fira text-sm">
-              <p className="text-[#2D2D2D]">
+              <p className="text-gray-900">
                 <strong>Servicio:</strong> {booking.service_type?.name || 'Sin especificar'}
               </p>
-              <p className="text-[#2D2D2D]">
+              <p className="text-gray-900">
                 <strong>Cliente:</strong> {booking.client_name}
               </p>
-              <p className="text-[#2D2D2D]">
+              <p className="text-gray-900">
                 <strong>Fecha:</strong>{' '}
                 {format(parseISO(booking.booking_date), "d 'de' MMMM, yyyy", { locale: es })}
               </p>
@@ -1530,7 +1530,7 @@ function DeleteConfirmationModal({ booking, onConfirm, onClose, processing }) {
               type="button"
               onClick={onClose}
               disabled={processing}
-              className="flex-1 px-4 py-2.5 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50"
+              className="flex-1 px-4 py-2.5 bg-white border border-gray-200 hover:border-[#8B5E3C] text-gray-900 rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50"
             >
               Cancelar
             </button>

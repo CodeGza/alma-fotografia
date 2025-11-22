@@ -357,7 +357,7 @@ function BlockedDatesTab() {
   return (
     <AnimatedSection delay={0.2}>
       <div className="bg-white rounded-2xl p-6 border border-gray-200/60 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h3 className="font-voga text-xl text-gray-900 mb-2">Días Bloqueados</h3>
             <p className="font-fira text-sm text-gray-600">
@@ -366,7 +366,7 @@ function BlockedDatesTab() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg font-fira text-sm font-medium flex items-center gap-2 transition-colors"
+            className="px-4 py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg font-fira text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap flex-shrink-0"
           >
             <Plus size={16} />
             Bloquear Días
@@ -383,9 +383,9 @@ function BlockedDatesTab() {
             {blockedDates.map((bd) => (
               <div
                 key={bd.id}
-                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
               >
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="font-fira font-medium text-gray-900">
                     {format(parseISO(bd.blocked_date), "EEEE d 'de' MMMM, yyyy", { locale: es })}
                   </p>
@@ -395,7 +395,7 @@ function BlockedDatesTab() {
                 </div>
                 <button
                   onClick={() => handleUnblock(bd.id)}
-                  className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center gap-1"
+                  className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center gap-1 whitespace-nowrap flex-shrink-0"
                 >
                   <Trash2 size={14} />
                   Desbloquear
@@ -773,12 +773,12 @@ function BookingTypesTab() {
           {bookingTypes.map((type) => (
             <div
               key={type.id}
-              className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
             >
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h4 className="font-fira font-semibold text-gray-900">{type.name}</h4>
                 <p className="font-fira text-sm text-gray-600 mt-1">{type.description}</p>
-                <div className="flex items-center gap-4 mt-2">
+                <div className="flex items-center gap-4 mt-2 flex-wrap">
                   <span className="font-fira text-xs text-gray-500">
                     <Clock size={12} className="inline mr-1" />
                     {type.duration_minutes} minutos
@@ -787,7 +787,7 @@ function BookingTypesTab() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 ml-4">
+              <div className="flex items-center gap-3 flex-shrink-0">
                 <button
                   onClick={() => setEditingType(type)}
                   className="px-3 py-1.5 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center gap-1.5"
@@ -803,7 +803,7 @@ function BookingTypesTab() {
                     onChange={() => handleToggleActive(type.id, type.is_active)}
                     className="w-5 h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer"
                   />
-                  <span className="font-fira text-sm text-gray-700">Activo</span>
+                  <span className="font-fira text-sm text-gray-700 whitespace-nowrap">Activo</span>
                 </label>
               </div>
             </div>

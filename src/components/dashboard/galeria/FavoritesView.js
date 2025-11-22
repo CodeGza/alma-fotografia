@@ -53,7 +53,10 @@ function ClientFavoritesSection({
   workflowStatus,
   onStatusChange,
   onAddNote,
-  onDeleteNote
+  onDeleteNote,
+  allowShareFavorites,
+  onToggleShareFavorites,
+  isUpdatingShareSetting
 }) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -366,15 +369,24 @@ function ClientFavoritesSection({
   return (
     <div className="bg-white">
       {/* Header oscuro estilo GalleryDetailView */}
-      <div className="bg-[#2d2d2d] text-white rounded-xl">
+      <div className="bg-gradient-to-br from-[#2D2D2D] to-[#1a1a1a] text-white rounded-2xl shadow-sm border border-gray-200">
         <div className="px-5 sm:px-6 lg:px-8 py-4 sm:py-6">
+
+          {/* Botón volver */}
+          <button
+            onClick={onRefresh}
+            className="flex items-center gap-2 text-[#C6A97D] hover:text-[#FFF8E2] transition-colors duration-200 font-fira text-sm mb-4"
+          >
+            <ArrowLeft size={16} />
+            <span>Volver</span>
+          </button>
 
           <div className="flex flex-col gap-4 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
                   <h3 className="font-voga text-xl sm:text-2xl lg:text-3xl break-words">
-                    {galleryTitle}
+                    Fotos favoritas
                   </h3>
                   {getWorkflowBadge()}
                 </div>
@@ -447,6 +459,23 @@ function ClientFavoritesSection({
                 >
                   <History size={16} />
                   <span className="hidden lg:inline">Historial</span>
+                </motion.button>
+
+                {/* Toggle Permitir Compartir Favoritas */}
+                <motion.button
+                  onClick={onToggleShareFavorites}
+                  disabled={isUpdatingShareSetting}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  title={allowShareFavorites ? 'Compartir favoritas habilitado' : 'Compartir favoritas deshabilitado'}
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 ${
+                    allowShareFavorites
+                      ? '!text-pink-300 bg-pink-500/20 hover:bg-pink-500/30 cursor-pointer border border-pink-500/30'
+                      : '!text-white bg-[#8B5E3C] hover:bg-[#6d4a2f] cursor-pointer'
+                  } ${isUpdatingShareSetting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <Share2 size={16} />
+                  <span className="hidden lg:inline">{allowShareFavorites ? 'Compartir ON' : 'Compartir OFF'}</span>
                 </motion.button>
 
                 {photos.length > 0 && (
@@ -1293,38 +1322,13 @@ export default function FavoritesView({ gallery, favoritesByClient }) {
     <div className="w-full">
       {/* Header mejorado */}
       <div className="mb-6 px-4 sm:px-6">
-        <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={() => router.push(`/dashboard/galerias/${gallery.id}`)}
-            className="flex items-center gap-2 text-[#C6A97D] hover:text-[#D4B896] transition-colors font-fira text-sm font-semibold group"
-          >
-            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            Volver a la galería
-          </button>
-
-          {/* Toggle de compartir favoritos */}
-          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-lg px-4 py-2.5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Share2 size={16} className="text-gray-500" />
-              <span className="font-fira text-sm text-gray-700">
-                Permitir compartir favoritos
-              </span>
-            </div>
-            <button
-              onClick={handleToggleShareFavorites}
-              disabled={isUpdatingShareSetting}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:ring-offset-2 ${
-                allowShareFavorites ? 'bg-[#79502A]' : 'bg-gray-300'
-              } ${isUpdatingShareSetting ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <span
-                className={`${
-                  allowShareFavorites ? 'translate-x-6' : 'translate-x-1'
-                } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-              />
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={() => router.push(`/dashboard/galerias/${gallery.id}`)}
+          className="flex items-center gap-2 text-[#8B5E3C] hover:text-[#6d4a2f] transition-colors font-fira text-sm font-semibold group"
+        >
+          <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+          Volver a la galería
+        </button>
       </div>
 
       {/* Lista de clientes */}
@@ -1370,6 +1374,9 @@ export default function FavoritesView({ gallery, favoritesByClient }) {
               onStatusChange={(newStatus) => handleStatusChange(client.email, newStatus)}
               onAddNote={handleAddNote}
               onDeleteNote={handleDeleteNote}
+              allowShareFavorites={allowShareFavorites}
+              onToggleShareFavorites={handleToggleShareFavorites}
+              isUpdatingShareSetting={isUpdatingShareSetting}
             />
           ))
         )}

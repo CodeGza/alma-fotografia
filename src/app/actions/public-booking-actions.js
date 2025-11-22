@@ -495,6 +495,69 @@ export async function cancelPublicBooking(bookingId) {
   }
 }
 
+/**
+ * Eliminar completamente una reserva pública (confirmada o no)
+ */
+export async function deletePublicBooking(bookingId) {
+  try {
+    const supabase = await createClient();
+
+    // Primero obtener los datos de la reserva para enviar email de notificación
+    const { data: booking, error: fetchError } = await supabase
+      .from('public_bookings')
+      .select(`
+        *,
+        booking_type:public_booking_types(id, name, slug)
+      `)
+      .eq('id', bookingId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Eliminar la reserva
+    const { error: deleteError } = await supabase
+      .from('public_bookings')
+      .delete()
+      .eq('id', bookingId);
+
+    if (deleteError) throw deleteError;
+
+    // Enviar email al cliente notificando la cancelación
+    if (booking && booking.status === 'confirmed') {
+      const bookingTypeName = booking.booking_type?.name || 'Reunión';
+      const formattedDate = new Date(booking.booking_date + 'T00:00:00').toLocaleDateString('es-UY', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+
+      const clientEmailTemplate = getEmailTemplate('client_booking_cancelled', {
+        bookingType: bookingTypeName,
+        clientName: booking.client_name,
+        bookingDate: formattedDate,
+        startTime: booking.start_time.substring(0, 5),
+        reason: 'La reserva fue cancelada por el administrador.',
+      });
+
+      if (clientEmailTemplate) {
+        await sendEmail({
+          to: booking.client_email,
+          subject: clientEmailTemplate.subject,
+          html: clientEmailTemplate.html,
+        });
+      }
+    }
+
+    return {
+      success: true,
+      message: 'Reserva eliminada exitosamente',
+    };
+  } catch (error) {
+    console.error('[deletePublicBooking] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 // ============================================
 // FUNCIONES HELPER
 // ============================================

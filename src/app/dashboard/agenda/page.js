@@ -56,6 +56,7 @@ import {
   getPendingPublicBookings,
   confirmPublicBooking,
   rejectPublicBooking,
+  deletePublicBooking,
 } from '@/app/actions/public-booking-actions';
 
 // Actions privadas
@@ -157,6 +158,13 @@ export default function AgendaPage() {
     setProcessingId(null);
   };
 
+  // Eliminar reserva pública - abre modal de confirmación
+  const handleDeletePublic = (booking) => {
+    setDeletingBooking(booking);
+    setShowDeleteModal(true);
+    setSelectedDate(null); // Cerrar el drawer
+  };
+
   // Eliminar evento privado - abre modal de confirmación
   const handleDeletePrivate = (booking) => {
     setDeletingBooking(booking);
@@ -164,15 +172,23 @@ export default function AgendaPage() {
     setSelectedDate(null); // Cerrar el drawer
   };
 
-  // Confirmar eliminación de evento privado
-  const confirmDeletePrivate = async () => {
+  // Confirmar eliminación (privado o público)
+  const confirmDelete = async () => {
     if (!deletingBooking) return;
 
     setProcessingId(deletingBooking.id);
-    const result = await deletePrivateBooking(deletingBooking.id);
+
+    // Determinar si es reserva pública o privada
+    const isPublicBooking = deletingBooking.booking_type !== undefined;
+    const result = isPublicBooking
+      ? await deletePublicBooking(deletingBooking.id)
+      : await deletePrivateBooking(deletingBooking.id);
 
     if (result.success) {
-      showToast({ message: 'Evento eliminado correctamente', type: 'success' });
+      showToast({
+        message: isPublicBooking ? 'Reserva eliminada correctamente' : 'Evento eliminado correctamente',
+        type: 'success'
+      });
       loadData();
       setShowDeleteModal(false);
       setDeletingBooking(null);
@@ -184,6 +200,13 @@ export default function AgendaPage() {
 
   // Editar evento privado
   const handleEditPrivate = (booking) => {
+    setEditingBooking(booking);
+    setShowEditModal(true);
+    setSelectedDate(null); // Cerrar el drawer
+  };
+
+  // Editar reserva pública
+  const handleEditPublic = (booking) => {
     setEditingBooking(booking);
     setShowEditModal(true);
     setSelectedDate(null); // Cerrar el drawer
@@ -543,7 +566,7 @@ export default function AgendaPage() {
       {showDeleteModal && deletingBooking && (
         <DeleteConfirmationModal
           booking={deletingBooking}
-          onConfirm={confirmDeletePrivate}
+          onConfirm={confirmDelete}
           onClose={() => {
             setShowDeleteModal(false);
             setDeletingBooking(null);
@@ -561,7 +584,9 @@ export default function AgendaPage() {
         onConfirm={handleConfirmPublic}
         onReject={handleRejectPublic}
         onEditPrivate={handleEditPrivate}
+        onEditPublic={handleEditPublic}
         onDeletePrivate={handleDeletePrivate}
+        onDeletePublic={handleDeletePublic}
         processing={processingId}
       />
     </PageTransition>
@@ -701,7 +726,7 @@ function PendingBookingCard({ booking, onConfirm, onReject, processing }) {
 }
 
 // Componente: Drawer lateral con detalles del día
-function DayDetailDrawer({ date, bookings, isBlocked, onClose, onConfirm, onReject, onEditPrivate, onDeletePrivate, processing }) {
+function DayDetailDrawer({ date, bookings, isBlocked, onClose, onConfirm, onReject, onEditPrivate, onEditPublic, onDeletePrivate, onDeletePublic, processing }) {
   if (!date || !bookings) return null;
 
   const allBookings = [
@@ -787,7 +812,9 @@ function DayDetailDrawer({ date, bookings, isBlocked, onClose, onConfirm, onReje
                 onConfirm={onConfirm}
                 onReject={onReject}
                 onEditPrivate={onEditPrivate}
+                onEditPublic={onEditPublic}
                 onDeletePrivate={onDeletePrivate}
+                onDeletePublic={onDeletePublic}
                 processing={processing}
               />
             ))}
@@ -799,7 +826,7 @@ function DayDetailDrawer({ date, bookings, isBlocked, onClose, onConfirm, onReje
 }
 
 // Componente: Card de booking en el drawer
-function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeletePrivate, processing }) {
+function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onEditPublic, onDeletePrivate, onDeletePublic, processing }) {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
 
@@ -921,12 +948,37 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
           </div>
         )}
 
+        {booking.type === 'public' && booking.status === 'confirmed' && (
+          <div className="flex gap-2 pt-3 border-t border-gray-200">
+            <button
+              onClick={() => onEditPublic(booking)}
+              disabled={processing === booking.id}
+              className="px-3 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
+            >
+              <Edit2 size={14} />
+              Editar
+            </button>
+            <button
+              onClick={() => onDeletePublic(booking)}
+              disabled={processing === booking.id}
+              className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
+            >
+              {processing === booking.id ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Trash2 size={14} />
+              )}
+              Eliminar
+            </button>
+          </div>
+        )}
+
         {booking.type === 'private' && (
           <div className="flex gap-2 pt-3 border-t border-gray-200">
             <button
               onClick={() => onEditPrivate(booking)}
               disabled={processing === booking.id}
-              className="flex-1 px-3 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
+              className="px-3 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               <Edit2 size={14} />
               Editar
@@ -934,7 +986,7 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
             <button
               onClick={() => onDeletePrivate(booking)}
               disabled={processing === booking.id}
-              className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
+              className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               {processing === booking.id ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -1071,7 +1123,7 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.2 }}
-        className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-xl p-6 max-w-xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-amber-100 rounded-lg">
@@ -1313,7 +1365,7 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.2 }}
-        className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-xl p-6 max-w-xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-amber-100 rounded-lg">
@@ -1492,7 +1544,7 @@ function DeleteConfirmationModal({ booking, onConfirm, onClose, processing }) {
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ duration: 0.2 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
+          className="bg-white rounded-xl p-5 max-w-sm w-full shadow-2xl"
         >
           {/* Header con icono de advertencia */}
           <div className="flex items-center gap-3 mb-4">

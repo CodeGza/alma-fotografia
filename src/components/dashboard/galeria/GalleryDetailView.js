@@ -55,8 +55,9 @@ import Modal from '@/components/ui/Modal';
 import { useModal } from '@/hooks/useModal';
 import { createClient } from '@/lib/supabaseClient';
 import { iconMap } from '@/lib/validations/gallery';
-import { deleteCloudinaryImage, deleteGalleries } from '@/app/actions/gallery-actions';
+import { deleteCloudinaryImage, deleteGalleries, updateAllowShareFavorites } from '@/app/actions/gallery-actions';
 import { assignPhotosToSection } from '@/app/actions/photo-sections-actions';
+import { useToast } from '@/components/ui/Toast';
 
 // Componente SortableSectionHeader para drag & drop de secciones (OLD - sin fotos)
 function SortableSectionHeader({ section }) {
@@ -311,6 +312,7 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
 
 export default function GalleryDetailView({ gallery }) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [showShareModal, setShowShareModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [photosPage, setPhotosPage] = useState(0);
@@ -326,6 +328,14 @@ export default function GalleryDetailView({ gallery }) {
   const [serviceIcon, setServiceIcon] = useState(null);
   const [serviceName, setServiceName] = useState(null);
   const [coverImageSize, setCoverImageSize] = useState(0);
+  const [allowShareFavorites, setAllowShareFavorites] = useState(gallery.allow_share_favorites || false);
+  const [isUpdatingShareSetting, setIsUpdatingShareSetting] = useState(false);
+
+  // Debug: verificar que allow_share_favorites existe
+  useEffect(() => {
+    console.log('🔍 [GalleryDetailView] allow_share_favorites:', gallery.allow_share_favorites);
+    console.log('🔍 [GalleryDetailView] allowShareFavorites state:', allowShareFavorites);
+  }, []);
 
   // Actualizar localPhotos cuando cambien las fotos desde el servidor
   useEffect(() => {
@@ -588,6 +598,32 @@ export default function GalleryDetailView({ gallery }) {
         router.refresh();
       }
     }, 1000);
+  };
+
+  // Manejar toggle de compartir favoritos
+  const handleToggleShareFavorites = async () => {
+    setIsUpdatingShareSetting(true);
+    const newValue = !allowShareFavorites;
+
+    try {
+      const result = await updateAllowShareFavorites(id, newValue);
+
+      if (result.success) {
+        setAllowShareFavorites(newValue);
+        showToast({
+          message: newValue
+            ? 'Los clientes ahora pueden compartir sus favoritos'
+            : 'Se deshabilitó el compartir favoritos',
+          type: 'success'
+        });
+      } else {
+        showToast({ message: result.error || 'Error al actualizar configuración', type: 'error' });
+      }
+    } catch (error) {
+      showToast({ message: 'Error al actualizar configuración', type: 'error' });
+    } finally {
+      setIsUpdatingShareSetting(false);
+    }
   };
 
   // Handler para cuando cambian las secciones

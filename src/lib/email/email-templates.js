@@ -628,6 +628,41 @@ function clientBookingRejectedEmail({ bookingType, clientName, bookingDate, star
 }
 
 /**
+ * Template: Reserva cancelada (para el cliente)
+ */
+function clientBookingCancelledEmail({ bookingType, clientName, bookingDate, startTime, reason }) {
+  const content = `
+    <p>Hola <strong>${clientName}</strong>,</p>
+
+    <p>Lamentamos informarte que tu reserva confirmada ha sido cancelada:</p>
+
+    <div class="highlight">
+      <p style="font-size: 18px; font-weight: 600; color: #DC2626; margin-bottom: 12px;">
+        ❌ Reserva cancelada
+      </p>
+      <p><strong>Tipo de reunión:</strong> ${bookingType}</p>
+      <p><strong>Fecha:</strong> ${bookingDate}</p>
+      <p><strong>Horario:</strong> ${startTime}</p>
+      ${reason ? `<p><strong>Motivo:</strong> ${reason}</p>` : ''}
+    </div>
+
+    <p>Si deseas reagendar, puedes hacer una nueva reserva en cualquier momento eligiendo una fecha y horario disponible.</p>
+
+    <p>Si tienes alguna consulta, no dudes en contactarnos.</p>
+
+    <p style="margin-top: 24px;">
+      Saludos,<br>
+      <strong style="color: #79502A;">Alma Fotografía</strong>
+    </p>
+  `;
+
+  return {
+    subject: `Reserva cancelada - ${bookingType} el ${bookingDate}`,
+    html: wrapTemplate(content, 'Reserva Cancelada'),
+  };
+}
+
+/**
  * Obtiene el template correcto según el tipo de notificación
  */
 export function getEmailTemplate(type, data) {
@@ -664,6 +699,8 @@ export function getEmailTemplate(type, data) {
       return clientBookingConfirmedEmail(data);
     case 'client_booking_rejected':
       return clientBookingRejectedEmail(data);
+    case 'client_booking_cancelled':
+      return clientBookingCancelledEmail(data);
     default:
       return null;
   }

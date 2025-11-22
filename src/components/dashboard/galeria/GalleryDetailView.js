@@ -247,6 +247,7 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
           loading="lazy"
           placeholder="blur"
           blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
+          style={{ minHeight: '200px' }}
         />
 
         {/* Drag handle - SOLO desde el icono para permitir scroll */}
@@ -1897,7 +1898,10 @@ export default function GalleryDetailView({ gallery }) {
         <EditGalleryModal
           gallery={gallery}
           hasActiveLink={has_active_link}
-          onClose={() => setShowEditModal(false)}
+          onClose={() => {
+            setShowEditModal(false);
+            router.refresh();
+          }}
           onSuccess={() => router.refresh()}
         />
       )}

@@ -366,10 +366,11 @@ export default function AgendaPage() {
                       <span
                         className={`
                           font-fira text-sm font-bold flex items-center justify-center w-7 h-7 rounded-full
-                          ${!isCurrentMonth ? 'text-gray-300' : ''}
-                          ${isTodayDate ? 'bg-blue-500 text-white' : 'text-gray-700'}
-                          ${isSelectedDay && !isTodayDate ? 'bg-[#79502A] text-white' : ''}
-                          ${isPast && !isTodayDate && !isSelectedDay ? 'text-gray-400' : ''}
+                          ${!isCurrentMonth ? 'text-transparent select-none' : ''}
+                          ${isTodayDate && isCurrentMonth ? 'bg-blue-500 text-white' : ''}
+                          ${isSelectedDay && !isTodayDate && isCurrentMonth ? 'bg-[#79502A] text-white' : ''}
+                          ${isPast && !isTodayDate && !isSelectedDay && isCurrentMonth ? 'text-gray-400' : ''}
+                          ${isCurrentMonth && !isTodayDate && !isSelectedDay && !isPast ? 'text-gray-700' : ''}
                         `}
                       >
                         {format(day, 'd')}
@@ -379,12 +380,17 @@ export default function AgendaPage() {
                     {/* Indicadores */}
                     {isCurrentMonth && (
                       <div className="flex flex-col items-center gap-1 mt-1">
-                        {/* Bloqueado */}
+                        {/* Bloqueado - Responsive: Solo punto en mobile, texto en desktop */}
                         {isBlocked && (
                           <div className="w-full px-1">
-                            <div className="flex items-center justify-center gap-1 py-0.5 bg-red-500 rounded-full">
-                              <Ban size={8} className="text-white" />
-                              <span className="font-fira text-[10px] text-white font-semibold">
+                            {/* Mobile: Solo punto rojo grande */}
+                            <div className="flex items-center justify-center md:hidden">
+                              <div className="w-2.5 h-2.5 rounded-full bg-red-500" title="Día bloqueado" />
+                            </div>
+                            {/* Desktop: Chip con icono y texto */}
+                            <div className="hidden md:flex items-center justify-center gap-1 py-0.5 px-2 bg-red-500 rounded-full">
+                              <Ban size={10} className="text-white flex-shrink-0" />
+                              <span className="font-fira text-[10px] text-white font-semibold whitespace-nowrap">
                                 Bloqueado
                               </span>
                             </div>
@@ -399,34 +405,34 @@ export default function AgendaPage() {
                                 key={idx}
                                 className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-gradient-to-r from-[#79502A] to-[#8B5A2F] rounded-md"
                               >
-                                <Briefcase size={8} className="text-white flex-shrink-0" />
-                                <span className="font-fira text-[9px] text-white font-medium truncate">
+                                <Briefcase size={10} className="text-white flex-shrink-0" />
+                                <span className="font-fira text-[10px] md:text-[9px] text-white font-medium truncate">
                                   {booking.client_name}
                                 </span>
                               </div>
                             ))}
                             {dayBookings.private.length > 2 && (
-                              <div className="text-center font-fira text-[9px] text-gray-500 font-medium">
+                              <div className="text-center font-fira text-[10px] md:text-[9px] text-gray-500 font-medium">
                                 +{dayBookings.private.length - 2} más
                               </div>
                             )}
                           </div>
                         )}
 
-                        {/* Reuniones públicas y pendientes - solo puntos */}
-                        <div className="flex items-center justify-center gap-1.5 mt-0.5">
+                        {/* Reuniones públicas y pendientes - puntos más grandes y visibles */}
+                        <div className="flex items-center justify-center gap-2 mt-0.5">
                           {dayBookings.pending.length > 0 && (
-                            <div className="flex items-center gap-0.5">
-                              <div className="w-1.5 h-1.5 rounded-full bg-orange-600" />
-                              <span className="font-fira text-[9px] text-orange-800 font-semibold">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-orange-600" title="Reuniones pendientes" />
+                              <span className="font-fira text-[10px] md:text-[9px] text-orange-800 font-semibold">
                                 {dayBookings.pending.length}
                               </span>
                             </div>
                           )}
                           {dayBookings.public.length > 0 && (
-                            <div className="flex items-center gap-0.5">
-                              <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                              <span className="font-fira text-[9px] text-orange-700 font-semibold">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-green-600" title="Reuniones confirmadas" />
+                              <span className="font-fira text-[10px] md:text-[9px] text-green-800 font-semibold">
                                 {dayBookings.public.length}
                               </span>
                             </div>

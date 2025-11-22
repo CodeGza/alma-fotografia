@@ -128,7 +128,7 @@ export default function TestimoniosPage() {
       {/* Stats */}
       <AnimatedSection>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-2">
-          <div className="bg-white rounded-xl p-5 border border-gray-200/60 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 border border-gray-200/60 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg">
                 <MessageSquare size={24} className="text-blue-600" />
@@ -140,7 +140,7 @@ export default function TestimoniosPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-5 border border-gray-200/60 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 border border-gray-200/60 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-gradient-to-br from-yellow-100 to-yellow-50 rounded-lg">
                 <Sparkles size={24} className="text-yellow-600" />
@@ -154,7 +154,7 @@ export default function TestimoniosPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-5 border border-gray-200/60 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 border border-gray-200/60 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-gradient-to-br from-amber-100 to-amber-50 rounded-lg">
                 <Star size={24} className="text-amber-600 fill-amber-600" />
@@ -177,7 +177,7 @@ export default function TestimoniosPage() {
 
       {/* Buscador */}
       <AnimatedSection delay={0.1}>
-        <div className="bg-white rounded-xl p-4 border border-gray-200/60 shadow-sm mb-6">
+        <div className="bg-white rounded-2xl p-4 border border-gray-200/60 shadow-sm mb-6">
           <div className="relative">
             <Search
               size={20}
@@ -212,7 +212,7 @@ export default function TestimoniosPage() {
       {/* Lista de testimonios */}
       <AnimatedSection delay={0.2}>
         {testimonials.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 border border-gray-200/60 text-center">
+          <div className="bg-white rounded-2xl p-12 border border-gray-200/60 shadow-sm text-center">
             <div className="inline-flex p-4 bg-gray-100 rounded-full mb-4">
               <MessageSquare size={32} className="text-gray-400" />
             </div>
@@ -222,7 +222,7 @@ export default function TestimoniosPage() {
             </p>
           </div>
         ) : filteredTestimonials.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 border border-gray-200/60 text-center">
+          <div className="bg-white rounded-2xl p-12 border border-gray-200/60 shadow-sm text-center">
             <div className="inline-flex p-4 bg-gray-100 rounded-full mb-4">
               <Search size={32} className="text-gray-400" />
             </div>
@@ -251,16 +251,21 @@ export default function TestimoniosPage() {
       </AnimatedSection>
 
       {/* Modal de edición */}
-      {editingTestimonial && (
-        <EditTestimonialModal
-          testimonial={editingTestimonial}
-          onClose={() => setEditingTestimonial(null)}
-          onSuccess={() => {
-            loadTestimonials();
-            setEditingTestimonial(null);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {editingTestimonial && (
+          <EditTestimonialModal
+            testimonial={editingTestimonial}
+            onClose={() => {
+              setEditingTestimonial(null);
+              loadTestimonials();
+            }}
+            onSuccess={() => {
+              setEditingTestimonial(null);
+              loadTestimonials();
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Modal de confirmación eliminar */}
       <AnimatePresence>
@@ -271,13 +276,16 @@ export default function TestimoniosPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
-              onClick={() => setDeletingTestimonial(null)}
+              onClick={() => {
+                setDeletingTestimonial(null);
+                loadTestimonials();
+              }}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md mx-4"
+              className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-md z-50"
             >
               <div className="bg-white rounded-2xl shadow-2xl border border-gray-200/60 p-6">
                 <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -291,7 +299,10 @@ export default function TestimoniosPage() {
                 </p>
                 <div className="flex gap-3">
                   <button
-                    onClick={() => setDeletingTestimonial(null)}
+                    onClick={() => {
+                      setDeletingTestimonial(null);
+                      loadTestimonials();
+                    }}
                     className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all duration-200 font-fira text-sm font-medium"
                   >
                     Cancelar
@@ -319,7 +330,7 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl p-5 sm:p-6 border border-gray-200/60 shadow-sm hover:shadow-md transition-shadow"
+      className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-200/60 shadow-sm hover:shadow-md transition-shadow"
     >
       <div className="flex flex-col gap-4">
         {/* Header */}
@@ -344,7 +355,7 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
             onClick={onToggleFeatured}
             disabled={processing || (maxFeatured && !testimonial.is_featured)}
             title={maxFeatured ? 'Máximo 10 testimonios destacados' : testimonial.is_featured ? 'Desmarcar como destacado' : 'Marcar como destacado'}
-            className={`flex-shrink-0 p-2 rounded-lg transition-all duration-200 ${
+            className={`flex-shrink-0 p-2.5 rounded-lg transition-all duration-200 ${
               testimonial.is_featured
                 ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
                 : maxFeatured
@@ -403,14 +414,14 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={onEdit}
-              className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition-all duration-200"
+              className="p-2.5 hover:bg-blue-50 text-blue-600 rounded-lg transition-all duration-200"
               title="Editar"
             >
               <Edit3 size={16} />
             </button>
             <button
               onClick={onDelete}
-              className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-all duration-200"
+              className="p-2.5 hover:bg-red-50 text-red-600 rounded-lg transition-all duration-200"
               title="Eliminar"
             >
               <Trash2 size={16} />
@@ -459,10 +470,18 @@ function EditTestimonialModal({ testimonial, onClose, onSuccess }) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
+        className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-2xl z-50 max-h-[90vh] overflow-y-auto"
       >
         <div className="bg-white rounded-2xl shadow-2xl border border-gray-200/60 p-6 sm:p-8">
-          <h2 className="font-voga text-2xl text-gray-900 mb-6">Editar Testimonio</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-voga text-2xl text-gray-900">Editar Testimonio</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X size={20} className="text-gray-600" />
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Nombre */}
@@ -474,7 +493,7 @@ function EditTestimonialModal({ testimonial, onClose, onSuccess }) {
                 type="text"
                 value={formData.client_name}
                 onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] transition-all"
               />
             </div>
 
@@ -513,7 +532,7 @@ function EditTestimonialModal({ testimonial, onClose, onSuccess }) {
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 rows={5}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent resize-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] transition-all resize-none"
               />
             </div>
 

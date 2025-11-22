@@ -86,6 +86,9 @@ const PhotoGrid = memo(({
                 loading="lazy"
                 quality={90}
                 unoptimized
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2YzZjRmNiIvPjwvc3ZnPg=="
+                style={{ minHeight: '200px' }}
               />
 
               {/* Overlay en modo selección */}

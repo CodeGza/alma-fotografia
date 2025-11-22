@@ -109,6 +109,10 @@ export async function generateMetadata({ params, searchParams }) {
     return {
       title: 'Galería no encontrada | Alma Fotografía',
       description: 'Esta galería no está disponible o el enlace no es válido.',
+      icons: {
+        icon: '/icon.png',
+        apple: '/apple-icon.png',
+      },
       robots: 'noindex, nofollow',
     };
   }
@@ -127,6 +131,10 @@ export async function generateMetadata({ params, searchParams }) {
       return {
         title: 'Galería no encontrada | Alma Fotografía',
         description: 'Esta galería no está disponible.',
+        icons: {
+          icon: '/icon.png',
+          apple: '/apple-icon.png',
+        },
         robots: 'noindex, nofollow',
       };
     }
@@ -141,6 +149,10 @@ export async function generateMetadata({ params, searchParams }) {
     if (!gallery) {
       return {
         title: 'Galería | Alma Fotografía',
+        icons: {
+          icon: '/icon.png',
+          apple: '/apple-icon.png',
+        },
         robots: 'noindex, nofollow',
       };
     }
@@ -156,6 +168,10 @@ export async function generateMetadata({ params, searchParams }) {
     return {
       title: `${gallery.title} | Alma Fotografía`,
       description: gallery.description || `Galería de fotos${formattedDate ? ` - ${formattedDate}` : ''}. Ve y descarga tus fotos profesionales.`,
+      icons: {
+        icon: '/icon.png',
+        apple: '/apple-icon.png',
+      },
       openGraph: {
         title: gallery.title,
         description: gallery.description || 'Galería de fotos profesionales',

@@ -1287,7 +1287,7 @@ export default function GalleryDetailView({ gallery }) {
                     onClick={() => setShowShareModal(true)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="!text-white flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-white border border-[#79502A]/30 hover:bg-[#79502A]/10 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center justify-center gap-2 shadow-sm"
+                    className="!text-white flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center justify-center gap-2 shadow-sm"
                   >
                     <Share2 size={16} />
                     <span>Compartir</span>

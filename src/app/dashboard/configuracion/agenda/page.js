@@ -563,34 +563,34 @@ function AddBlockedDateModal({ onClose, onSuccess }) {
             </label>
 
             {/* Navegación del calendario */}
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-fira font-medium text-gray-900">
+            <div className="flex items-center justify-between mb-4 gap-2">
+              <h4 className="font-fira font-medium text-gray-900 text-sm sm:text-base flex-shrink-0">
                 {format(currentMonth, 'MMMM yyyy', { locale: es })}
               </h4>
-              <div className="flex gap-2">
+              <div className="flex gap-1 sm:gap-2 flex-shrink-0">
                 <button
                   type="button"
                   onClick={prevMonth}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <ChevronLeft size={20} />
+                  <ChevronLeft size={18} className="sm:w-5 sm:h-5" />
                 </button>
                 <button
                   type="button"
                   onClick={nextMonth}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <ChevronRight size={20} />
+                  <ChevronRight size={18} className="sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
 
             {/* Días de la semana */}
-            <div className="grid grid-cols-7 gap-2 mb-2">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2">
               {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((day, i) => (
                 <div
                   key={i}
-                  className="text-center font-fira text-xs font-semibold text-gray-600 py-2"
+                  className="text-center font-fira text-[10px] sm:text-xs font-semibold text-gray-600 py-1 sm:py-2"
                 >
                   {day}
                 </div>
@@ -598,7 +598,7 @@ function AddBlockedDateModal({ onClose, onSuccess }) {
             </div>
 
             {/* Grid de días */}
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2">
               {calendarDays.map((day, index) => {
                 if (!day) {
                   return <div key={`empty-${index}`} />;
@@ -616,7 +616,7 @@ function AddBlockedDateModal({ onClose, onSuccess }) {
                     onClick={() => !isPast && toggleDate(day)}
                     disabled={isPast}
                     className={`
-                      relative p-2 rounded-lg border-2 transition-all font-fira text-sm
+                      relative p-1.5 sm:p-2 rounded-lg border-2 transition-all font-fira text-xs sm:text-sm
                       ${isSelected
                         ? 'border-[#79502A] bg-[#79502A] text-white'
                         : hasEvents

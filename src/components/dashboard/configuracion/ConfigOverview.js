@@ -101,31 +101,31 @@ export default function ConfigOverview() {
                 }`}
             >
               {/* Background principal */}
-              <div className="absolute inset-0 bg-[#2D2D2D]" />
+              <div className="absolute inset-0 bg-white" />
 
               {/* Borde con color de marca */}
-              <div className={`absolute inset-0 border ${action.disabled ? 'border-[#79502A]/20' : 'border-[#79502A]/30'} rounded-xl`} />
+              <div className={`absolute inset-0 border ${action.disabled ? 'border-gray-100' : 'border-gray-200'} rounded-xl`} />
 
               {/* Contenido */}
               <div className="relative p-5 sm:p-6 flex flex-col min-h-[160px]">
                 {/* Icon */}
-                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#79502A]/20
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gray-50
                   flex items-center justify-center mb-4
                   transition-all duration-300
-                  ${!action.disabled && 'group-hover:bg-[#79502A]/30 group-hover:scale-105'}`}>
+                  ${!action.disabled && 'group-hover:bg-gray-100 group-hover:scale-105'}`}>
                   <IconComponent
                     size={24}
-                    className="text-[#C6A97D]"
+                    className="text-[#8B5E3C]"
                     strokeWidth={2}
                   />
                 </div>
 
                 {/* Texto */}
                 <div className="flex-1">
-                  <h3 className="font-fira text-base sm:text-lg font-bold mb-2 text-[#FFF8E2] transition-all">
+                  <h3 className="font-fira text-base sm:text-lg font-bold mb-2 text-gray-900 transition-all">
                     {action.title}
                   </h3>
-                  <p className="font-fira text-xs sm:text-sm text-[#C6A97D] leading-relaxed">
+                  <p className="font-fira text-xs sm:text-sm text-gray-600 leading-relaxed">
                     {action.description}
                   </p>
                 </div>
@@ -133,7 +133,7 @@ export default function ConfigOverview() {
                 {/* Badge o Arrow */}
                 <div className="mt-4 flex items-center justify-between">
                   {!action.disabled ? (
-                    <div className="flex items-center gap-2 text-[#C6A97D] group-hover:text-[#79502A] font-fira text-sm font-semibold group-hover:gap-3 transition-all">
+                    <div className="flex items-center gap-2 text-gray-600 group-hover:text-[#8B5E3C] font-fira text-sm font-semibold group-hover:gap-3 transition-all">
                       <span>Configurar</span>
                       <ArrowRight
                         size={18}
@@ -142,8 +142,8 @@ export default function ConfigOverview() {
                       />
                     </div>
                   ) : (
-                    <div className="px-3 py-1.5 bg-[#79502A]/10 rounded-lg">
-                      <span className="text-[10px] sm:text-xs font-fira font-semibold text-[#C6A97D]/60 flex items-center gap-1.5">
+                    <div className="px-3 py-1.5 bg-gray-100 rounded-lg">
+                      <span className="text-[10px] sm:text-xs font-fira font-semibold text-gray-500 flex items-center gap-1.5">
                         <Sparkles size={12} />
                         Próximamente
                       </span>

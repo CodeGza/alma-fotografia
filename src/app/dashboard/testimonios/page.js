@@ -114,7 +114,7 @@ export default function TestimoniosPage() {
         <DashboardHeader title="Testimonios" subtitle="Gestión de testimonios de clientes" />
         <AnimatedSection>
           <div className="flex items-center justify-center py-12">
-            <Loader2 size={40} className="animate-spin text-[#79502A]" />
+            <Loader2 size={40} className="animate-spin text-[#8B5E3C]" />
           </div>
         </AnimatedSection>
       </PageTransition>
@@ -128,40 +128,40 @@ export default function TestimoniosPage() {
       {/* Stats */}
       <AnimatedSection>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-2">
-          <div className="bg-[#2D2D2D] rounded-xl p-5 border border-[#79502A]/30">
+          <div className="bg-white rounded-xl p-5 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-[#79502A]/20 rounded-lg">
-                <MessageSquare size={24} className="text-[#C6A97D]" />
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <MessageSquare size={24} className="text-[#8B5E3C]" />
               </div>
               <div>
-                <p className="font-fira text-sm text-[#C6A97D]">Total</p>
-                <p className="font-voga text-2xl text-[#FFF8E2]">{testimonials.length}</p>
+                <p className="font-fira text-sm text-gray-600">Total</p>
+                <p className="font-voga text-2xl text-gray-900">{testimonials.length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#2D2D2D] rounded-xl p-5 border border-[#79502A]/30">
+          <div className="bg-white rounded-xl p-5 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-[#79502A]/20 rounded-lg">
-                <Sparkles size={24} className="text-[#C6A97D]" />
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <Sparkles size={24} className="text-[#8B5E3C]" />
               </div>
               <div>
-                <p className="font-fira text-sm text-[#C6A97D]">Destacados</p>
-                <p className="font-voga text-2xl text-[#FFF8E2]">
+                <p className="font-fira text-sm text-gray-600">Destacados</p>
+                <p className="font-voga text-2xl text-gray-900">
                   {featuredCount}/10
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#2D2D2D] rounded-xl p-5 border border-[#79502A]/30">
+          <div className="bg-white rounded-xl p-5 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-[#79502A]/20 rounded-lg">
-                <Star size={24} className="text-[#C6A97D] fill-[#C6A97D]" />
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <Star size={24} className="text-[#8B5E3C] fill-[#8B5E3C]" />
               </div>
               <div>
-                <p className="font-fira text-sm text-[#C6A97D]">Promedio</p>
-                <p className="font-voga text-2xl text-[#FFF8E2]">
+                <p className="font-fira text-sm text-gray-600">Promedio</p>
+                <p className="font-voga text-2xl text-gray-900">
                   {testimonials.length > 0
                     ? (
                         testimonials.reduce((sum, t) => sum + (t.rating || 0), 0) /
@@ -177,7 +177,7 @@ export default function TestimoniosPage() {
 
       {/* Buscador */}
       <AnimatedSection delay={0.1}>
-        <div className="bg-white rounded-2xl p-4 border border-gray-200/60 shadow-sm mb-6">
+        <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm mb-6">
           <div className="relative">
             <Search
               size={20}
@@ -188,7 +188,7 @@ export default function TestimoniosPage() {
               placeholder="Buscar por galería, cliente o mensaje..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 font-fira text-sm text-gray-700 placeholder-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] transition-all"
+              className="w-full pl-10 pr-10 py-2.5 font-fira text-sm text-gray-700 placeholder-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] transition-all"
             />
             {searchQuery && (
               <button
@@ -212,7 +212,7 @@ export default function TestimoniosPage() {
       {/* Lista de testimonios */}
       <AnimatedSection delay={0.2}>
         {testimonials.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 border border-gray-200/60 shadow-sm text-center">
+          <div className="bg-white rounded-2xl p-12 border border-gray-200 shadow-sm text-center">
             <div className="inline-flex p-4 bg-gray-100 rounded-full mb-4">
               <MessageSquare size={32} className="text-gray-400" />
             </div>
@@ -222,7 +222,7 @@ export default function TestimoniosPage() {
             </p>
           </div>
         ) : filteredTestimonials.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 border border-gray-200/60 shadow-sm text-center">
+          <div className="bg-white rounded-2xl p-12 border border-gray-200 shadow-sm text-center">
             <div className="inline-flex p-4 bg-gray-100 rounded-full mb-4">
               <Search size={32} className="text-gray-400" />
             </div>
@@ -287,7 +287,7 @@ export default function TestimoniosPage() {
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-md z-50"
             >
-              <div className="bg-white rounded-2xl shadow-2xl border border-gray-200/60 p-6">
+              <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6">
                 <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <AlertCircle size={24} className="text-red-600" />
                 </div>
@@ -330,20 +330,20 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[#2D2D2D] rounded-xl p-5 sm:p-6 border border-[#79502A]/30 hover:shadow-xl transition-all duration-200"
+      className="bg-white rounded-xl p-5 sm:p-6 border border-gray-200 hover:shadow-xl transition-all duration-200"
     >
       <div className="flex flex-col gap-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="p-2 bg-[#79502A]/20 rounded-lg flex-shrink-0">
-              <User size={18} className="text-[#C6A97D]" />
+            <div className="p-2 bg-gray-100 rounded-lg flex-shrink-0">
+              <User size={18} className="text-[#8B5E3C]" />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="font-fira text-base font-semibold text-[#FFF8E2] truncate">
+              <h3 className="font-fira text-base font-semibold text-gray-900 truncate">
                 {testimonial.client_name}
               </h3>
-              <p className="font-fira text-xs text-[#C6A97D]/70 flex items-center gap-1.5 truncate">
+              <p className="font-fira text-xs text-gray-600 flex items-center gap-1.5 truncate">
                 <Mail size={12} />
                 {testimonial.client_email}
               </p>
@@ -357,16 +357,16 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
             title={maxFeatured ? 'Máximo 10 testimonios destacados' : testimonial.is_featured ? 'Desmarcar como destacado' : 'Marcar como destacado'}
             className={`flex-shrink-0 p-2.5 rounded-lg transition-all duration-200 ${
               testimonial.is_featured
-                ? 'bg-[#C6A97D]/20 text-[#C6A97D] hover:bg-[#C6A97D]/30'
+                ? 'bg-amber-100 text-[#8B5E3C] hover:bg-amber-200'
                 : maxFeatured
-                ? 'bg-[#79502A]/10 text-[#C6A97D]/40 cursor-not-allowed'
-                : 'bg-[#79502A]/10 text-[#C6A97D] hover:bg-[#79502A]/20'
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-100 text-[#8B5E3C] hover:bg-gray-200'
             } disabled:opacity-50`}
           >
             {processing ? (
               <Loader2 size={18} className="animate-spin" />
             ) : (
-              <Sparkles size={18} className={testimonial.is_featured ? 'fill-[#C6A97D]' : ''} />
+              <Sparkles size={18} className={testimonial.is_featured ? 'fill-[#8B5E3C]' : ''} />
             )}
           </button>
         </div>
@@ -380,32 +380,32 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
                 size={16}
                 className={`${
                   star <= testimonial.rating
-                    ? 'fill-[#C6A97D] text-[#C6A97D]'
-                    : 'fill-[#79502A]/20 text-[#79502A]/20'
+                    ? 'fill-[#8B5E3C] text-[#8B5E3C]'
+                    : 'fill-gray-200 text-gray-300'
                 }`}
               />
             ))}
-            <span className="ml-2 font-fira text-xs text-[#C6A97D]/70">
+            <span className="ml-2 font-fira text-xs text-gray-600">
               {testimonial.rating}/5
             </span>
           </div>
         )}
 
         {/* Mensaje */}
-        <p className="font-fira text-sm text-[#FFF8E2] leading-relaxed">
+        <p className="font-fira text-sm text-gray-700 leading-relaxed">
           {testimonial.message}
         </p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#79502A]/20">
+        <div className="flex items-center justify-between gap-3 pt-3 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0 flex-1">
             {testimonial.gallery && (
-              <span className="font-fira text-xs text-[#C6A97D] flex items-center gap-1.5 truncate">
+              <span className="font-fira text-xs text-gray-600 flex items-center gap-1.5 truncate">
                 <ImageIcon size={12} className="flex-shrink-0" />
                 {testimonial.gallery.title}
               </span>
             )}
-            <span className="font-fira text-xs text-[#C6A97D]/70 flex items-center gap-1.5">
+            <span className="font-fira text-xs text-gray-500 flex items-center gap-1.5">
               <Calendar size={12} className="flex-shrink-0" />
               {new Date(testimonial.created_at).toLocaleDateString('es-UY')}
             </span>
@@ -414,14 +414,14 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={onEdit}
-              className="p-2.5 hover:bg-[#79502A]/20 text-[#C6A97D] rounded-lg transition-all duration-200"
+              className="p-2.5 hover:bg-gray-100 text-[#8B5E3C] rounded-lg transition-all duration-200"
               title="Editar"
             >
               <Edit3 size={16} />
             </button>
             <button
               onClick={onDelete}
-              className="p-2.5 hover:bg-red-600/20 text-red-400 rounded-lg transition-all duration-200"
+              className="p-2.5 hover:bg-red-100 text-red-600 rounded-lg transition-all duration-200"
               title="Eliminar"
             >
               <Trash2 size={16} />
@@ -472,7 +472,7 @@ function EditTestimonialModal({ testimonial, onClose, onSuccess }) {
         exit={{ opacity: 0, scale: 0.95 }}
         className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-2xl z-50 max-h-[90vh] overflow-y-auto"
       >
-        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200/60 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-voga text-2xl text-gray-900">Editar Testimonio</h2>
             <button
@@ -514,7 +514,7 @@ function EditTestimonialModal({ testimonial, onClose, onSuccess }) {
                       size={32}
                       className={`${
                         star <= formData.rating
-                          ? 'fill-yellow-400 text-yellow-400'
+                          ? 'fill-[#8B5E3C] text-[#8B5E3C]'
                           : 'fill-gray-200 text-gray-300'
                       } transition-colors`}
                     />
@@ -532,7 +532,7 @@ function EditTestimonialModal({ testimonial, onClose, onSuccess }) {
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 rows={5}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] transition-all resize-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] transition-all resize-none"
               />
             </div>
 
@@ -549,7 +549,7 @@ function EditTestimonialModal({ testimonial, onClose, onSuccess }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 px-4 py-2.5 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-lg transition-all duration-200 font-fira text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
+                className="flex-1 px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg transition-all duration-200 font-fira text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
               >
                 {isSubmitting ? (
                   <>

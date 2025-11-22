@@ -148,7 +148,7 @@ export default function GalleryCardHorizontal({
     <>
       <div
         onClick={handleClick}
-        className="group bg-[#2D2D2D] rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-[1.01] flex flex-row min-h-[140px] border border-[#79502A]/30"
+        className="group bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-[1.01] flex flex-row min-h-[140px] border border-gray-200"
       >
         {/* ============================================ */}
         {/* IMAGEN - Izquierda */}
@@ -225,22 +225,22 @@ export default function GalleryCardHorizontal({
           <div className="flex items-start justify-between gap-2 mb-1.5 sm:mb-2">
             <div className="flex-1 min-w-0">
               {/* Título */}
-              <h3 className="font-voga text-sm sm:text-base md:text-lg text-[#FFF8E2] truncate group-hover:text-[#C6A97D] transition-colors duration-200">
+              <h3 className="font-voga text-sm sm:text-base md:text-lg text-gray-900 truncate group-hover:text-[#8B5E3C] transition-colors duration-200">
                 {title}
               </h3>
-              
+
               {/* Servicio + Fecha - Solo móvil */}
               <div className="flex items-center gap-2 mt-0.5 sm:hidden">
                 {serviceData && (
-                  <div className="flex items-center gap-1 text-[#C6A97D]">
+                  <div className="flex items-center gap-1 text-gray-600">
                     <ServiceIcon size={10} />
                     <span className="font-fira text-[10px] font-medium truncate max-w-[80px]">
                       {serviceData.name}
                     </span>
                   </div>
                 )}
-                <span className="text-white/40">•</span>
-                <span className="font-fira text-[10px] text-white/60 truncate">
+                <span className="text-gray-400">•</span>
+                <span className="font-fira text-[10px] text-gray-600 truncate">
                   {formattedDate}
                 </span>
               </div>
@@ -269,14 +269,14 @@ export default function GalleryCardHorizontal({
             {/* Flecha - Solo desktop */}
             <ChevronRight
               size={16}
-              className="hidden sm:block text-[#C6A97D]/40 group-hover:text-[#79502A] group-hover:translate-x-1 transition-all duration-200 flex-shrink-0"
+              className="hidden sm:block text-gray-400 group-hover:text-[#8B5E3C] group-hover:translate-x-1 transition-all duration-200 flex-shrink-0"
             />
           </div>
 
           {/* Metadata - Solo desktop */}
           <div className="hidden sm:flex flex-col gap-1 mb-2">
             {serviceData && (
-              <div className="flex items-center gap-1.5 text-[#C6A97D]">
+              <div className="flex items-center gap-1.5 text-gray-600">
                 <ServiceIcon size={12} />
                 <span className="font-fira text-xs font-semibold truncate">
                   {serviceData.name}
@@ -284,7 +284,7 @@ export default function GalleryCardHorizontal({
               </div>
             )}
 
-            <div className="flex items-center gap-1.5 text-[#C6A97D]">
+            <div className="flex items-center gap-1.5 text-gray-600">
               <Calendar size={10} />
               <span className="font-fira text-[10px] sm:text-xs truncate">
                 {formattedDate}
@@ -292,7 +292,7 @@ export default function GalleryCardHorizontal({
             </div>
 
             {client_email && (
-              <div className="flex items-center gap-1.5 text-[#C6A97D]">
+              <div className="flex items-center gap-1.5 text-gray-600">
                 <Mail size={10} />
                 <span className="font-fira text-[10px] sm:text-xs truncate">
                   {client_email}
@@ -302,8 +302,8 @@ export default function GalleryCardHorizontal({
 
             {allow_downloads && download_pin && (
               <div className="flex items-center gap-1.5">
-                <Lock size={10} className="text-[#C6A97D]" />
-                <span className="font-fira text-[10px] sm:text-xs font-semibold text-[#C6A97D]">
+                <Lock size={10} className="text-gray-600" />
+                <span className="font-fira text-[10px] sm:text-xs font-semibold text-gray-600">
                   PIN: {download_pin}
                 </span>
               </div>
@@ -314,37 +314,37 @@ export default function GalleryCardHorizontal({
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
             {/* Fotos */}
             <div className="flex items-center gap-1">
-              <div className="p-0.5 sm:p-1 bg-[#79502A]/20 rounded">
-                <ImageIcon size={10} className="sm:w-3 sm:h-3 text-[#C6A97D]" />
+              <div className="p-0.5 sm:p-1 bg-gray-100 rounded">
+                <ImageIcon size={10} className="sm:w-3 sm:h-3 text-gray-600" />
               </div>
-              <span className="font-fira text-[10px] sm:text-xs font-semibold text-[#FFF8E2]">
+              <span className="font-fira text-[10px] sm:text-xs font-semibold text-gray-900">
                 {photoCount}
               </span>
             </div>
 
             {/* Vistas */}
             <div className="flex items-center gap-1">
-              <div className="p-0.5 sm:p-1 bg-[#79502A]/20 rounded">
-                <Eye size={10} className="sm:w-3 sm:h-3 text-[#C6A97D]" />
+              <div className="p-0.5 sm:p-1 bg-gray-100 rounded">
+                <Eye size={10} className="sm:w-3 sm:h-3 text-gray-600" />
               </div>
-              <span className="font-fira text-[10px] sm:text-xs font-semibold text-[#FFF8E2]">
+              <span className="font-fira text-[10px] sm:text-xs font-semibold text-gray-900">
                 {displayViews}
               </span>
             </div>
 
             {/* Favoritos */}
             <div className="flex items-center gap-1">
-              <div className="p-0.5 sm:p-1 bg-[#79502A]/20 rounded">
+              <div className="p-0.5 sm:p-1 bg-gray-100 rounded">
                 <Heart
                   size={10}
                   className={`sm:w-3 sm:h-3 ${
-                    favorites_count > 0 ? 'text-pink-400' : 'text-[#C6A97D]/40'
+                    favorites_count > 0 ? 'text-pink-400' : 'text-gray-400'
                   }`}
                 />
               </div>
               <span
                 className={`font-fira text-[10px] sm:text-xs font-semibold ${
-                  favorites_count > 0 ? 'text-[#FFF8E2]' : 'text-[#C6A97D]/40'
+                  favorites_count > 0 ? 'text-gray-900' : 'text-gray-400'
                 }`}
               >
                 {favorites_count}
@@ -358,10 +358,10 @@ export default function GalleryCardHorizontal({
             <button
               onClick={handleShare}
               disabled={isArchived}
-              className={`py-1 !text-white sm:py-1.5 md:py-2 rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 ${
+              className={`py-1 sm:py-1.5 md:py-2 rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 ${
                 isArchived
-                  ? 'bg-white/5 text-white/30 cursor-not-allowed'
-                  : 'bg-[#79502A] hover:bg-[#5a3c1f] text-white'
+                  ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                  : 'bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white'
               }`}
               aria-label="Compartir"
             >
@@ -371,7 +371,7 @@ export default function GalleryCardHorizontal({
             {/* Editar */}
             <button
               onClick={handleEdit}
-              className="py-1 !text-white sm:py-1.5 md:py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1"
+              className="py-1 sm:py-1.5 md:py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1"
               aria-label="Editar"
             >
               <Edit size={10} className="sm:w-3 sm:h-3" />
@@ -381,10 +381,10 @@ export default function GalleryCardHorizontal({
             <button
               onClick={handleFavorites}
               disabled={favorites_count === 0}
-              className={`py-1 !text-pink-400 sm:py-1.5 md:py-2 rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 ${
+              className={`py-1 sm:py-1.5 md:py-2 rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 ${
                 favorites_count > 0
-                  ? 'bg-pink-500/20 hover:bg-pink-500/30 text-pink-300'
-                  : 'bg-white/5 text-white/30 cursor-not-allowed'
+                  ? 'bg-pink-500/20 hover:bg-pink-500/30 text-pink-600'
+                  : 'bg-gray-50 text-gray-400 cursor-not-allowed'
               }`}
               aria-label="Ver favoritas"
             >

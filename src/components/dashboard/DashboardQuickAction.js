@@ -7,13 +7,11 @@ import * as LucideIcons from 'lucide-react';
 /**
  * REDISEÑO UI - DashboardQuickAction
  *
- * Cambios visuales aplicados:
- * - Primary: fondo #79502A, texto blanco, hover más oscuro
- * - Secondary: fondo blanco, borde #79502A, texto #2D2D2D, hover con fondo #79502A/10
- * - Bordes redondeados rounded-lg
- * - Sombras suaves para elevación
- * - Animaciones de escala y elevación
- * - Textos más concisos
+ * PALETA BLANCO PREDOMINANTE:
+ * - Primary: fondo #8B5E3C (marrón), texto blanco
+ * - Secondary: fondo blanco, borde gris, texto oscuro
+ * - Iconos: #8B5E3C
+ * - Hover: Elevación sutil
  *
  * Funcionalidad preservada:
  * - Link a href
@@ -39,17 +37,17 @@ export default function DashboardQuickAction({
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.2 }}
         className={`
-          flex items-center gap-4 p-6 rounded-lg border transition-all duration-200 shadow-md hover:shadow-lg
+          flex items-center gap-4 p-6 rounded-lg border transition-all duration-200 shadow-sm hover:shadow-md
           ${isPrimary
-            ? 'bg-[#79502A] border-[#79502A] text-white hover:bg-[#5a3c1f]'
-            : 'bg-white border-[#79502A]/30 text-[#2D2D2D] hover:bg-[#79502A]/10 hover:border-[#79502A]'
+            ? 'bg-[#8B5E3C] border-[#8B5E3C] text-white hover:bg-[#6d4a2f]'
+            : 'bg-white border-gray-200 text-[#2D2D2D] hover:bg-gray-50 hover:border-[#8B5E3C]'
           }
         `}
       >
         {/* Icono */}
         {Icon && (
           <div className="flex-shrink-0">
-            <Icon size={28} strokeWidth={2} className={isPrimary ? 'text-white' : 'text-[#79502A]'} />
+            <Icon size={28} strokeWidth={2} className={isPrimary ? 'text-white' : 'text-[#8B5E3C]'} />
           </div>
         )}
 
@@ -59,7 +57,7 @@ export default function DashboardQuickAction({
             {title}
           </div>
           <div className={`text-xs ${
-            isPrimary ? 'text-white/80' : 'text-[#79502A]/70'
+            isPrimary ? 'text-white/80' : 'text-gray-600'
           }`}>
             {description}
           </div>

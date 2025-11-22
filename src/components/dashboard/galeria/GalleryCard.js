@@ -105,7 +105,7 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
     <>
       <div
         onClick={handleClick}
-        className="group relative bg-[#2D2D2D] rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-2xl hover:scale-[1.02] flex flex-col border border-[#79502A]/30"
+        className="group relative bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-2xl hover:scale-[1.02] flex flex-col border border-gray-200"
       >
         {/* Imagen de portada */}
         <div className="relative w-full aspect-[4/3] bg-gray-800 overflow-hidden">
@@ -194,11 +194,11 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
         <div className="p-4 flex flex-col flex-1">
           {/* Título y tipo de servicio */}
           <div className="mb-2">
-            <h3 className="font-voga text-lg text-[#FFF8E2] mb-1 truncate group-hover:text-[#C6A97D] transition-colors duration-200">
+            <h3 className="font-voga text-lg text-gray-900 mb-1 truncate group-hover:text-[#8B5E3C] transition-colors duration-200">
               {title}
             </h3>
             {serviceData && (
-              <div className="flex items-center gap-1.5 text-[#C6A97D]">
+              <div className="flex items-center gap-1.5 text-gray-600">
                 <ServiceIcon size={12} />
                 <span className="font-fira text-xs">{serviceData.name}</span>
               </div>
@@ -207,7 +207,7 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
 
           {/* Descripción */}
           {description && (
-            <p className="font-fira text-xs text-[#C6A97D]/80 mb-3 line-clamp-2 leading-relaxed">
+            <p className="font-fira text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
               {description}
             </p>
           )}
@@ -215,14 +215,14 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
           {/* Metadata */}
           <div className="space-y-2 mb-4">
             {/* Fecha */}
-            <div className="flex items-center gap-2 text-[#C6A97D]">
+            <div className="flex items-center gap-2 text-gray-600">
               <Calendar size={12} className="flex-shrink-0" />
               <span className="font-fira text-xs truncate">{formattedDate}</span>
             </div>
 
             {/* Email */}
             {client_email && (
-              <div className="flex items-center gap-2 text-[#C6A97D]">
+              <div className="flex items-center gap-2 text-gray-600">
                 <Mail size={12} className="flex-shrink-0" />
                 <span className="font-fira text-xs truncate">{client_email}</span>
               </div>
@@ -231,8 +231,8 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
             {/* PIN de descarga */}
             {allow_downloads && download_pin && (
               <div className="flex items-center gap-2">
-                <Lock size={12} className="flex-shrink-0 text-[#C6A97D]" />
-                <span className="font-fira text-xs font-semibold text-[#C6A97D]">
+                <Lock size={12} className="flex-shrink-0 text-gray-600" />
+                <span className="font-fira text-xs font-semibold text-gray-600">
                   PIN: {download_pin}
                 </span>
               </div>
@@ -246,49 +246,49 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
           <div className="grid grid-cols-3 gap-2 mb-4">
             {/* Fotos */}
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-[#79502A]/20 rounded">
-                <ImageIcon size={12} className="text-[#C6A97D]" />
+              <div className="p-1.5 bg-gray-100 rounded">
+                <ImageIcon size={12} className="text-gray-600" />
               </div>
               <div>
-                <p className="font-fira text-sm font-semibold text-[#FFF8E2]">{photoCount}</p>
-                <p className="font-fira text-[10px] text-[#C6A97D]">Fotos</p>
+                <p className="font-fira text-sm font-semibold text-gray-900">{photoCount}</p>
+                <p className="font-fira text-[10px] text-gray-600">Fotos</p>
               </div>
             </div>
 
             {/* Vistas */}
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-[#79502A]/20 rounded">
-                <Eye size={12} className="text-[#C6A97D]" />
+              <div className="p-1.5 bg-gray-100 rounded">
+                <Eye size={12} className="text-gray-600" />
               </div>
               <div>
-                <p className="font-fira text-sm font-semibold text-[#FFF8E2]">{displayViews}</p>
-                <p className="font-fira text-[10px] text-[#C6A97D]">Vistas</p>
+                <p className="font-fira text-sm font-semibold text-gray-900">{displayViews}</p>
+                <p className="font-fira text-[10px] text-gray-600">Vistas</p>
               </div>
             </div>
 
             {/* Favoritos */}
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-[#79502A]/20 rounded">
-                <Heart size={12} className={favorites_count > 0 ? 'text-pink-400' : 'text-[#C6A97D]/40'} />
+              <div className="p-1.5 bg-gray-100 rounded">
+                <Heart size={12} className={favorites_count > 0 ? 'text-pink-400' : 'text-gray-400'} />
               </div>
               <div>
-                <p className={`font-fira text-sm font-semibold ${favorites_count > 0 ? 'text-[#FFF8E2]' : 'text-[#C6A97D]/40'}`}>
+                <p className={`font-fira text-sm font-semibold ${favorites_count > 0 ? 'text-gray-900' : 'text-gray-400'}`}>
                   {favorites_count}
                 </p>
-                <p className="font-fira text-[10px] text-[#C6A97D]">Favs</p>
+                <p className="font-fira text-[10px] text-gray-600">Favs</p>
               </div>
             </div>
           </div>
 
           {/* Acciones - SIEMPRE AL FONDO */}
-          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#79502A]/30 mt-auto">
+          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-100 mt-auto">
             <button
               onClick={handleShare}
               disabled={isArchived}
-              className={`py-2 rounded-lg transition-all duration-200 !text-white font-fira text-xs font-semibold flex items-center justify-center gap-1.5 ${
+              className={`py-2 rounded-lg transition-all duration-200 font-fira text-xs font-semibold flex items-center justify-center gap-1.5 ${
                 isArchived
-                  ? 'bg-white/5 text-white/30 cursor-not-allowed'
-                  : 'bg-[#79502A] hover:bg-[#5a3c1f] text-white'
+                  ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                  : 'bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white'
               }`}
               title={isArchived ? 'No se puede compartir una galería archivada' : 'Compartir'}
             >
@@ -296,7 +296,7 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
             </button>
             <button
               onClick={handleEdit}
-              className="py-2 !text-white bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200 font-fira text-xs font-semibold flex items-center justify-center gap-1.5"
+              className="py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg transition-all duration-200 font-fira text-xs font-semibold flex items-center justify-center gap-1.5"
               title="Editar"
             >
               <Edit size={12} />
@@ -304,10 +304,10 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
             <button
               onClick={handleFavorites}
               disabled={favorites_count === 0}
-              className={`py-2 !text-pink-400 rounded-lg transition-all duration-200 font-fira text-xs font-semibold flex items-center justify-center gap-1.5 ${
+              className={`py-2 rounded-lg transition-all duration-200 font-fira text-xs font-semibold flex items-center justify-center gap-1.5 ${
                 favorites_count > 0
-                  ? 'bg-pink-500/20 hover:bg-pink-500/30 text-pink-300'
-                  : 'bg-white/5 text-white/30 cursor-not-allowed'
+                  ? 'bg-pink-500/20 hover:bg-pink-500/30 text-pink-600'
+                  : 'bg-gray-50 text-gray-400 cursor-not-allowed'
               }`}
               title={favorites_count > 0 ? 'Ver favoritas' : 'Sin favoritas'}
             >

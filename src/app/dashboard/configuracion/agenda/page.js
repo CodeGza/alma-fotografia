@@ -76,7 +76,7 @@ export default function AgendaConfigPage() {
         />
         <AnimatedSection>
           <div className="flex items-center justify-center py-12">
-            <Loader2 size={40} className="animate-spin text-[#79502A]" />
+            <Loader2 size={40} className="animate-spin text-[#8B5E3C]" />
           </div>
         </AnimatedSection>
       </PageTransition>
@@ -99,7 +99,7 @@ export default function AgendaConfigPage() {
             onClick={() => setActiveTab('horarios')}
             className={`px-3 sm:px-4 py-2 sm:py-3 font-fira text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
               activeTab === 'horarios'
-                ? 'border-[#79502A] text-[#79502A]'
+                ? 'border-[#8B5E3C] text-[#8B5E3C]'
                 : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -114,7 +114,7 @@ export default function AgendaConfigPage() {
             onClick={() => setActiveTab('bloqueos')}
             className={`px-3 sm:px-4 py-2 sm:py-3 font-fira text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
               activeTab === 'bloqueos'
-                ? 'border-[#79502A] text-[#79502A]'
+                ? 'border-[#8B5E3C] text-[#8B5E3C]'
                 : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -128,7 +128,7 @@ export default function AgendaConfigPage() {
             onClick={() => setActiveTab('tipos')}
             className={`px-3 sm:px-4 py-2 sm:py-3 font-fira text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
               activeTab === 'tipos'
-                ? 'border-[#79502A] text-[#79502A]'
+                ? 'border-[#8B5E3C] text-[#8B5E3C]'
                 : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -217,7 +217,7 @@ function WorkingHoursTab() {
     return (
       <AnimatedSection delay={0.2}>
         <div className="flex items-center justify-center py-12">
-          <Loader2 size={32} className="animate-spin text-[#79502A]" />
+          <Loader2 size={32} className="animate-spin text-[#8B5E3C]" />
         </div>
       </AnimatedSection>
     );
@@ -255,7 +255,7 @@ function WorkingHoursTab() {
                       onChange={(e) =>
                         handleDayChange(day.value, 'is_working_day', e.target.checked)
                       }
-                      className="w-4 h-4 sm:w-5 sm:h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-[#8B5E3C] border-gray-300 rounded focus:ring-[#8B5E3C] cursor-pointer"
                     />
                     <span className="font-fira text-xs sm:text-sm text-gray-700">Día laborable</span>
                   </label>
@@ -270,7 +270,7 @@ function WorkingHoursTab() {
                         type="time"
                         value={dayData?.start_time?.substring(0, 5) || '09:00'}
                         onChange={(e) => handleDayChange(day.value, 'start_time', e.target.value + ':00')}
-                        className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+                        className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
                       />
                     </div>
 
@@ -280,7 +280,7 @@ function WorkingHoursTab() {
                         type="time"
                         value={dayData?.end_time?.substring(0, 5) || '18:00'}
                         onChange={(e) => handleDayChange(day.value, 'end_time', e.target.value + ':00')}
-                        className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+                        className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
                       />
                     </div>
                   </div>
@@ -295,7 +295,7 @@ function WorkingHoursTab() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-400 text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] disabled:bg-gray-400 text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
             {saving ? (
               <>
@@ -351,7 +351,7 @@ function BlockedDatesTab() {
     return (
       <AnimatedSection delay={0.2}>
         <div className="flex items-center justify-center py-12">
-          <Loader2 size={32} className="animate-spin text-[#79502A]" />
+          <Loader2 size={32} className="animate-spin text-[#8B5E3C]" />
         </div>
       </AnimatedSection>
     );
@@ -359,7 +359,7 @@ function BlockedDatesTab() {
 
   return (
     <AnimatedSection delay={0.2}>
-      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/60 shadow-sm">
+      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
         {/* Header responsive - Stack vertical en mobile */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div className="flex-1 min-w-0">
@@ -370,7 +370,7 @@ function BlockedDatesTab() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="w-full sm:w-auto px-4 py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg font-fira text-sm font-medium flex items-center justify-center gap-2 transition-colors whitespace-nowrap flex-shrink-0"
+            className="w-full sm:w-auto px-4 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-sm font-medium flex items-center justify-center gap-2 transition-colors whitespace-nowrap flex-shrink-0"
           >
             <Plus size={16} />
             Bloquear Días
@@ -626,10 +626,10 @@ function AddBlockedDateModal({ onClose, onSuccess }) {
                     className={`
                       relative aspect-square min-h-[32px] sm:min-h-[40px] rounded border-2 transition-all font-fira text-[10px] xs:text-xs sm:text-sm flex items-center justify-center
                       ${isSelected
-                        ? 'border-[#79502A] bg-[#79502A] text-white font-medium'
+                        ? 'border-[#8B5E3C] bg-[#8B5E3C] text-white font-medium'
                         : hasEvents
                         ? 'border-red-300 bg-red-50 text-red-400 cursor-not-allowed'
-                        : 'border-gray-200 hover:border-[#79502A] hover:bg-[#79502A]/5 text-gray-900'
+                        : 'border-gray-200 hover:border-[#8B5E3C] hover:bg-[#8B5E3C]/5 text-gray-900'
                       }
                       ${isPast ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
                     `}
@@ -646,7 +646,7 @@ function AddBlockedDateModal({ onClose, onSuccess }) {
             {/* Leyenda - Responsive */}
             <div className="flex flex-col xs:flex-row xs:flex-wrap gap-2 xs:gap-4 mt-3 sm:mt-4 text-[10px] xs:text-xs font-fira">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-[#79502A] bg-[#79502A] rounded flex-shrink-0"></div>
+                <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-[#8B5E3C] bg-[#8B5E3C] rounded flex-shrink-0"></div>
                 <span className="text-gray-600">Seleccionado</span>
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2">
@@ -703,7 +703,7 @@ function AddBlockedDateModal({ onClose, onSuccess }) {
             <button
               type="submit"
               disabled={submitting || selectedDates.length === 0}
-              className="w-full sm:flex-1 px-4 py-2 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:flex-1 px-4 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -761,7 +761,7 @@ function BookingTypesTab() {
     return (
       <AnimatedSection delay={0.2}>
         <div className="flex items-center justify-center py-12">
-          <Loader2 size={32} className="animate-spin text-[#79502A]" />
+          <Loader2 size={32} className="animate-spin text-[#8B5E3C]" />
         </div>
       </AnimatedSection>
     );
@@ -769,7 +769,7 @@ function BookingTypesTab() {
 
   return (
     <AnimatedSection delay={0.2}>
-      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/60 shadow-sm">
+      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
         {/* Header */}
         <div className="mb-4 sm:mb-6">
           <h3 className="font-voga text-lg sm:text-xl text-gray-900 mb-1 sm:mb-2">Tipos de Reunión Pública</h3>
@@ -802,7 +802,7 @@ function BookingTypesTab() {
               <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 xs:gap-3">
                 <button
                   onClick={() => setEditingType(type)}
-                  className="w-full xs:flex-1 px-3 py-1.5 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full xs:flex-1 px-3 py-1.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
                 >
                   <Settings size={14} />
                   Editar
@@ -813,7 +813,7 @@ function BookingTypesTab() {
                     type="checkbox"
                     checked={type.is_active}
                     onChange={() => handleToggleActive(type.id, type.is_active)}
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer"
+                    className="w-4 h-4 sm:w-5 sm:h-5 text-[#8B5E3C] border-gray-300 rounded focus:ring-[#8B5E3C] cursor-pointer"
                   />
                   <span className="font-fira text-xs sm:text-sm text-gray-700 whitespace-nowrap">Activo</span>
                 </label>
@@ -824,7 +824,7 @@ function BookingTypesTab() {
 
         {/* Tip - Responsive */}
         <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <p className="font-fira text-xs sm:text-sm text-[#79502A] leading-relaxed">
+          <p className="font-fira text-xs sm:text-sm text-[#8B5E3C] leading-relaxed">
             <strong>Tip:</strong> Podés editar la duración de cada tipo de reunión y activar/desactivar según tus necesidades. Los tipos desactivados no aparecerán en el formulario público de reservas.
           </p>
         </div>
@@ -889,7 +889,7 @@ function EditBookingTypeModal({ bookingType, onClose, onSuccess }) {
         {/* Header - Mobile optimized */}
         <div className="flex items-start gap-2 sm:gap-3 mb-4">
           <div className="p-1.5 sm:p-2 bg-amber-100 rounded-lg flex-shrink-0">
-            <Users size={18} className="sm:w-5 sm:h-5 text-[#79502A]" />
+            <Users size={18} className="sm:w-5 sm:h-5 text-[#8B5E3C]" />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-voga text-lg sm:text-xl text-gray-900">Editar Tipo de Reunión</h3>
@@ -910,7 +910,7 @@ function EditBookingTypeModal({ bookingType, onClose, onSuccess }) {
               step="15"
               value={durationMinutes}
               onChange={(e) => setDurationMinutes(e.target.value)}
-              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-sm focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             />
             <p className="mt-1 font-fira text-[10px] xs:text-xs text-gray-500 leading-relaxed">
               Mínimo: 15 min • Máximo: 480 min (8 horas) • Incrementos de 15 min
@@ -926,7 +926,7 @@ function EditBookingTypeModal({ bookingType, onClose, onSuccess }) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Descripción del tipo de reunión..."
               rows={3}
-              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] resize-none"
             />
           </div>
 
@@ -943,7 +943,7 @@ function EditBookingTypeModal({ bookingType, onClose, onSuccess }) {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full sm:flex-1 px-4 py-2 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-400 text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:flex-1 px-4 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] disabled:bg-gray-400 text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>

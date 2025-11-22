@@ -6,14 +6,13 @@ import { HardDrive, AlertTriangle, RefreshCw } from 'lucide-react';
 /**
  * REDISEÑO UI - StorageCard
  *
- * Cambios visuales aplicados:
- * - Fondo #2D2D2D con bordes #79502A
- * - Textos en #FFF8E2 y #C6A97D
- * - Barra de progreso con colores de la paleta
- * - Estados de alerta con verde/rojo según paleta
- * - Bordes redondeados rounded-lg
- * - Sombras suaves
- * - Animaciones en botón refresh
+ * PALETA BLANCO PREDOMINANTE:
+ * - Fondo: #FFFFFF (blanco)
+ * - Bordes: #E5E7EB (gris sutil)
+ * - Texto: #2D2D2D (oscuro)
+ * - Iconos: #8B5E3C (marrón)
+ * - Barra: Verde/Marrón/Rojo según uso
+ * - Badges: Colores funcionales
  *
  * Funcionalidad preservada:
  * - Fetch de datos de Cloudinary
@@ -65,7 +64,7 @@ export default function StorageCard() {
       return {
         color: 'bg-red-600',
         textColor: 'text-red-600',
-        bgColor: 'bg-red-600/20',
+        bgColor: 'bg-red-50',
         message: 'Crítico',
         icon: <AlertTriangle className="w-5 h-5 text-red-600" />
       };
@@ -73,23 +72,23 @@ export default function StorageCard() {
       return {
         color: 'bg-red-600',
         textColor: 'text-red-600',
-        bgColor: 'bg-red-600/10',
+        bgColor: 'bg-red-50',
         message: 'Alto',
         icon: <AlertTriangle className="w-5 h-5 text-red-600" />
       };
     } else if (percentage >= 50) {
       return {
-        color: 'bg-[#C6A97D]',
-        textColor: 'text-[#C6A97D]',
-        bgColor: 'bg-[#C6A97D]/20',
+        color: 'bg-[#8B5E3C]',
+        textColor: 'text-[#8B5E3C]',
+        bgColor: 'bg-[#8B5E3C]/10',
         message: 'Moderado',
-        icon: <HardDrive className="w-5 h-5 text-[#C6A97D]" />
+        icon: <HardDrive className="w-5 h-5 text-[#8B5E3C]" />
       };
     } else {
       return {
         color: 'bg-green-600',
         textColor: 'text-green-600',
-        bgColor: 'bg-green-600/20',
+        bgColor: 'bg-green-50',
         message: 'Disponible',
         icon: <HardDrive className="w-5 h-5 text-green-600" />
       };
@@ -99,16 +98,16 @@ export default function StorageCard() {
   // Loading state
   if (loading) {
     return (
-      <div className="bg-[#2D2D2D] border border-[#79502A]/30 rounded-lg p-6 shadow-md">
+      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
-          <HardDrive className="w-5 h-5 text-[#C6A97D]/40 animate-pulse" />
-          <h3 className="font-semibold text-[#FFF8E2]/40">
+          <HardDrive className="w-5 h-5 text-gray-400 animate-pulse" />
+          <h3 className="font-semibold text-gray-400">
             Almacenamiento
           </h3>
         </div>
         <div className="space-y-3">
-          <div className="h-10 bg-[#79502A]/10 rounded-lg animate-pulse" />
-          <div className="h-2 bg-[#79502A]/10 rounded-full animate-pulse" />
+          <div className="h-10 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="h-2 bg-gray-100 rounded-full animate-pulse" />
         </div>
       </div>
     );
@@ -117,23 +116,23 @@ export default function StorageCard() {
   // Error state
   if (error || !usage) {
     return (
-      <div className="bg-[#2D2D2D] border border-[#79502A]/30 rounded-lg p-6 shadow-md">
+      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <HardDrive className="w-5 h-5 text-[#C6A97D]" />
-            <h3 className="font-semibold text-[#FFF8E2]">
+            <HardDrive className="w-5 h-5 text-[#8B5E3C]" />
+            <h3 className="font-semibold text-[#2D2D2D]">
               Almacenamiento
             </h3>
           </div>
           <button
             onClick={fetchUsage}
-            className="text-[#C6A97D] hover:text-[#FFF8E2] transition-colors duration-200 p-2 hover:bg-[#79502A]/20 rounded-lg"
+            className="text-[#8B5E3C] hover:text-[#6d4a2f] transition-colors duration-200 p-2 hover:bg-gray-50 rounded-lg"
             title="Reintentar"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-sm text-[#C6A97D]/70">
+        <p className="text-sm text-gray-600">
           No disponible
         </p>
       </div>
@@ -150,12 +149,12 @@ export default function StorageCard() {
   const displayUnit = parseFloat(usage.storageGB) >= 1 ? 'GB' : 'MB';
 
   return (
-    <div className="bg-[#2D2D2D] border border-[#79502A]/30 rounded-lg p-6 shadow-md">
+    <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
       {/* Header con estado */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           {statusConfig.icon}
-          <h3 className="font-semibold text-[#FFF8E2]">
+          <h3 className="font-semibold text-[#2D2D2D]">
             Almacenamiento
           </h3>
         </div>
@@ -165,7 +164,7 @@ export default function StorageCard() {
           </span>
           <button
             onClick={fetchUsage}
-            className="text-[#C6A97D] hover:text-[#FFF8E2] transition-all duration-200 disabled:opacity-50 p-2 hover:bg-[#79502A]/20 rounded-lg"
+            className="text-[#8B5E3C] hover:text-[#6d4a2f] transition-all duration-200 disabled:opacity-50 p-2 hover:bg-gray-50 rounded-lg"
             disabled={loading}
             title="Actualizar"
           >
@@ -177,16 +176,16 @@ export default function StorageCard() {
       {/* Uso actual */}
       <div className="space-y-3">
         <div className="flex items-end gap-2">
-          <span className="text-3xl text-[#FFF8E2] font-light">
+          <span className="text-3xl text-[#2D2D2D] font-light">
             {displayValue}
           </span>
-          <span className="text-sm text-[#C6A97D] pb-1">
+          <span className="text-sm text-gray-600 pb-1">
             {displayUnit} / {usage.limitGB} GB
           </span>
         </div>
 
         {/* Barra de progreso */}
-        <div className="w-full bg-[#79502A]/20 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
           <div
             className={`${statusConfig.color} h-full transition-all duration-500 ease-out`}
             style={{ width: `${Math.min(percentage, 100)}%` }}
@@ -195,11 +194,11 @@ export default function StorageCard() {
 
         {/* Info adicional */}
         <div className="flex items-center justify-between">
-          <p className="text-xs text-[#C6A97D]/70">
+          <p className="text-xs text-gray-600">
             {percentage < 0.1 ? '< 0.1' : percentage}% usado
           </p>
           {usage.filesCount !== undefined && (
-            <p className="text-xs text-[#C6A97D]/50">
+            <p className="text-xs text-gray-500">
               {usage.filesCount} {usage.filesCount === 1 ? 'archivo' : 'archivos'}
             </p>
           )}

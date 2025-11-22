@@ -7,14 +7,13 @@ import * as LucideIcons from 'lucide-react';
 /**
  * REDISEÑO UI - DashboardStatCard
  *
- * Cambios visuales aplicados:
- * - Fondo #2D2D2D (gris oscuro elegante)
- * - Borde #79502A con opacidad
- * - Textos en #FFF8E2 y #C6A97D
- * - Hover con escala y sombra
- * - Icono con animación de escala
- * - Bordes redondeados rounded-lg
- * - Transiciones suaves 200ms
+ * PALETA BLANCO PREDOMINANTE:
+ * - Fondo: #FFFFFF (blanco puro)
+ * - Bordes: #E5E7EB (gris sutil)
+ * - Icono: #8B5E3C (marrón)
+ * - Texto valor: #2D2D2D (oscuro)
+ * - Texto título: #6B7280 (gris)
+ * - Hover: Elevación con sombra
  *
  * Funcionalidad preservada:
  * - Link a href
@@ -28,17 +27,17 @@ export default function DashboardStatCard({ stat }) {
   return (
     <Link href={stat.href} className="block">
       <motion.div
-        whileHover={{ scale: 1.03, y: -4 }}
+        whileHover={{ scale: 1.02, y: -4 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="group relative bg-[#2D2D2D] border border-[#79502A]/30 hover:border-[#C6A97D] rounded-lg p-8 shadow-md hover:shadow-xl transition-all duration-200"
+        className="group relative bg-white border border-gray-200 hover:border-[#8B5E3C] rounded-lg p-8 shadow-sm hover:shadow-lg transition-all duration-200"
       >
         {/* Contenedor de icono */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 flex items-center justify-center bg-[#79502A]/20 rounded-lg group-hover:bg-[#C6A97D]/20 transition-all duration-200">
+          <div className="w-16 h-16 flex items-center justify-center bg-gray-50 group-hover:bg-[#8B5E3C]/10 rounded-lg transition-all duration-200">
             {Icon && (
               <Icon
                 size={32}
-                className="text-[#C6A97D] group-hover:text-[#FFF8E2] group-hover:scale-110 transition-all duration-200"
+                className="text-[#8B5E3C] group-hover:scale-110 transition-all duration-200"
                 strokeWidth={2}
               />
             )}
@@ -47,10 +46,10 @@ export default function DashboardStatCard({ stat }) {
 
         {/* Sección de datos */}
         <div className="text-center">
-          <p className="text-5xl text-[#FFF8E2] mb-2 font-light">
+          <p className="text-5xl text-[#2D2D2D] mb-2 font-light">
             {stat.value}
           </p>
-          <p className="text-sm tracking-wider uppercase text-[#C6A97D] font-medium">
+          <p className="text-sm tracking-wider uppercase text-gray-600 font-medium">
             {stat.title}
           </p>
         </div>

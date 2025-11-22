@@ -5,9 +5,14 @@ import AnimatedSection from '@/components/dashboard/AnimatedSection';
 import DashboardStatCard from '@/components/dashboard/DashboardStatCard';
 import DashboardQuickAction from '@/components/dashboard/DashboardQuickAction';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
+import PendingBookingsWidget from '@/components/dashboard/PendingBookingsWidget';
+import UpcomingEventsWidget from '@/components/dashboard/UpcomingEventsWidget';
+import RecentNotificationsWidget from '@/components/dashboard/RecentNotificationsWidget';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import StorageCard from '@/components/dashboard/StorageCard';
+import { startOfMonth, endOfMonth, format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export const revalidate = 60;
 
@@ -50,10 +55,17 @@ async function DashboardStats() {
     }
   );
 
+  // Obtener fechas del mes actual
+  const now = new Date();
+  const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
+  const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd');
+
   const [
     { count: galleriesCount },
     { count: testimonialsCount },
     { count: photosCount },
+    { data: publicBookings },
+    { data: privateBookings },
   ] = await Promise.all([
     supabase
       .from('galleries')
@@ -66,7 +78,23 @@ async function DashboardStats() {
     supabase
       .from('photos')
       .select('*', { count: 'exact', head: true }),
+
+    // Reservas públicas del mes
+    supabase
+      .from('public_bookings')
+      .select('*')
+      .gte('booking_date', monthStart)
+      .lte('booking_date', monthEnd),
+
+    // Eventos privados del mes
+    supabase
+      .from('private_bookings')
+      .select('*')
+      .gte('booking_date', monthStart)
+      .lte('booking_date', monthEnd),
   ]);
+
+  const totalBookingsThisMonth = (publicBookings?.length || 0) + (privateBookings?.length || 0);
 
   const stats = [
     {
@@ -84,11 +112,11 @@ async function DashboardStats() {
       href: '/dashboard/testimonios',
     },
     {
-      id: 'fotos',
-      title: 'Fotos Totales',
-      value: photosCount || 0,
-      iconName: 'Camera',
-      href: '/dashboard/galerias',
+      id: 'bookings',
+      title: 'Reservas del Mes',
+      value: totalBookingsThisMonth,
+      iconName: 'Calendar',
+      href: '/dashboard/agenda',
     },
   ];
 
@@ -101,9 +129,104 @@ async function DashboardStats() {
           </AnimatedSection>
         ))}
       </div>
+    </>
+  );
+}
 
-      <AnimatedSection delay={0.3}>
-        <StorageCard />
+async function DashboardWidgets() {
+  const cookieStore = await cookies();
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(name) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
+
+  const today = format(new Date(), 'yyyy-MM-dd');
+
+  // Obtener datos en paralelo
+  const [
+    { data: pendingBookings },
+    { data: publicBookings },
+    { data: privateBookings },
+    { data: notifications },
+  ] = await Promise.all([
+    // Reservas públicas pendientes
+    supabase
+      .from('public_bookings')
+      .select('*, booking_type:public_booking_types(id, name, slug)')
+      .eq('status', 'pending')
+      .order('booking_date', { ascending: true })
+      .order('start_time', { ascending: true }),
+
+    // Próximas reservas públicas confirmadas
+    supabase
+      .from('public_bookings')
+      .select('*, booking_type:public_booking_types(id, name, slug)')
+      .eq('status', 'confirmed')
+      .gte('booking_date', today)
+      .order('booking_date', { ascending: true })
+      .order('start_time', { ascending: true })
+      .limit(10),
+
+    // Próximos eventos privados
+    supabase
+      .from('private_bookings')
+      .select('*, service_type:service_types(id, name)')
+      .gte('booking_date', today)
+      .order('booking_date', { ascending: true })
+      .limit(10),
+
+    // Notificaciones recientes
+    supabase
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(15),
+  ]);
+
+  // Combinar eventos públicos y privados y ordenar por fecha
+  const upcomingEvents = [
+    ...(publicBookings || []).map(b => ({ ...b, type: 'public' })),
+    ...(privateBookings || []).map(b => ({ ...b, type: 'private' })),
+  ].sort((a, b) => {
+    const dateCompare = a.booking_date.localeCompare(b.booking_date);
+    if (dateCompare !== 0) return dateCompare;
+
+    const timeA = a.start_time || '00:00:00';
+    const timeB = b.start_time || '00:00:00';
+    return timeA.localeCompare(timeB);
+  });
+
+  return (
+    <>
+      {/* Widgets de Reservas y Eventos */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <AnimatedSection delay={0.3}>
+          <PendingBookingsWidget initialBookings={pendingBookings || []} />
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.4}>
+          <UpcomingEventsWidget events={upcomingEvents} />
+        </AnimatedSection>
+      </div>
+
+      {/* Widget de Notificaciones */}
+      <AnimatedSection delay={0.5}>
+        <RecentNotificationsWidget notifications={notifications || []} />
+      </AnimatedSection>
+
+      {/* Storage Card */}
+      <AnimatedSection delay={0.6}>
+        <div className="mt-8">
+          <StorageCard />
+        </div>
       </AnimatedSection>
     </>
   );
@@ -122,11 +245,11 @@ export default async function DashboardHome() {
       variant: 'primary',
     },
     {
-      id: 'manage-testimonials',
-      href: '/dashboard/testimonios',
-      iconName: 'Users',
-      title: 'Gestionar testimonios',
-      description: 'Ver y moderar opiniones',
+      id: 'view-agenda',
+      href: '/dashboard/agenda',
+      iconName: 'Calendar',
+      title: 'Ver agenda',
+      description: 'Gestionar reservas y eventos',
       variant: 'secondary',
     },
   ];
@@ -135,13 +258,14 @@ export default async function DashboardHome() {
     <PageTransition>
       <DashboardHeader
         title={`Bienvenida, ${displayName}`}
-        subtitle="Panel de control y estadísticas"
+        subtitle={`Hoy es ${format(new Date(), "d 'de' MMMM, yyyy", { locale: es })}`}
       />
 
       <div className="mt-8">
+        {/* Estadísticas */}
         <Suspense
           fallback={
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <DashboardSkeleton type="stat" />
               <DashboardSkeleton type="stat" />
               <DashboardSkeleton type="stat" />
@@ -151,9 +275,25 @@ export default async function DashboardHome() {
           <DashboardStats />
         </Suspense>
 
-        <AnimatedSection delay={0.4}>
+        {/* Widgets */}
+        <Suspense
+          fallback={
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <DashboardSkeleton type="widget" />
+                <DashboardSkeleton type="widget" />
+              </div>
+              <DashboardSkeleton type="widget" />
+            </div>
+          }
+        >
+          <DashboardWidgets />
+        </Suspense>
+
+        {/* Acciones Rápidas */}
+        <AnimatedSection delay={0.7}>
           <div className="mt-12">
-            <h2 className="text-2xl text-[#2D2D2D] mb-6 font-medium">
+            <h2 className="text-2xl text-[#2D2D2D] mb-6 font-voga">
               Acciones rápidas
             </h2>
 

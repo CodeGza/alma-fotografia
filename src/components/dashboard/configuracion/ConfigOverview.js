@@ -20,10 +20,6 @@ const quickActions = [
     title: 'Tipos de Servicio',
     description: 'Gestiona los servicios que ofreces',
     href: '/dashboard/configuracion/servicios',
-    gradient: 'from-amber-50 to-orange-50',
-    iconBg: 'bg-gradient-to-br from-[#79502A] to-[#8B5A2F]',
-    iconColor: 'text-white',
-    accentColor: 'text-[#79502A]',
     disabled: false
   },
   {
@@ -31,10 +27,6 @@ const quickActions = [
     title: 'Agenda',
     description: 'Horarios, bloqueos y tipos de reunión',
     href: '/dashboard/configuracion/agenda',
-    gradient: 'from-blue-50 to-indigo-50',
-    iconBg: 'bg-gradient-to-br from-blue-600 to-indigo-600',
-    iconColor: 'text-white',
-    accentColor: 'text-blue-600',
     disabled: false
   },
   {
@@ -42,10 +34,6 @@ const quickActions = [
     title: 'Perfil',
     description: 'Información personal y contacto',
     href: '/dashboard/configuracion/perfil',
-    gradient: 'from-stone-50 to-stone-100',
-    iconBg: 'bg-gradient-to-br from-[#A67C52] to-[#B8956A]',
-    iconColor: 'text-white',
-    accentColor: 'text-[#8B5A2F]',
     disabled: true
   },
   {
@@ -53,10 +41,6 @@ const quickActions = [
     title: 'Notificaciones',
     description: 'Preferencias de alertas',
     href: '/dashboard/configuracion/notificaciones',
-    gradient: 'from-orange-50 to-amber-50',
-    iconBg: 'bg-gradient-to-br from-[#8B5A2F] to-[#A0713E]',
-    iconColor: 'text-white',
-    accentColor: 'text-[#79502A]',
     disabled: false
   },
   {
@@ -64,10 +48,6 @@ const quickActions = [
     title: 'Apariencia',
     description: 'Personaliza tu marca',
     href: '/dashboard/configuracion/apariencia',
-    gradient: 'from-neutral-50 to-stone-50',
-    iconBg: 'bg-gradient-to-br from-[#6B4423] to-[#79502A]',
-    iconColor: 'text-white',
-    accentColor: 'text-[#6B4423]',
     disabled: true
   },
   {
@@ -75,10 +55,6 @@ const quickActions = [
     title: 'Seguridad',
     description: 'Contraseña y sesiones',
     href: '/dashboard/configuracion/seguridad',
-    gradient: 'from-amber-50 to-orange-50',
-    iconBg: 'bg-gradient-to-br from-[#79502A] to-[#A67C52]',
-    iconColor: 'text-white',
-    accentColor: 'text-[#79502A]',
     disabled: true
   },
   {
@@ -86,10 +62,6 @@ const quickActions = [
     title: 'Almacenamiento',
     description: 'Uso de espacio',
     href: '/dashboard/configuracion/almacenamiento',
-    gradient: 'from-stone-50 to-amber-50',
-    iconBg: 'bg-gradient-to-br from-[#B8956A] to-[#C4A576]',
-    iconColor: 'text-white',
-    accentColor: 'text-[#8B5A2F]',
     disabled: true
   },
 ];
@@ -116,52 +88,44 @@ export default function ConfigOverview() {
                 damping: 20
               }}
               whileHover={{
-                scale: action.disabled ? 1 : 1.03,
-                y: action.disabled ? 0 : -5
+                scale: action.disabled ? 1 : 1.02,
+                y: action.disabled ? 0 : -2
               }}
-              whileTap={{ scale: action.disabled ? 1 : 0.97 }}
+              whileTap={{ scale: action.disabled ? 1 : 0.98 }}
               onClick={() => !action.disabled && router.push(action.href)}
               disabled={action.disabled}
-              className={`relative overflow-hidden rounded-2xl transition-all text-left group
+              className={`relative overflow-hidden rounded-xl transition-all duration-200 text-left group
                 ${action.disabled
                   ? 'opacity-60 cursor-not-allowed'
-                  : 'cursor-pointer shadow-lg hover:shadow-2xl'
+                  : 'cursor-pointer hover:shadow-xl'
                 }`}
             >
-              {/* Background con gradiente */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} transition-opacity
-                ${!action.disabled && 'group-hover:opacity-80'}`} />
+              {/* Background principal */}
+              <div className="absolute inset-0 bg-[#2D2D2D]" />
 
-              {/* Patrón decorativo */}
-              <div className="absolute inset-0 opacity-[0.03]"
-                style={{
-                  backgroundImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
-                  backgroundSize: '24px 24px'
-                }}
-              />
+              {/* Borde con color de marca */}
+              <div className={`absolute inset-0 border ${action.disabled ? 'border-[#79502A]/20' : 'border-[#79502A]/30'} rounded-xl`} />
 
               {/* Contenido */}
               <div className="relative p-5 sm:p-6 flex flex-col min-h-[160px]">
-                {/* Icon con gradiente */}
-                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl ${action.iconBg}
-                  flex items-center justify-center mb-4 shadow-lg
+                {/* Icon */}
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#79502A]/20
+                  flex items-center justify-center mb-4
                   transition-all duration-300
-                  ${!action.disabled && 'group-hover:scale-110 group-hover:rotate-3'}`}>
+                  ${!action.disabled && 'group-hover:bg-[#79502A]/30 group-hover:scale-105'}`}>
                   <IconComponent
                     size={24}
-                    className={action.iconColor}
+                    className="text-[#C6A97D]"
                     strokeWidth={2}
                   />
                 </div>
 
                 {/* Texto */}
                 <div className="flex-1">
-                  <h3 className={`font-fira text-base sm:text-lg font-bold mb-2
-                    ${action.disabled ? 'text-black/70' : action.accentColor}
-                    transition-all`}>
+                  <h3 className="font-fira text-base sm:text-lg font-bold mb-2 text-[#FFF8E2] transition-all">
                     {action.title}
                   </h3>
-                  <p className="font-fira text-xs sm:text-sm text-black/60 leading-relaxed">
+                  <p className="font-fira text-xs sm:text-sm text-[#C6A97D] leading-relaxed">
                     {action.description}
                   </p>
                 </div>
@@ -169,8 +133,7 @@ export default function ConfigOverview() {
                 {/* Badge o Arrow */}
                 <div className="mt-4 flex items-center justify-between">
                   {!action.disabled ? (
-                    <div className={`flex items-center gap-2 ${action.accentColor} font-fira text-sm font-semibold
-                      group-hover:gap-3 transition-all`}>
+                    <div className="flex items-center gap-2 text-[#C6A97D] group-hover:text-[#79502A] font-fira text-sm font-semibold group-hover:gap-3 transition-all">
                       <span>Configurar</span>
                       <ArrowRight
                         size={18}
@@ -179,8 +142,8 @@ export default function ConfigOverview() {
                       />
                     </div>
                   ) : (
-                    <div className="px-3 py-1.5 bg-black/5 backdrop-blur-sm rounded-lg">
-                      <span className="text-[10px] sm:text-xs font-fira font-semibold text-black/40 flex items-center gap-1.5">
+                    <div className="px-3 py-1.5 bg-[#79502A]/10 rounded-lg">
+                      <span className="text-[10px] sm:text-xs font-fira font-semibold text-[#C6A97D]/60 flex items-center gap-1.5">
                         <Sparkles size={12} />
                         Próximamente
                       </span>
@@ -188,16 +151,6 @@ export default function ConfigOverview() {
                   )}
                 </div>
               </div>
-
-              {/* Shimmer effect on hover */}
-              {!action.disabled && (
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: '100%' }}
-                  transition={{ duration: 0.6 }}
-                />
-              )}
             </motion.button>
           );
         })}

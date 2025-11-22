@@ -128,40 +128,40 @@ export default function TestimoniosPage() {
       {/* Stats */}
       <AnimatedSection>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-2">
-          <div className="bg-white rounded-2xl p-5 border border-gray-200/60 shadow-sm">
+          <div className="bg-[#2D2D2D] rounded-xl p-5 border border-[#79502A]/30">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg">
-                <MessageSquare size={24} className="text-blue-600" />
+              <div className="p-3 bg-[#79502A]/20 rounded-lg">
+                <MessageSquare size={24} className="text-[#C6A97D]" />
               </div>
               <div>
-                <p className="font-fira text-sm text-gray-600">Total</p>
-                <p className="font-voga text-2xl text-gray-900">{testimonials.length}</p>
+                <p className="font-fira text-sm text-[#C6A97D]">Total</p>
+                <p className="font-voga text-2xl text-[#FFF8E2]">{testimonials.length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-gray-200/60 shadow-sm">
+          <div className="bg-[#2D2D2D] rounded-xl p-5 border border-[#79502A]/30">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-yellow-100 to-yellow-50 rounded-lg">
-                <Sparkles size={24} className="text-yellow-600" />
+              <div className="p-3 bg-[#79502A]/20 rounded-lg">
+                <Sparkles size={24} className="text-[#C6A97D]" />
               </div>
               <div>
-                <p className="font-fira text-sm text-gray-600">Destacados</p>
-                <p className="font-voga text-2xl text-gray-900">
+                <p className="font-fira text-sm text-[#C6A97D]">Destacados</p>
+                <p className="font-voga text-2xl text-[#FFF8E2]">
                   {featuredCount}/10
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-gray-200/60 shadow-sm">
+          <div className="bg-[#2D2D2D] rounded-xl p-5 border border-[#79502A]/30">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-amber-100 to-amber-50 rounded-lg">
-                <Star size={24} className="text-amber-600 fill-amber-600" />
+              <div className="p-3 bg-[#79502A]/20 rounded-lg">
+                <Star size={24} className="text-[#C6A97D] fill-[#C6A97D]" />
               </div>
               <div>
-                <p className="font-fira text-sm text-gray-600">Promedio</p>
-                <p className="font-voga text-2xl text-gray-900">
+                <p className="font-fira text-sm text-[#C6A97D]">Promedio</p>
+                <p className="font-voga text-2xl text-[#FFF8E2]">
                   {testimonials.length > 0
                     ? (
                         testimonials.reduce((sum, t) => sum + (t.rating || 0), 0) /
@@ -330,20 +330,20 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-200/60 shadow-sm hover:shadow-md transition-shadow"
+      className="bg-[#2D2D2D] rounded-xl p-5 sm:p-6 border border-[#79502A]/30 hover:shadow-xl transition-all duration-200"
     >
       <div className="flex flex-col gap-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="p-2 bg-gradient-to-br from-amber-100 to-amber-50 rounded-lg flex-shrink-0">
-              <User size={18} className="text-amber-600" />
+            <div className="p-2 bg-[#79502A]/20 rounded-lg flex-shrink-0">
+              <User size={18} className="text-[#C6A97D]" />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="font-fira text-base font-semibold text-gray-900 truncate">
+              <h3 className="font-fira text-base font-semibold text-[#FFF8E2] truncate">
                 {testimonial.client_name}
               </h3>
-              <p className="font-fira text-xs text-gray-500 flex items-center gap-1.5 truncate">
+              <p className="font-fira text-xs text-[#C6A97D]/70 flex items-center gap-1.5 truncate">
                 <Mail size={12} />
                 {testimonial.client_email}
               </p>
@@ -357,16 +357,16 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
             title={maxFeatured ? 'Máximo 10 testimonios destacados' : testimonial.is_featured ? 'Desmarcar como destacado' : 'Marcar como destacado'}
             className={`flex-shrink-0 p-2.5 rounded-lg transition-all duration-200 ${
               testimonial.is_featured
-                ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
+                ? 'bg-[#C6A97D]/20 text-[#C6A97D] hover:bg-[#C6A97D]/30'
                 : maxFeatured
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                ? 'bg-[#79502A]/10 text-[#C6A97D]/40 cursor-not-allowed'
+                : 'bg-[#79502A]/10 text-[#C6A97D] hover:bg-[#79502A]/20'
             } disabled:opacity-50`}
           >
             {processing ? (
               <Loader2 size={18} className="animate-spin" />
             ) : (
-              <Sparkles size={18} className={testimonial.is_featured ? 'fill-yellow-600' : ''} />
+              <Sparkles size={18} className={testimonial.is_featured ? 'fill-[#C6A97D]' : ''} />
             )}
           </button>
         </div>
@@ -380,32 +380,32 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
                 size={16}
                 className={`${
                   star <= testimonial.rating
-                    ? 'fill-yellow-400 text-yellow-400'
-                    : 'fill-gray-200 text-gray-300'
+                    ? 'fill-[#C6A97D] text-[#C6A97D]'
+                    : 'fill-[#79502A]/20 text-[#79502A]/20'
                 }`}
               />
             ))}
-            <span className="ml-2 font-fira text-xs text-gray-600">
+            <span className="ml-2 font-fira text-xs text-[#C6A97D]/70">
               {testimonial.rating}/5
             </span>
           </div>
         )}
 
         {/* Mensaje */}
-        <p className="font-fira text-sm text-gray-700 leading-relaxed">
+        <p className="font-fira text-sm text-[#FFF8E2] leading-relaxed">
           {testimonial.message}
         </p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-3 pt-3 border-t border-gray-200/50">
+        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#79502A]/20">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0 flex-1">
             {testimonial.gallery && (
-              <span className="font-fira text-xs text-gray-600 flex items-center gap-1.5 truncate">
+              <span className="font-fira text-xs text-[#C6A97D] flex items-center gap-1.5 truncate">
                 <ImageIcon size={12} className="flex-shrink-0" />
                 {testimonial.gallery.title}
               </span>
             )}
-            <span className="font-fira text-xs text-gray-500 flex items-center gap-1.5">
+            <span className="font-fira text-xs text-[#C6A97D]/70 flex items-center gap-1.5">
               <Calendar size={12} className="flex-shrink-0" />
               {new Date(testimonial.created_at).toLocaleDateString('es-UY')}
             </span>
@@ -414,14 +414,14 @@ function TestimonialCard({ testimonial, onToggleFeatured, onEdit, onDelete, proc
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={onEdit}
-              className="p-2.5 hover:bg-blue-50 text-blue-600 rounded-lg transition-all duration-200"
+              className="p-2.5 hover:bg-[#79502A]/20 text-[#C6A97D] rounded-lg transition-all duration-200"
               title="Editar"
             >
               <Edit3 size={16} />
             </button>
             <button
               onClick={onDelete}
-              className="p-2.5 hover:bg-red-50 text-red-600 rounded-lg transition-all duration-200"
+              className="p-2.5 hover:bg-red-600/20 text-red-400 rounded-lg transition-all duration-200"
               title="Eliminar"
             >
               <Trash2 size={16} />
@@ -549,7 +549,7 @@ function EditTestimonialModal({ testimonial, onClose, onSuccess }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#8B5A2F] to-[#79502A] hover:from-[#9c6b3f] hover:to-[#8B5A2F] text-white rounded-lg transition-all duration-200 font-fira text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
+                className="flex-1 px-4 py-2.5 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-lg transition-all duration-200 font-fira text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
               >
                 {isSubmitting ? (
                   <>

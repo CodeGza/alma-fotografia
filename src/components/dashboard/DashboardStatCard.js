@@ -5,64 +5,52 @@ import { motion } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
 
 /**
- * DashboardStatCard - Tarjeta de estadística minimalista
- * 
- * Diseño:
- * - Fondo blanco, borde negro fino (1px)
- * - Sin sombras ni degradados (estilo editorial)
- * - Hover sutil: solo borde se oscurece + icono cambia a dorado
- * - Layout vertical: icono arriba, número centro, label abajo
- * 
- * Animación:
- * - Scale 1.02 en hover (muy sutil)
- * - Duración 200ms para suavidad
- * 
- * Props:
- * @param {Object} stat - { id, title, value, iconName, href }
- * @param {string} stat.title - Label descriptivo (ej: "Galerías")
- * @param {string} stat.value - Número a mostrar (ej: "12")
- * @param {string} stat.iconName - Nombre del icono de lucide-react
- * @param {string} stat.href - URL de navegación
+ * REDISEÑO UI - DashboardStatCard
+ *
+ * Cambios visuales aplicados:
+ * - Fondo #2D2D2D (gris oscuro elegante)
+ * - Borde #79502A con opacidad
+ * - Textos en #FFF8E2 y #C6A97D
+ * - Hover con escala y sombra
+ * - Icono con animación de escala
+ * - Bordes redondeados rounded-lg
+ * - Transiciones suaves 200ms
+ *
+ * Funcionalidad preservada:
+ * - Link a href
+ * - Props: stat (id, title, value, iconName, href)
+ * - Animaciones framer-motion
+ * - Iconos dinámicos lucide-react
  */
 export default function DashboardStatCard({ stat }) {
-  // Resolver icono dinámicamente desde lucide-react
-  // Esto evita error de serialización Server → Client Component
   const Icon = LucideIcons[stat.iconName];
 
   return (
     <Link href={stat.href} className="block">
       <motion.div
-        whileHover={{ scale: 1.02 }}
+        whileHover={{ scale: 1.03, y: -4 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="group relative bg-white border border-black/20 hover:border-black rounded-none p-8 transition-all duration-300"
+        className="group relative bg-[#2D2D2D] border border-[#79502A]/30 hover:border-[#C6A97D] rounded-lg p-8 shadow-md hover:shadow-xl transition-all duration-200"
       >
-        {/* 
-          Contenedor de icono
-          - Cuadrado perfecto (64x64px)
-          - Borde que cambia a dorado en hover
-        */}
+        {/* Contenedor de icono */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 flex items-center justify-center border border-black/20 group-hover:border-[#C6A97D] transition-colors duration-300">
+          <div className="w-16 h-16 flex items-center justify-center bg-[#79502A]/20 rounded-lg group-hover:bg-[#C6A97D]/20 transition-all duration-200">
             {Icon && (
-              <Icon 
-                size={32} 
-                className="text-black group-hover:text-[#C6A97D] transition-colors duration-300" 
-                strokeWidth={1.5}
+              <Icon
+                size={32}
+                className="text-[#C6A97D] group-hover:text-[#FFF8E2] group-hover:scale-110 transition-all duration-200"
+                strokeWidth={2}
               />
             )}
           </div>
         </div>
 
-        {/* 
-          Sección de datos
-          - Número grande con Voga (elegante)
-          - Label pequeño uppercase con Fira Sans
-        */}
+        {/* Sección de datos */}
         <div className="text-center">
-          <p className="font-voga text-5xl text-black mb-2">
+          <p className="text-5xl text-[#FFF8E2] mb-2 font-light">
             {stat.value}
           </p>
-          <p className="font-fira text-sm tracking-wider uppercase text-black/60">
+          <p className="text-sm tracking-wider uppercase text-[#C6A97D] font-medium">
             {stat.title}
           </p>
         </div>

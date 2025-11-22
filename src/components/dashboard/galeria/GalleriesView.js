@@ -299,63 +299,63 @@ export default function GalleriesView({ galleries, serviceTypes }) {
   return (
     <div className="flex gap-6">
       <div className="flex-1 min-w-0">
-        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <div className="bg-white rounded-xl border border-[#79502A]/30 p-4 mb-6 shadow-sm">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
               <Search
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#79502A]"
               />
               <input
                 type="text"
-                placeholder="Buscar por título, cliente..."
+                placeholder="Buscar galerías..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] placeholder:text-[#C6A97D]/60 focus:outline-none focus:ring-2 focus:ring-[#C6A97D] focus:border-transparent transition-all duration-200"
               />
             </div>
 
-            <button 
+            <button
               onClick={() => setShowSidebar(true)}
-              className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-fira text-sm font-medium text-gray-700 flex items-center justify-center gap-2"
+              className="px-4 py-2.5 bg-white border border-[#79502A]/30 hover:bg-[#79502A]/10 rounded-lg font-fira text-sm font-medium text-[#2D2D2D] flex items-center justify-center gap-2 transition-all duration-200"
             >
               <SlidersHorizontal size={16} />
               <span>Filtros</span>
             </button>
 
-            <div className="hidden sm:flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <div className="hidden sm:flex items-center gap-1 bg-[#FFF8E2] rounded-lg p-1">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded transition-colors ${
-                  viewMode === 'grid' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'
+                className={`p-2 rounded transition-all duration-200 ${
+                  viewMode === 'grid' ? 'bg-[#79502A] text-white shadow-sm' : 'text-[#79502A] hover:bg-[#79502A]/10'
                 }`}
               >
-                <Grid3x3 size={16} className="text-gray-600" />
+                <Grid3x3 size={16} />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded transition-colors ${
-                  viewMode === 'list' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'
+                className={`p-2 rounded transition-all duration-200 ${
+                  viewMode === 'list' ? 'bg-[#79502A] text-white shadow-sm' : 'text-[#79502A] hover:bg-[#79502A]/10'
                 }`}
               >
-                <List size={16} className="text-gray-600" />
+                <List size={16} />
               </button>
             </div>
           </div>
 
           {hasActiveFilters && (
             <div className="mt-3 flex items-center gap-2 flex-wrap">
-              <span className="font-fira text-xs text-gray-500">Filtros:</span>
-              
+              <span className="font-fira text-xs text-[#79502A] font-medium">Filtros activos:</span>
+
               {searchQuery && (
-                <div className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full font-fira text-xs font-medium flex items-center gap-1">
+                <div className="px-2 py-1 bg-[#C6A97D]/20 text-[#79502A] rounded-full font-fira text-xs font-medium flex items-center gap-1">
                   <span>"{searchQuery}"</span>
                   <button onClick={() => setSearchQuery('')}><X size={12} /></button>
                 </div>
               )}
 
               {selectedArchiveStatus === 'archived' && (
-                <div className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full font-fira text-xs font-medium flex items-center gap-1">
+                <div className="px-2 py-1 bg-[#C6A97D]/20 text-[#79502A] rounded-full font-fira text-xs font-medium flex items-center gap-1">
                   <Archive size={10} />
                   <span>Archivadas</span>
                   <button onClick={() => setSelectedArchiveStatus('active')}><X size={12} /></button>
@@ -364,7 +364,7 @@ export default function GalleriesView({ galleries, serviceTypes }) {
 
               <button
                 onClick={clearFilters}
-                className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-full font-fira text-xs font-medium flex items-center gap-1"
+                className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-full font-fira text-xs font-medium flex items-center gap-1 transition-all duration-200"
               >
                 <X size={12} />
                 Limpiar
@@ -374,7 +374,7 @@ export default function GalleriesView({ galleries, serviceTypes }) {
         </div>
 
         <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <p className="font-fira text-sm text-gray-600">
+          <p className="font-fira text-sm text-[#2D2D2D] font-medium">
             {filteredGalleries.length === 0
               ? 'No hay galerías'
               : filteredGalleries.length === 1
@@ -386,25 +386,25 @@ export default function GalleriesView({ galleries, serviceTypes }) {
             {!selectionMode ? (
               <button
                 onClick={() => setSelectionMode(true)}
-                className="flex-1 sm:flex-none px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-fira text-sm font-medium text-gray-700 flex items-center justify-center gap-2"
+                className="flex-1 sm:flex-none px-4 py-2 bg-white border border-[#79502A]/30 hover:bg-[#79502A]/10 rounded-lg font-fira text-sm font-medium text-[#2D2D2D] flex items-center justify-center gap-2 transition-all duration-200"
               >
                 <CheckSquare size={16} />
                 <span>Seleccionar</span>
               </button>
             ) : (
               <>
-                <span className="font-fira text-sm text-gray-600 flex-1 sm:flex-none">
+                <span className="font-fira text-sm text-[#79502A] font-semibold flex-1 sm:flex-none">
                   {selectedGalleries.size} seleccionadas
                 </span>
                 <button
                   onClick={toggleSelectAll}
-                  className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-fira text-xs font-medium text-gray-700"
+                  className="px-3 py-2 bg-white border border-[#79502A]/30 hover:bg-[#79502A]/10 rounded-lg font-fira text-xs font-medium text-[#2D2D2D] transition-all duration-200"
                 >
                   {selectedGalleries.size === filteredGalleries.length ? 'Ninguna' : 'Todas'}
                 </button>
                 <button
                   onClick={cancelSelection}
-                  className="px-3 py-2 hover:bg-gray-100 rounded-lg font-fira text-xs font-medium text-gray-700"
+                  className="px-3 py-2 hover:bg-gray-100 rounded-lg font-fira text-xs font-medium text-[#2D2D2D] transition-all duration-200"
                 >
                   Cancelar
                 </button>
@@ -414,13 +414,13 @@ export default function GalleriesView({ galleries, serviceTypes }) {
         </div>
 
         {selectionMode && selectedGalleries.size > 0 && (
-          <div className="sticky top-0 z-20 mb-4 p-4 bg-[#2d2d2d] border-[#C6A97D] border rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
-            <span className="font-fira text-sm font-semibold text-white">
+          <div className="sticky top-0 z-20 mb-4 p-4 bg-[#2D2D2D] border border-[#C6A97D]/30 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg animate-in slide-in-from-top-2 duration-300">
+            <span className="font-fira text-sm font-semibold text-[#FFF8E2]">
               {selectedGalleries.size} {selectedGalleries.size === 1 ? 'galería seleccionada' : 'galerías seleccionadas'}
             </span>
             <div className="flex gap-2 w-full sm:w-auto">
               {selectedGalleriesData.hasMixed ? (
-                <button 
+                <button
                   disabled
                   className="flex-1 sm:flex-none px-4 py-2 bg-white/10 text-white/40 rounded-lg font-fira text-sm font-semibold flex items-center justify-center gap-2 cursor-not-allowed"
                   title="No puedes archivar y desarchivar al mismo tiempo"
@@ -429,26 +429,26 @@ export default function GalleriesView({ galleries, serviceTypes }) {
                   <span>Mezcladas</span>
                 </button>
               ) : selectedGalleriesData.hasArchived ? (
-                <button 
+                <button
                   onClick={() => setShowRestoreModal(true)}
-                  className="flex-1 sm:flex-none px-4 !text-white  py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-fira text-sm font-semibold flex items-center justify-center gap-2"
+                  className="flex-1 sm:flex-none px-4 !text-white py-2 bg-green-600 hover:bg-green-700 rounded-lg font-fira text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200"
                 >
                   <ArchiveRestore size={16} />
                   <span>Desarchivar</span>
                 </button>
               ) : (
-                <button 
+                <button
                   onClick={() => setShowArchiveModal(true)}
-                  className="!text-white flex-1 sm:flex-none px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg font-fira text-sm font-semibold flex items-center justify-center gap-2"
+                  className="!text-white flex-1 sm:flex-none px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-fira text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200"
                 >
                   <Archive size={16} />
                   <span>Archivar</span>
                 </button>
               )}
 
-              <button 
+              <button
                 onClick={() => setShowDeleteModal(true)}
-                className="!text-white flex-1 sm:flex-none px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-sm font-semibold flex items-center justify-center gap-2"
+                className="!text-white flex-1 sm:flex-none px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-fira text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200"
               >
                 <Trash2 size={16} />
                 <span>Eliminar</span>
@@ -475,9 +475,11 @@ export default function GalleriesView({ galleries, serviceTypes }) {
 
             {filteredGalleries.length === 0 && (
               <div className="col-span-full flex flex-col items-center justify-center min-h-[40vh] p-12">
-                <Search size={32} className="text-gray-400 mb-4" />
-                <h3 className="font-voga text-xl text-black mb-2">No se encontraron galerías</h3>
-                <p className="font-fira text-sm text-gray-600">
+                <div className="p-4 bg-[#FFF8E2] rounded-full mb-4">
+                  <Search size={32} className="text-[#79502A]" />
+                </div>
+                <h3 className="font-voga text-xl text-[#2D2D2D] mb-2">No se encontraron galerías</h3>
+                <p className="font-fira text-sm text-[#C6A97D]">
                   {hasActiveFilters ? 'Intenta ajustar los filtros' : ''}
                 </p>
               </div>
@@ -486,9 +488,9 @@ export default function GalleriesView({ galleries, serviceTypes }) {
         ) : (
           <div className="hidden lg:block space-y-4">
             <Link href="/dashboard/galerias/new">
-              <div className="bg-[#2d2d2d] mb-4 rounded-xl p-6 cursor-pointer hover:shadow-lg transition-all duration-300 active:scale-[0.99]">
+              <div className="bg-[#2D2D2D] mb-4 rounded-xl p-6 cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] border border-[#79502A]/30">
                 <div className="flex items-center gap-3 text-white">
-                  <ImageIcon size={20} className="text-[#caad81]" />
+                  <ImageIcon size={20} className="text-[#C6A97D]" />
                   <p className="font-fira text-sm font-semibold">Crear nueva galería</p>
                 </div>
               </div>
@@ -507,10 +509,12 @@ export default function GalleriesView({ galleries, serviceTypes }) {
             ))}
 
             {filteredGalleries.length === 0 && (
-              <div className="flex flex-col items-center justify-center min-h-[40vh] bg-white rounded-xl border border-gray-200 p-12">
-                <Search size={32} className="text-gray-400 mb-4" />
-                <h3 className="font-voga text-xl text-black mb-2">No se encontraron galerías</h3>
-                <p className="font-fira text-sm text-gray-600">
+              <div className="flex flex-col items-center justify-center min-h-[40vh] bg-white rounded-xl border border-[#79502A]/30 p-12">
+                <div className="p-4 bg-[#FFF8E2] rounded-full mb-4">
+                  <Search size={32} className="text-[#79502A]" />
+                </div>
+                <h3 className="font-voga text-xl text-[#2D2D2D] mb-2">No se encontraron galerías</h3>
+                <p className="font-fira text-sm text-[#C6A97D]">
                   {hasActiveFilters ? 'Intenta ajustar los filtros' : ''}
                 </p>
               </div>
@@ -520,9 +524,9 @@ export default function GalleriesView({ galleries, serviceTypes }) {
 
         <div className="lg:hidden space-y-4">
           <Link href="/dashboard/galerias/new" className="block mb-4">
-            <div className="bg-[#2d2d2d] rounded-xl p-4 cursor-pointer active:scale-[0.98] transition-all duration-300">
+            <div className="bg-[#2D2D2D] rounded-xl p-4 cursor-pointer active:scale-[0.98] transition-all duration-200 border border-[#79502A]/30">
               <div className="flex items-center justify-center gap-2 text-white">
-                <ImageIcon size={16} className="text-[#caad81]" />
+                <ImageIcon size={16} className="text-[#C6A97D]" />
                 <p className="font-fira text-xs font-semibold">Crear nueva galería</p>
               </div>
             </div>
@@ -542,9 +546,11 @@ export default function GalleriesView({ galleries, serviceTypes }) {
 
           {filteredGalleries.length === 0 && (
             <div className="flex flex-col items-center justify-center min-h-[20vh] p-6">
-              <Search size={24} className="text-gray-400 mb-2" />
-              <h3 className="font-voga text-base text-black mb-1">No se encontraron galerías</h3>
-              <p className="font-fira text-xs text-gray-600 text-center">
+              <div className="p-3 bg-[#FFF8E2] rounded-full mb-2">
+                <Search size={24} className="text-[#79502A]" />
+              </div>
+              <h3 className="font-voga text-base text-[#2D2D2D] mb-1">No se encontraron galerías</h3>
+              <p className="font-fira text-xs text-[#C6A97D] text-center">
                 {hasActiveFilters ? 'Intenta ajustar los filtros' : ''}
               </p>
             </div>
@@ -662,8 +668,8 @@ export default function GalleriesView({ galleries, serviceTypes }) {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleBatchDelete}
-        title="Eliminar galerías permanentemente"
-        message="Esta acción eliminará permanentemente las galerías, todas sus fotos de Cloudinary, las portadas y todos los enlaces compartidos. No se podrá recuperar."
+        title="¿Eliminar galerías?"
+        message="Esta acción no puede deshacerse. Se eliminarán todas las fotos y enlaces."
         confirmText="Eliminar permanentemente"
         cancelText="Cancelar"
         variant="danger"

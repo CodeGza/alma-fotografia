@@ -247,45 +247,60 @@ export default function AgendaPage() {
 
   return (
     <PageTransition>
-      <DashboardHeader title="Agenda" subtitle="Gestión de reservas y calendario" />
+      <DashboardHeader title="Agenda" subtitle="Reuniones y eventos programados" />
 
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">
         {/* Header con stats y acciones */}
         <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           {/* Stats compactas */}
           <div className="flex flex-wrap gap-3">
-            <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-[#A67C52]/30">
-              <Users size={18} className="text-[#79502A]" />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0 }}
+              className="flex items-center gap-2 px-4 py-2.5 bg-[#2D2D2D] rounded-xl border border-[#79502A]/30 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              <Users size={18} className="text-[#C6A97D]" />
               <div>
-                <p className="font-fira text-xs text-[#79502A]/70">Reuniones</p>
-                <p className="font-fira text-sm font-bold text-[#6B4423]">{publicConfirmedCount}</p>
+                <p className="font-fira text-xs text-[#FFF8E2]/70">Reuniones</p>
+                <p className="font-fira text-sm font-bold text-[#FFF8E2]">{publicConfirmedCount}</p>
               </div>
-            </div>
+            </motion.div>
 
             {publicPendingCount > 0 && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border border-orange-300/50">
-                <Clock size={18} className="text-orange-800" />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="flex items-center gap-2 px-4 py-2.5 bg-[#2D2D2D] rounded-xl border border-[#C6A97D]/30 shadow-sm hover:shadow-md transition-all duration-200"
+              >
+                <Clock size={18} className="text-[#C6A97D]" />
                 <div>
-                  <p className="font-fira text-xs text-orange-700/70">Pendientes</p>
-                  <p className="font-fira text-sm font-bold text-orange-900">{publicPendingCount}</p>
+                  <p className="font-fira text-xs text-[#FFF8E2]/70">Pendientes</p>
+                  <p className="font-fira text-sm font-bold text-[#FFF8E2]">{publicPendingCount}</p>
                 </div>
-              </div>
+              </motion.div>
             )}
 
-            <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-stone-50 to-amber-50 rounded-xl border border-[#8B5A2F]/30">
-              <Briefcase size={18} className="text-[#8B5A2F]" />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex items-center gap-2 px-4 py-2.5 bg-[#2D2D2D] rounded-xl border border-[#79502A]/30 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              <Briefcase size={18} className="text-[#C6A97D]" />
               <div>
-                <p className="font-fira text-xs text-[#8B5A2F]/70">Eventos</p>
-                <p className="font-fira text-sm font-bold text-[#6B4423]">{privateConfirmedCount}</p>
+                <p className="font-fira text-xs text-[#FFF8E2]/70">Eventos</p>
+                <p className="font-fira text-sm font-bold text-[#FFF8E2]">{privateConfirmedCount}</p>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Acciones */}
           <div className="flex gap-2">
             <Link
               href="/dashboard/configuracion/agenda"
-              className="px-4 py-2 bg-white border-2 border-gray-200 hover:border-[#79502A]/30 text-gray-700 rounded-xl font-fira text-sm font-semibold transition-all flex items-center gap-2 hover:shadow-md"
+              className="px-4 py-2 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-xl font-fira text-sm font-semibold transition-all duration-200 flex items-center gap-2 hover:shadow-md"
             >
               <Settings size={16} />
               <span className="hidden sm:inline">Configurar</span>
@@ -293,7 +308,7 @@ export default function AgendaPage() {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2.5 bg-gradient-to-r from-[#79502A] to-[#8B5A2F] text-white rounded-xl font-fira text-sm font-semibold transition-all flex items-center gap-2 hover:shadow-lg hover:scale-105"
+              className="px-4 py-2.5 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-xl font-fira text-sm font-semibold transition-all duration-200 flex items-center gap-2 hover:shadow-xl hover:scale-105"
             >
               <Plus size={16} />
               Nuevo Evento
@@ -303,35 +318,35 @@ export default function AgendaPage() {
 
         {/* Calendario principal */}
         <AnimatedSection>
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-xl border border-[#79502A]/20 overflow-hidden">
             {/* Header del calendario */}
-            <div className="bg-[#2d2d2d] p-6">
+            <div className="bg-[#2D2D2D] p-6">
               <div className="flex items-center justify-between">
                 <button
                   onClick={prevMonth}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2 hover:bg-[#79502A]/20 rounded-lg transition-all duration-200"
                 >
-                  <ChevronLeft size={24} className="text-white" />
+                  <ChevronLeft size={24} className="text-[#FFF8E2]" />
                 </button>
 
-                <h2 className="font-voga text-2xl text-white uppercase">
+                <h2 className="font-voga text-2xl text-[#FFF8E2] uppercase">
                   {format(currentDate, 'MMMM yyyy', { locale: es })}
                 </h2>
 
                 <button
                   onClick={nextMonth}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2 hover:bg-[#79502A]/20 rounded-lg transition-all duration-200"
                 >
-                  <ChevronRight size={24} className="text-white" />
+                  <ChevronRight size={24} className="text-[#FFF8E2]" />
                 </button>
               </div>
             </div>
 
             {/* Días de la semana */}
-            <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
+            <div className="grid grid-cols-7 bg-[#FFF8E2] border-b border-[#79502A]/20">
               {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
                 <div key={day} className="p-3 text-center">
-                  <span className="font-fira text-xs font-bold text-gray-600 uppercase">
+                  <span className="font-fira text-xs font-bold text-[#79502A] uppercase">
                     {day}
                   </span>
                 </div>
@@ -352,25 +367,26 @@ export default function AgendaPage() {
                   <motion.button
                     key={index}
                     whileHover={{ scale: isCurrentMonth ? 1.02 : 1 }}
+                    whileTap={{ scale: isCurrentMonth ? 0.98 : 1 }}
                     onClick={() => isCurrentMonth && setSelectedDate(day)}
                     className={`
-                      relative p-3 min-h-[100px] border-b border-r border-gray-100
-                      transition-all
-                      ${!isCurrentMonth ? 'bg-gray-50/50 cursor-default' : 'bg-white hover:bg-gray-50 cursor-pointer'}
-                      ${isSelectedDay ? 'ring-2 ring-[#79502A] ring-inset bg-[#79502A]/5' : ''}
-                      ${isTodayDate && !isSelectedDay ? 'bg-blue-50/50' : ''}
+                      relative p-3 min-h-[100px] border-b border-r border-[#79502A]/10
+                      transition-all duration-200
+                      ${!isCurrentMonth ? 'bg-[#FFF8E2]/30 cursor-default' : 'bg-white hover:bg-[#FFF8E2]/50 cursor-pointer'}
+                      ${isSelectedDay ? 'ring-2 ring-[#79502A] ring-inset bg-[#C6A97D]/10' : ''}
+                      ${isTodayDate && !isSelectedDay ? 'bg-[#C6A97D]/10' : ''}
                     `}
                   >
                     {/* Número del día */}
                     <div className="flex items-center justify-center mb-2">
                       <span
                         className={`
-                          font-fira text-sm font-bold flex items-center justify-center w-7 h-7 rounded-full
+                          font-fira text-sm font-bold flex items-center justify-center w-7 h-7 rounded-full transition-all duration-200
                           ${!isCurrentMonth ? 'text-transparent select-none' : ''}
-                          ${isTodayDate && isCurrentMonth ? 'bg-blue-500 text-white' : ''}
-                          ${isSelectedDay && !isTodayDate && isCurrentMonth ? 'bg-[#79502A] text-white' : ''}
+                          ${isTodayDate && isCurrentMonth ? 'bg-[#C6A97D] text-white shadow-md' : ''}
+                          ${isSelectedDay && !isTodayDate && isCurrentMonth ? 'bg-[#79502A] text-white shadow-md' : ''}
                           ${isPast && !isTodayDate && !isSelectedDay && isCurrentMonth ? 'text-gray-400' : ''}
-                          ${isCurrentMonth && !isTodayDate && !isSelectedDay && !isPast ? 'text-gray-700' : ''}
+                          ${isCurrentMonth && !isTodayDate && !isSelectedDay && !isPast ? 'text-[#2D2D2D]' : ''}
                         `}
                       >
                         {format(day, 'd')}
@@ -382,37 +398,44 @@ export default function AgendaPage() {
                       <div className="flex flex-col items-center gap-1 mt-1">
                         {/* Bloqueado - Responsive: Solo punto en mobile, texto en desktop */}
                         {isBlocked && (
-                          <div className="w-full px-1">
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="w-full px-1"
+                          >
                             {/* Mobile: Solo punto rojo grande */}
                             <div className="flex items-center justify-center md:hidden">
-                              <div className="w-2.5 h-2.5 rounded-full bg-red-500" title="Día bloqueado" />
+                              <div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" title="Día bloqueado" />
                             </div>
                             {/* Desktop: Chip con icono y texto */}
-                            <div className="hidden md:flex items-center justify-center gap-1 py-0.5 px-2 bg-red-500 rounded-full">
+                            <div className="hidden md:flex items-center justify-center gap-1 py-0.5 px-2 bg-red-600 hover:bg-red-700 rounded-full shadow-sm transition-colors duration-200">
                               <Ban size={10} className="text-white flex-shrink-0" />
                               <span className="font-fira text-[10px] text-white font-semibold whitespace-nowrap">
                                 Bloqueado
                               </span>
                             </div>
-                          </div>
+                          </motion.div>
                         )}
 
                         {/* Eventos privados - mostrar nombre */}
                         {dayBookings.private.length > 0 && (
                           <div className="w-full px-1 space-y-0.5">
                             {dayBookings.private.slice(0, 2).map((booking, idx) => (
-                              <div
+                              <motion.div
                                 key={idx}
-                                className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-gradient-to-r from-[#79502A] to-[#8B5A2F] rounded-md"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: idx * 0.05 }}
+                                className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-[#79502A] hover:bg-[#5a3c1f] rounded-md shadow-sm transition-all duration-200"
                               >
-                                <Briefcase size={10} className="text-white flex-shrink-0" />
-                                <span className="font-fira text-[10px] md:text-[9px] text-white font-medium truncate">
+                                <Briefcase size={10} className="text-[#FFF8E2] flex-shrink-0" />
+                                <span className="font-fira text-[10px] md:text-[9px] text-[#FFF8E2] font-medium truncate">
                                   {booking.client_name}
                                 </span>
-                              </div>
+                              </motion.div>
                             ))}
                             {dayBookings.private.length > 2 && (
-                              <div className="text-center font-fira text-[10px] md:text-[9px] text-gray-500 font-medium">
+                              <div className="text-center font-fira text-[10px] md:text-[9px] text-[#79502A] font-medium">
                                 +{dayBookings.private.length - 2} más
                               </div>
                             )}
@@ -422,20 +445,28 @@ export default function AgendaPage() {
                         {/* Reuniones públicas y pendientes - puntos más grandes y visibles */}
                         <div className="flex items-center justify-center gap-2 mt-0.5">
                           {dayBookings.pending.length > 0 && (
-                            <div className="flex items-center gap-1">
-                              <div className="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-orange-600" title="Reuniones pendientes" />
-                              <span className="font-fira text-[10px] md:text-[9px] text-orange-800 font-semibold">
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="flex items-center gap-1"
+                            >
+                              <div className="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-[#C6A97D] shadow-sm" title="Reuniones pendientes" />
+                              <span className="font-fira text-[10px] md:text-[9px] text-[#79502A] font-semibold">
                                 {dayBookings.pending.length}
                               </span>
-                            </div>
+                            </motion.div>
                           )}
                           {dayBookings.public.length > 0 && (
-                            <div className="flex items-center gap-1">
-                              <div className="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-green-600" title="Reuniones confirmadas" />
-                              <span className="font-fira text-[10px] md:text-[9px] text-green-800 font-semibold">
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="flex items-center gap-1"
+                            >
+                              <div className="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-green-600 shadow-sm" title="Reuniones confirmadas" />
+                              <span className="font-fira text-[10px] md:text-[9px] text-green-700 font-semibold">
                                 {dayBookings.public.length}
                               </span>
-                            </div>
+                            </motion.div>
                           )}
                         </div>
                       </div>
@@ -450,14 +481,14 @@ export default function AgendaPage() {
         {/* Pendientes de confirmación */}
         {publicPendingCount > 0 && (
           <AnimatedSection delay={0.1}>
-            <div className="mt-6 bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-200/50">
+            <div className="mt-6 bg-[#2D2D2D] rounded-2xl p-6 border border-[#79502A]/30 shadow-xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <Clock size={24} className="text-orange-800" />
+                <div className="p-2 bg-[#C6A97D]/20 rounded-lg">
+                  <Clock size={24} className="text-[#C6A97D]" />
                 </div>
                 <div>
-                  <h3 className="font-voga text-xl text-gray-900">Pendientes de Confirmación</h3>
-                  <p className="font-fira text-sm text-gray-600">
+                  <h3 className="font-voga text-xl text-[#FFF8E2]">Pendientes de Confirmación</h3>
+                  <p className="font-fira text-sm text-[#C6A97D]">
                     {publicPendingCount} {publicPendingCount === 1 ? 'reunión' : 'reuniones'} esperando respuesta
                   </p>
                 </div>
@@ -553,7 +584,9 @@ function PendingBookingCard({ booking, onConfirm, onReject, processing }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl p-4 border border-orange-200 shadow-sm"
+        whileHover={{ y: -2, boxShadow: "0 10px 30px -10px rgba(121, 80, 42, 0.3)" }}
+        transition={{ duration: 0.2 }}
+        className="bg-white rounded-xl p-4 border border-[#79502A]/30 shadow-md"
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
@@ -561,30 +594,30 @@ function PendingBookingCard({ booking, onConfirm, onReject, processing }) {
               {booking.booking_type?.slug === 'videollamada' ? (
                 <Video size={16} className="text-[#79502A]" />
               ) : (
-                <MapPin size={16} className="text-[#8B5A2F]" />
+                <MapPin size={16} className="text-[#79502A]" />
               )}
-              <h4 className="font-fira text-sm font-bold text-gray-900">
+              <h4 className="font-fira text-sm font-bold text-[#2D2D2D]">
                 {booking.booking_type?.name || 'Reunión'}
               </h4>
             </div>
 
-            <div className="space-y-1 text-xs text-gray-600 font-fira">
+            <div className="space-y-1 text-xs text-[#2D2D2D]/70 font-fira">
               <div className="flex items-center gap-2">
-                <User size={12} />
+                <User size={12} className="text-[#79502A]" />
                 {booking.client_name}
               </div>
               {booking.client_email && (
                 <div className="flex items-center gap-2">
-                  <Mail size={12} />
+                  <Mail size={12} className="text-[#79502A]" />
                   {booking.client_email}
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <CalendarIcon size={12} />
+                <CalendarIcon size={12} className="text-[#79502A]" />
                 {format(parseISO(booking.booking_date), "d 'de' MMMM, yyyy", { locale: es })}
               </div>
               <div className="flex items-center gap-2">
-                <Clock size={12} />
+                <Clock size={12} className="text-[#79502A]" />
                 {booking.start_time} - {booking.end_time}
               </div>
             </div>
@@ -594,7 +627,7 @@ function PendingBookingCard({ booking, onConfirm, onReject, processing }) {
             <button
               onClick={() => onConfirm(booking.id)}
               disabled={processing}
-              className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg font-fira text-xs font-semibold transition-colors disabled:opacity-50 flex items-center gap-1"
+              className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center gap-1 hover:shadow-md"
             >
               {processing ? (
                 <Loader2 size={12} className="animate-spin" />
@@ -606,7 +639,7 @@ function PendingBookingCard({ booking, onConfirm, onReject, processing }) {
             <button
               onClick={() => setShowRejectModal(true)}
               disabled={processing}
-              className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-fira text-xs font-semibold transition-colors disabled:opacity-50 flex items-center gap-1"
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center gap-1 hover:shadow-md"
             >
               <XCircle size={12} />
               Rechazar
@@ -622,39 +655,41 @@ function PendingBookingCard({ booking, onConfirm, onReject, processing }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
             onClick={() => setShowRejectModal(false)}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+              className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
             >
-              <h3 className="font-voga text-xl text-gray-900 mb-4">Rechazar reunión</h3>
-              <p className="font-fira text-sm text-gray-600 mb-4">
-                Por favor indica el motivo del rechazo (opcional):
+              <h3 className="font-voga text-xl text-[#2D2D2D] mb-2">¿Confirmar rechazo?</h3>
+              <p className="font-fira text-sm text-[#2D2D2D]/70 mb-4">
+                Motivo del rechazo (opcional):
               </p>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Ej: No tengo disponibilidad en ese horario"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 resize-none"
+                className="w-full px-4 py-3 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
                 rows={3}
               />
               <div className="flex gap-2 mt-4">
                 <button
-                  onClick={handleReject}
-                  className="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-fira text-sm font-semibold transition-colors"
-                >
-                  Rechazar
-                </button>
-                <button
                   onClick={() => setShowRejectModal(false)}
-                  className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-fira text-sm font-semibold transition-colors"
+                  className="flex-1 px-4 py-2.5 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-lg font-fira text-sm font-semibold transition-all duration-200"
                 >
                   Cancelar
+                </button>
+                <button
+                  onClick={handleReject}
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200"
+                >
+                  Rechazar
                 </button>
               </div>
             </motion.div>
@@ -686,7 +721,8 @@ function DayDetailDrawer({ date, bookings, isBlocked, onClose, onConfirm, onReje
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm"
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       >
         <motion.div
@@ -698,19 +734,19 @@ function DayDetailDrawer({ date, bookings, isBlocked, onClose, onConfirm, onReje
           className="absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-2xl overflow-y-auto"
         >
           {/* Header */}
-          <div className="sticky top-0 bg-[#2d2d2d] p-6 z-10">
+          <div className="sticky top-0 bg-[#2D2D2D] p-6 z-10 shadow-lg">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="font-voga text-2xl text-white">
+              <h2 className="font-voga text-2xl text-[#FFF8E2]">
                 {format(date, 'd', { locale: es })}
               </h2>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                className="p-2 hover:bg-[#79502A]/20 rounded-lg transition-all duration-200"
               >
-                <X size={24} className="text-white" />
+                <X size={24} className="text-[#FFF8E2]" />
               </button>
             </div>
-            <p className="font-fira text-white/90">
+            <p className="font-fira text-[#C6A97D]">
               {format(date, "EEEE, d 'de' MMMM", { locale: es })}
             </p>
           </div>
@@ -718,22 +754,30 @@ function DayDetailDrawer({ date, bookings, isBlocked, onClose, onConfirm, onReje
           {/* Contenido */}
           <div className="p-6 space-y-4">
             {isBlocked && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3"
+              >
                 <Ban size={24} className="text-red-600 flex-shrink-0" />
                 <div>
                   <p className="font-fira text-sm font-bold text-red-900">Día bloqueado</p>
                   <p className="font-fira text-xs text-red-700">
-                    No se pueden agendar reuniones en este día
+                    No se pueden agendar reuniones
                   </p>
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {allBookings.length === 0 && !isBlocked && (
-              <div className="text-center py-12">
-                <CalendarIcon size={48} className="mx-auto text-gray-300 mb-3" />
-                <p className="font-fira text-gray-500">No hay eventos para este día</p>
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center py-12"
+              >
+                <CalendarIcon size={48} className="mx-auto text-[#C6A97D]/30 mb-3" />
+                <p className="font-fira text-[#2D2D2D]/50">No hay eventos para este día</p>
+              </motion.div>
             )}
 
             {allBookings.map((booking) => (
@@ -769,27 +813,27 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
   const getTypeStyles = () => {
     if (booking.type === 'pending') {
       return {
-        bg: 'bg-gradient-to-br from-orange-50 to-amber-50',
-        border: 'border-orange-200',
-        icon: <Clock size={20} className="text-orange-800" />,
-        badge: 'bg-orange-100 text-orange-800',
+        bg: 'bg-[#2D2D2D]',
+        border: 'border-[#C6A97D]/30',
+        icon: <Clock size={20} className="text-[#C6A97D]" />,
+        badge: 'bg-[#C6A97D]/20 text-[#C6A97D]',
         badgeText: 'Pendiente',
       };
     }
     if (booking.type === 'private') {
       return {
-        bg: 'bg-gradient-to-br from-stone-50 to-amber-50',
-        border: 'border-[#8B5A2F]/30',
-        icon: <Briefcase size={20} className="text-[#8B5A2F]" />,
-        badge: 'bg-stone-200 text-[#6B4423]',
-        badgeText: 'Evento Grande',
+        bg: 'bg-[#2D2D2D]',
+        border: 'border-[#79502A]/30',
+        icon: <Briefcase size={20} className="text-[#79502A]" />,
+        badge: 'bg-[#79502A]/20 text-[#79502A]',
+        badgeText: 'Evento',
       };
     }
     return {
-      bg: 'bg-gradient-to-br from-amber-50 to-orange-50',
+      bg: 'bg-[#2D2D2D]',
       border: 'border-[#79502A]/30',
-      icon: <Users size={20} className="text-[#79502A]" />,
-      badge: 'bg-orange-100 text-[#6B4423]',
+      icon: <Users size={20} className="text-[#C6A97D]" />,
+      badge: 'bg-green-600/20 text-green-600',
       badgeText: 'Reunión',
     };
   };
@@ -801,7 +845,9 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`${styles.bg} border ${styles.border} rounded-xl p-4 shadow-sm`}
+        whileHover={{ y: -2, boxShadow: "0 10px 30px -10px rgba(121, 80, 42, 0.3)" }}
+        transition={{ duration: 0.2 }}
+        className={`${styles.bg} border ${styles.border} rounded-xl p-4 shadow-md`}
       >
         <div className="flex items-start justify-between gap-3 mb-3">
           {styles.icon}
@@ -811,51 +857,51 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
                 {styles.badgeText}
               </span>
             </div>
-            <h4 className="font-fira text-sm font-bold text-gray-900">
+            <h4 className="font-fira text-sm font-bold text-[#FFF8E2]">
               {booking.booking_type?.name || booking.service_type?.name || 'Sin título'}
             </h4>
           </div>
         </div>
 
-        <div className="space-y-2 text-xs text-gray-700 font-fira mb-3">
+        <div className="space-y-2 text-xs text-[#C6A97D] font-fira mb-3">
           <div className="flex items-center gap-2">
-            <User size={12} />
+            <User size={12} className="text-[#FFF8E2]" />
             <span className="font-medium">{booking.client_name}</span>
           </div>
           {booking.client_email && (
             <div className="flex items-center gap-2">
-              <Mail size={12} />
+              <Mail size={12} className="text-[#FFF8E2]" />
               {booking.client_email}
             </div>
           )}
           {booking.client_phone && (
             <div className="flex items-center gap-2">
-              <Phone size={12} />
+              <Phone size={12} className="text-[#FFF8E2]" />
               {booking.client_phone}
             </div>
           )}
           {booking.start_time && booking.end_time && (
             <div className="flex items-center gap-2">
-              <Clock size={12} />
+              <Clock size={12} className="text-[#FFF8E2]" />
               <span className="font-medium">
                 {booking.start_time} - {booking.end_time}
               </span>
             </div>
           )}
           {booking.notes && (
-            <div className="flex items-start gap-2 mt-3 p-2 bg-white/60 rounded-lg">
-              <MessageSquare size={12} className="mt-0.5 flex-shrink-0" />
-              <span className="text-gray-600 italic">{booking.notes}</span>
+            <div className="flex items-start gap-2 mt-3 p-2 bg-[#79502A]/10 rounded-lg">
+              <MessageSquare size={12} className="mt-0.5 flex-shrink-0 text-[#FFF8E2]" />
+              <span className="text-[#FFF8E2]/80 italic">{booking.notes}</span>
             </div>
           )}
         </div>
 
         {booking.type === 'pending' && (
-          <div className="flex gap-2 pt-3 border-t border-orange-200/50">
+          <div className="flex gap-2 pt-3 border-t border-[#79502A]/20">
             <button
               onClick={() => onConfirm(booking.id)}
               disabled={processing === booking.id}
-              className="flex-1 px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-fira text-xs font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+              className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               {processing === booking.id ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -867,7 +913,7 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
             <button
               onClick={() => setShowRejectModal(true)}
               disabled={processing === booking.id}
-              className="flex-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-fira text-xs font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+              className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               <XCircle size={14} />
               Rechazar
@@ -876,11 +922,11 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
         )}
 
         {booking.type === 'private' && (
-          <div className="flex gap-2 pt-3 border-t border-stone-200/50">
+          <div className="flex gap-2 pt-3 border-t border-[#79502A]/20">
             <button
               onClick={() => onEditPrivate(booking)}
               disabled={processing === booking.id}
-              className="flex-1 px-3 py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg font-fira text-xs font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+              className="flex-1 px-3 py-2 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               <Edit2 size={14} />
               Editar
@@ -888,7 +934,7 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
             <button
               onClick={() => onDeletePrivate(booking)}
               disabled={processing === booking.id}
-              className="flex-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-fira text-xs font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+              className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               {processing === booking.id ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -908,39 +954,41 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onDeleteP
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
             onClick={() => setShowRejectModal(false)}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+              className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
             >
-              <h3 className="font-voga text-xl text-gray-900 mb-4">Rechazar reunión</h3>
-              <p className="font-fira text-sm text-gray-600 mb-4">
-                Por favor indica el motivo del rechazo (opcional):
+              <h3 className="font-voga text-xl text-[#2D2D2D] mb-2">¿Confirmar rechazo?</h3>
+              <p className="font-fira text-sm text-[#2D2D2D]/70 mb-4">
+                Motivo del rechazo (opcional):
               </p>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Ej: No tengo disponibilidad en ese horario"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg font-fira text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 resize-none"
+                className="w-full px-4 py-3 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
                 rows={3}
               />
               <div className="flex gap-2 mt-4">
                 <button
-                  onClick={handleReject}
-                  className="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-fira text-sm font-semibold transition-colors"
-                >
-                  Rechazar
-                </button>
-                <button
                   onClick={() => setShowRejectModal(false)}
-                  className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-fira text-sm font-semibold transition-colors"
+                  className="flex-1 px-4 py-2.5 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-lg font-fira text-sm font-semibold transition-all duration-200"
                 >
                   Cancelar
+                </button>
+                <button
+                  onClick={handleReject}
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200"
+                >
+                  Rechazar
                 </button>
               </div>
             </motion.div>
@@ -1017,33 +1065,35 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-xl max-h-[90vh] overflow-y-auto"
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.2 }}
+        className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-orange-100 rounded-lg">
+          <div className="p-2 bg-[#79502A]/10 rounded-lg">
             <Briefcase size={24} className="text-[#79502A]" />
           </div>
           <div>
-            <h3 className="font-voga text-xl text-gray-900">Crear Evento Grande</h3>
-            <p className="font-fira text-sm text-gray-600">Bodas, quinceañeras, eventos empresariales</p>
+            <h3 className="font-voga text-xl text-[#2D2D2D]">Nuevo Evento</h3>
+            <p className="font-fira text-sm text-[#2D2D2D]/70">Bodas, quinceañeras, eventos empresariales</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Tipo de servicio */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Tipo de Evento *
             </label>
             <select
               required
               value={formData.serviceTypeId}
               onChange={(e) => handleInputChange('serviceTypeId', e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             >
               <option value="">Seleccioná un tipo</option>
               {serviceTypes.map((type) => (
@@ -1056,7 +1106,7 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
 
           {/* Fecha */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Fecha del Evento *
             </label>
             <input
@@ -1065,12 +1115,12 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               value={formData.bookingDate}
               onChange={(e) => handleInputChange('bookingDate', e.target.value)}
               min={format(new Date(), 'yyyy-MM-dd')}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             />
             {availabilityMessage && (
               <p
                 className={`mt-2 font-fira text-xs ${
-                  availabilityMessage.startsWith('✅') ? 'text-green-600' : 'text-orange-700'
+                  availabilityMessage.startsWith('✅') ? 'text-green-600' : 'text-[#C6A97D]'
                 }`}
               >
                 {availabilityMessage}
@@ -1080,7 +1130,7 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
 
           {/* Nombre del cliente */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Nombre del Cliente *
             </label>
             <input
@@ -1089,13 +1139,13 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               value={formData.clientName}
               onChange={(e) => handleInputChange('clientName', e.target.value)}
               placeholder="Ej: María González"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Email
             </label>
             <input
@@ -1103,13 +1153,13 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               value={formData.clientEmail}
               onChange={(e) => handleInputChange('clientEmail', e.target.value)}
               placeholder="cliente@ejemplo.com"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             />
           </div>
 
           {/* Teléfono */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Teléfono
             </label>
             <input
@@ -1117,13 +1167,13 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               value={formData.clientPhone}
               onChange={(e) => handleInputChange('clientPhone', e.target.value)}
               placeholder="+598 99 123 456"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             />
           </div>
 
           {/* Notas del cliente */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Notas del Cliente
             </label>
             <textarea
@@ -1131,13 +1181,13 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               onChange={(e) => handleInputChange('notes', e.target.value)}
               placeholder="Información adicional visible para el cliente..."
               rows={3}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
             />
           </div>
 
           {/* Notas internas */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Notas Internas
             </label>
             <textarea
@@ -1145,14 +1195,14 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
               onChange={(e) => handleInputChange('internalNotes', e.target.value)}
               placeholder="Notas privadas (solo visibles para vos)..."
               rows={2}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
             />
           </div>
 
           {/* Info */}
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+          <div className="bg-[#FFF8E2] border border-[#C6A97D]/30 rounded-lg p-3">
             <p className="font-fira text-xs text-[#79502A]">
-              💡 <strong>Recordá:</strong> Podés tener máximo 2 eventos por día (tenés 2 salones disponibles)
+              <strong>Nota:</strong> Máximo 2 eventos por día (2 salones disponibles)
             </p>
           </div>
 
@@ -1161,14 +1211,14 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-fira text-sm font-semibold transition-colors"
+              className="flex-1 px-4 py-2.5 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-lg font-fira text-sm font-semibold transition-all duration-200"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#79502A] to-[#8B5A2F] hover:from-[#8B5A2F] hover:to-[#79502A] text-white rounded-lg font-fira text-sm font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -1257,33 +1307,35 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-xl max-h-[90vh] overflow-y-auto"
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.2 }}
+        className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-orange-100 rounded-lg">
+          <div className="p-2 bg-[#79502A]/10 rounded-lg">
             <Edit2 size={24} className="text-[#79502A]" />
           </div>
           <div>
-            <h3 className="font-voga text-xl text-gray-900">Editar Evento</h3>
-            <p className="font-fira text-sm text-gray-600">Modificá los detalles del evento</p>
+            <h3 className="font-voga text-xl text-[#2D2D2D]">Editar Evento</h3>
+            <p className="font-fira text-sm text-[#2D2D2D]/70">Modificar detalles del evento</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Tipo de servicio */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Tipo de Evento *
             </label>
             <select
               required
               value={formData.serviceTypeId}
               onChange={(e) => handleInputChange('serviceTypeId', e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             >
               <option value="">Seleccioná un tipo</option>
               {serviceTypes.map((type) => (
@@ -1296,7 +1348,7 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
 
           {/* Fecha */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Fecha del Evento *
             </label>
             <input
@@ -1305,12 +1357,12 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               value={formData.bookingDate}
               onChange={(e) => handleInputChange('bookingDate', e.target.value)}
               min={format(new Date(), 'yyyy-MM-dd')}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             />
             {availabilityMessage && (
               <p
                 className={`mt-2 font-fira text-xs ${
-                  availabilityMessage.startsWith('✅') ? 'text-green-600' : 'text-orange-700'
+                  availabilityMessage.startsWith('✅') ? 'text-green-600' : 'text-[#C6A97D]'
                 }`}
               >
                 {availabilityMessage}
@@ -1320,7 +1372,7 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
 
           {/* Nombre del cliente */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Nombre del Cliente *
             </label>
             <input
@@ -1329,13 +1381,13 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               value={formData.clientName}
               onChange={(e) => handleInputChange('clientName', e.target.value)}
               placeholder="Ej: María González"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Email
             </label>
             <input
@@ -1343,13 +1395,13 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               value={formData.clientEmail}
               onChange={(e) => handleInputChange('clientEmail', e.target.value)}
               placeholder="cliente@ejemplo.com"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             />
           </div>
 
           {/* Teléfono */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Teléfono
             </label>
             <input
@@ -1357,13 +1409,13 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               value={formData.clientPhone}
               onChange={(e) => handleInputChange('clientPhone', e.target.value)}
               placeholder="+598 99 123 456"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             />
           </div>
 
           {/* Notas del cliente */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Notas del Cliente
             </label>
             <textarea
@@ -1371,13 +1423,13 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               onChange={(e) => handleInputChange('notes', e.target.value)}
               placeholder="Información adicional visible para el cliente..."
               rows={3}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
             />
           </div>
 
           {/* Notas internas */}
           <div>
-            <label className="block font-fira text-sm font-medium text-gray-700 mb-2">
+            <label className="block font-fira text-sm font-medium text-[#2D2D2D] mb-2">
               Notas Internas
             </label>
             <textarea
@@ -1385,7 +1437,7 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
               onChange={(e) => handleInputChange('internalNotes', e.target.value)}
               placeholder="Notas privadas (solo visibles para vos)..."
               rows={2}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
+              className="w-full px-3 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A] resize-none"
             />
           </div>
 
@@ -1394,14 +1446,14 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-fira text-sm font-semibold transition-colors"
+              className="flex-1 px-4 py-2.5 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-lg font-fira text-sm font-semibold transition-all duration-200"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#79502A] to-[#8B5A2F] hover:from-[#8B5A2F] hover:to-[#79502A] text-white rounded-lg font-fira text-sm font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-[#79502A] hover:bg-[#5a3c1f] text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -1430,15 +1482,17 @@ function DeleteConfirmationModal({ booking, onConfirm, onClose, processing }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          transition={{ duration: 0.2 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+          className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
         >
           {/* Header con icono de advertencia */}
           <div className="flex items-center gap-3 mb-4">
@@ -1446,24 +1500,24 @@ function DeleteConfirmationModal({ booking, onConfirm, onClose, processing }) {
               <AlertCircle size={24} className="text-red-600" />
             </div>
             <div>
-              <h3 className="font-voga text-xl text-gray-900">Eliminar Evento</h3>
-              <p className="font-fira text-sm text-gray-600">Esta acción no se puede deshacer</p>
+              <h3 className="font-voga text-xl text-[#2D2D2D]">¿Eliminar evento?</h3>
+              <p className="font-fira text-sm text-[#2D2D2D]/70">Esta acción no se puede deshacer</p>
             </div>
           </div>
 
           {/* Información del evento */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <p className="font-fira text-sm text-gray-700 mb-2">
-              ¿Estás segura de que querés eliminar este evento?
+          <div className="bg-[#FFF8E2] rounded-lg p-4 mb-6">
+            <p className="font-fira text-sm text-[#2D2D2D]/70 mb-2">
+              Estás por eliminar este evento:
             </p>
             <div className="space-y-1 font-fira text-sm">
-              <p className="text-gray-900">
+              <p className="text-[#2D2D2D]">
                 <strong>Servicio:</strong> {booking.service_type?.name || 'Sin especificar'}
               </p>
-              <p className="text-gray-900">
+              <p className="text-[#2D2D2D]">
                 <strong>Cliente:</strong> {booking.client_name}
               </p>
-              <p className="text-gray-900">
+              <p className="text-[#2D2D2D]">
                 <strong>Fecha:</strong>{' '}
                 {format(parseISO(booking.booking_date), "d 'de' MMMM, yyyy", { locale: es })}
               </p>
@@ -1476,14 +1530,14 @@ function DeleteConfirmationModal({ booking, onConfirm, onClose, processing }) {
               type="button"
               onClick={onClose}
               disabled={processing}
-              className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-fira text-sm font-semibold transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2.5 bg-white border border-[#79502A]/30 hover:border-[#79502A] text-[#2D2D2D] rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               onClick={onConfirm}
               disabled={processing}
-              className="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-fira text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {processing ? (
                 <>
@@ -1493,7 +1547,7 @@ function DeleteConfirmationModal({ booking, onConfirm, onClose, processing }) {
               ) : (
                 <>
                   <Trash2 size={16} />
-                  Eliminar Evento
+                  Eliminar
                 </>
               )}
             </button>

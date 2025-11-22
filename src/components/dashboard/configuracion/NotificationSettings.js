@@ -349,17 +349,17 @@ export default function NotificationSettings() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border-2 border-gray-200 rounded-xl p-5 sm:p-6 space-y-3"
+        className="bg-white border border-[#79502A]/30 rounded-xl p-5 sm:p-6 space-y-3"
       >
         <div className="flex items-start gap-3">
           <div className="p-2.5 bg-[#79502A]/10 rounded-lg">
             <Mail size={20} className="text-[#79502A]" />
           </div>
           <div className="flex-1">
-            <h3 className="font-voga text-lg sm:text-xl text-black mb-1">
+            <h3 className="font-voga text-lg sm:text-xl text-[#2D2D2D] mb-1">
               Email para notificaciones
             </h3>
-            <p className="font-fira text-sm text-gray-600">
+            <p className="font-fira text-sm text-[#2D2D2D]/70">
               Configura el email donde recibirás las notificaciones
             </p>
           </div>
@@ -371,11 +371,11 @@ export default function NotificationSettings() {
             value={preferences.notification_email}
             onChange={(e) => handleChange('notification_email', e.target.value)}
             placeholder="tu-email@ejemplo.com"
-            className="w-full px-3 sm:px-4 py-2.5 border-2 border-gray-200 rounded-lg font-fira text-sm text-black
+            className="w-full px-3 sm:px-4 py-2.5 border border-[#79502A]/30 rounded-lg font-fira text-sm text-[#2D2D2D]
               focus:outline-none focus:ring-2 focus:ring-[#C6A97D]/40 focus:border-[#79502A] transition-all
-              hover:border-gray-300"
+              hover:border-[#79502A]/50"
           />
-          <p className="font-fira text-xs text-gray-500 leading-relaxed">
+          <p className="font-fira text-xs text-[#2D2D2D]/60 leading-relaxed">
             Configura qué notificaciones quieres recibir por email y cuáles en la plataforma
           </p>
         </div>
@@ -386,17 +386,17 @@ export default function NotificationSettings() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white border-2 border-gray-200 rounded-xl p-5 sm:p-6 space-y-5"
+        className="bg-white border border-[#79502A]/30 rounded-xl p-5 sm:p-6 space-y-5"
       >
         <div className="flex items-start gap-3">
-          <div className="p-2.5 bg-blue-500/10 rounded-lg">
-            <Bell size={20} className="text-blue-600" />
+          <div className="p-2.5 bg-[#79502A]/10 rounded-lg">
+            <Bell size={20} className="text-[#79502A]" />
           </div>
           <div>
-            <h3 className="font-voga text-lg sm:text-xl text-black mb-1">
+            <h3 className="font-voga text-lg sm:text-xl text-[#2D2D2D] mb-1">
               Tipos de notificaciones
             </h3>
-            <p className="font-fira text-sm text-gray-600">
+            <p className="font-fira text-sm text-[#2D2D2D]/70">
               Elige cómo quieres recibir cada tipo de notificación
             </p>
           </div>
@@ -408,7 +408,7 @@ export default function NotificationSettings() {
             return (
               <div
                 key={item.emailKey}
-                className="p-3 sm:p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+                className="p-3 sm:p-4 rounded-lg border border-[#79502A]/20 hover:border-[#79502A]/40 hover:shadow-sm transition-all duration-200"
               >
                 <div className="flex items-start gap-3 mb-3">
                   <IconComponent
@@ -416,10 +416,10 @@ export default function NotificationSettings() {
                     className="text-[#79502A] flex-shrink-0 mt-0.5"
                   />
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-fira text-sm font-semibold text-black mb-1 leading-tight">
+                    <h4 className="font-fira text-sm font-semibold text-[#2D2D2D] mb-1 leading-tight">
                       {item.title}
                     </h4>
-                    <p className="font-fira text-xs text-gray-600 leading-relaxed">
+                    <p className="font-fira text-xs text-[#2D2D2D]/70 leading-relaxed">
                       {item.description}
                     </p>
                   </div>
@@ -433,7 +433,7 @@ export default function NotificationSettings() {
                       onChange={() => handleChange(item.emailKey)}
                       className="w-4 h-4 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer"
                     />
-                    <span className="font-fira text-xs font-medium text-gray-700 group-hover:text-black transition-colors flex items-center gap-1.5">
+                    <span className="font-fira text-xs font-medium text-[#2D2D2D]/70 group-hover:text-[#2D2D2D] transition-colors flex items-center gap-1.5">
                       <Mail size={14} className="text-[#79502A]" />
                       Email
                     </span>
@@ -444,10 +444,10 @@ export default function NotificationSettings() {
                       type="checkbox"
                       checked={preferences[item.inappKey]}
                       onChange={() => handleChange(item.inappKey)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                      className="w-4 h-4 text-[#79502A] border-gray-300 rounded focus:ring-[#79502A] cursor-pointer"
                     />
-                    <span className="font-fira text-xs font-medium text-gray-700 group-hover:text-black transition-colors flex items-center gap-1.5">
-                      <Bell size={14} className="text-blue-600" />
+                    <span className="font-fira text-xs font-medium text-[#2D2D2D]/70 group-hover:text-[#2D2D2D] transition-colors flex items-center gap-1.5">
+                      <Bell size={14} className="text-[#79502A]" />
                       In-app
                     </span>
                   </label>
@@ -470,7 +470,7 @@ export default function NotificationSettings() {
           disabled={isSaving}
           whileHover={{ scale: isSaving ? 1 : 1.02 }}
           whileTap={{ scale: isSaving ? 1 : 0.98 }}
-          className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-300 disabled:cursor-not-allowed text-white hover:text-white rounded-lg font-fira text-sm font-semibold flex items-center justify-center gap-2 shadow-lg transition-all"
+          className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-fira text-sm font-semibold flex items-center justify-center gap-2 shadow-lg transition-all duration-200"
         >
           {isSaving ? (
             <>

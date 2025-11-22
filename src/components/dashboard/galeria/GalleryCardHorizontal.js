@@ -148,7 +148,7 @@ export default function GalleryCardHorizontal({
     <>
       <div
         onClick={handleClick}
-        className="group bg-[#2d2d2d] rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.01] flex flex-row min-h-[140px]"
+        className="group bg-[#2D2D2D] rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-[1.01] flex flex-row min-h-[140px] border border-[#79502A]/30"
       >
         {/* ============================================ */}
         {/* IMAGEN - Izquierda */}
@@ -225,7 +225,7 @@ export default function GalleryCardHorizontal({
           <div className="flex items-start justify-between gap-2 mb-1.5 sm:mb-2">
             <div className="flex-1 min-w-0">
               {/* Título */}
-              <h3 className="font-voga text-sm sm:text-base md:text-lg text-white truncate group-hover:text-[#C6A97D] transition-colors">
+              <h3 className="font-voga text-sm sm:text-base md:text-lg text-[#FFF8E2] truncate group-hover:text-[#C6A97D] transition-colors duration-200">
                 {title}
               </h3>
               
@@ -269,7 +269,7 @@ export default function GalleryCardHorizontal({
             {/* Flecha - Solo desktop */}
             <ChevronRight
               size={16}
-              className="hidden sm:block text-white/40 group-hover:text-[#79502A] group-hover:translate-x-1 transition-all flex-shrink-0"
+              className="hidden sm:block text-[#C6A97D]/40 group-hover:text-[#79502A] group-hover:translate-x-1 transition-all duration-200 flex-shrink-0"
             />
           </div>
 
@@ -284,7 +284,7 @@ export default function GalleryCardHorizontal({
               </div>
             )}
 
-            <div className="flex items-center gap-1.5 text-white/60">
+            <div className="flex items-center gap-1.5 text-[#C6A97D]">
               <Calendar size={10} />
               <span className="font-fira text-[10px] sm:text-xs truncate">
                 {formattedDate}
@@ -292,7 +292,7 @@ export default function GalleryCardHorizontal({
             </div>
 
             {client_email && (
-              <div className="flex items-center gap-1.5 text-white/60">
+              <div className="flex items-center gap-1.5 text-[#C6A97D]">
                 <Mail size={10} />
                 <span className="font-fira text-[10px] sm:text-xs truncate">
                   {client_email}
@@ -302,9 +302,9 @@ export default function GalleryCardHorizontal({
 
             {allow_downloads && download_pin && (
               <div className="flex items-center gap-1.5">
-                <Lock size={10} className="text-[#b8824f]" />
-                <span className="font-fira text-[10px] sm:text-xs font-semibold text-[#b8824f]">
-                  PIN DE DESCARGA: {download_pin}
+                <Lock size={10} className="text-[#C6A97D]" />
+                <span className="font-fira text-[10px] sm:text-xs font-semibold text-[#C6A97D]">
+                  PIN: {download_pin}
                 </span>
               </div>
             )}
@@ -314,37 +314,37 @@ export default function GalleryCardHorizontal({
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
             {/* Fotos */}
             <div className="flex items-center gap-1">
-              <div className="p-0.5 sm:p-1 bg-white/10 rounded">
-                <ImageIcon size={10} className="sm:w-3 sm:h-3 text-[#caad81]" />
+              <div className="p-0.5 sm:p-1 bg-[#79502A]/20 rounded">
+                <ImageIcon size={10} className="sm:w-3 sm:h-3 text-[#C6A97D]" />
               </div>
-              <span className="font-fira text-[10px] sm:text-xs font-semibold text-white">
+              <span className="font-fira text-[10px] sm:text-xs font-semibold text-[#FFF8E2]">
                 {photoCount}
               </span>
             </div>
 
             {/* Vistas */}
             <div className="flex items-center gap-1">
-              <div className="p-0.5 sm:p-1 bg-white/10 rounded">
-                <Eye size={10} className="sm:w-3 sm:h-3 text-blue-400" />
+              <div className="p-0.5 sm:p-1 bg-[#79502A]/20 rounded">
+                <Eye size={10} className="sm:w-3 sm:h-3 text-[#C6A97D]" />
               </div>
-              <span className="font-fira text-[10px] sm:text-xs font-semibold text-white">
+              <span className="font-fira text-[10px] sm:text-xs font-semibold text-[#FFF8E2]">
                 {displayViews}
               </span>
             </div>
 
             {/* Favoritos */}
             <div className="flex items-center gap-1">
-              <div className="p-0.5 sm:p-1 bg-white/10 rounded">
-                <Heart 
-                  size={10} 
+              <div className="p-0.5 sm:p-1 bg-[#79502A]/20 rounded">
+                <Heart
+                  size={10}
                   className={`sm:w-3 sm:h-3 ${
-                    favorites_count > 0 ? 'text-pink-400' : 'text-white/40'
-                  }`} 
+                    favorites_count > 0 ? 'text-pink-400' : 'text-[#C6A97D]/40'
+                  }`}
                 />
               </div>
-              <span 
+              <span
                 className={`font-fira text-[10px] sm:text-xs font-semibold ${
-                  favorites_count > 0 ? 'text-white' : 'text-white/40'
+                  favorites_count > 0 ? 'text-[#FFF8E2]' : 'text-[#C6A97D]/40'
                 }`}
               >
                 {favorites_count}
@@ -358,12 +358,12 @@ export default function GalleryCardHorizontal({
             <button
               onClick={handleShare}
               disabled={isArchived}
-              className={`py-1 !text-white sm:py-1.5 md:py-2 rounded-lg transition-colors font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 ${
+              className={`py-1 !text-white sm:py-1.5 md:py-2 rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 ${
                 isArchived
                   ? 'bg-white/5 text-white/30 cursor-not-allowed'
-                  : 'bg-[#79502A] hover:bg-[#8B5A2F] text-white'
+                  : 'bg-[#79502A] hover:bg-[#5a3c1f] text-white'
               }`}
-              aria-label="Compartir galería"
+              aria-label="Compartir"
             >
               <Share2 size={10} className="sm:w-3 sm:h-3" />
             </button>
@@ -371,8 +371,8 @@ export default function GalleryCardHorizontal({
             {/* Editar */}
             <button
               onClick={handleEdit}
-              className="py-1 !text-white sm:py-1.5 md:py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1"
-              aria-label="Editar galería"
+              className="py-1 !text-white sm:py-1.5 md:py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1"
+              aria-label="Editar"
             >
               <Edit size={10} className="sm:w-3 sm:h-3" />
             </button>
@@ -381,12 +381,12 @@ export default function GalleryCardHorizontal({
             <button
               onClick={handleFavorites}
               disabled={favorites_count === 0}
-              className={`py-1 !text-pink-400 sm:py-1.5 md:py-2 rounded-lg transition-colors font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 ${
+              className={`py-1 !text-pink-400 sm:py-1.5 md:py-2 rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 ${
                 favorites_count > 0
                   ? 'bg-pink-500/20 hover:bg-pink-500/30 text-pink-300'
                   : 'bg-white/5 text-white/30 cursor-not-allowed'
               }`}
-              aria-label="Ver favoritos"
+              aria-label="Ver favoritas"
             >
               <Heart size={10} className="sm:w-3 sm:h-3" />
             </button>

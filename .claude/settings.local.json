@@ -1,4 +1,5 @@
 {
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "Bash(git rm:*)",
@@ -40,7 +41,8 @@
       "Bash(node temp-fix-notifications.js:*)",
       "Bash(.gitignore)",
       "Bash(pnpm approve-builds:*)",
-      "Bash(node scripts/generate-favicons.js:*)"
+      "Bash(node scripts/generate-favicons.js:*)",
+      "Bash(start:*)"
     ],
     "deny": [],
     "ask": []

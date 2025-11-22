@@ -94,7 +94,7 @@ async function DashboardStats() {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 ">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {stats.map((stat, index) => (
           <AnimatedSection key={stat.id} delay={index * 0.1}>
             <DashboardStatCard stat={stat} />
@@ -135,34 +135,36 @@ export default async function DashboardHome() {
     <PageTransition>
       <DashboardHeader
         title={`Bienvenida, ${displayName}`}
-        subtitle="Resumen de tu actividad reciente"
+        subtitle="Panel de control y estadísticas"
       />
 
-      <Suspense
-        fallback={
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            <DashboardSkeleton type="stat" />
-            <DashboardSkeleton type="stat" />
-            <DashboardSkeleton type="stat" />
-          </div>
-        }
-      >
-        <DashboardStats />
-      </Suspense>
+      <div className="mt-8">
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <DashboardSkeleton type="stat" />
+              <DashboardSkeleton type="stat" />
+              <DashboardSkeleton type="stat" />
+            </div>
+          }
+        >
+          <DashboardStats />
+        </Suspense>
 
-      <AnimatedSection delay={0.4}>
-        <div className="mb-8">
-          <h2 className="font-voga text-3xl text-black mb-8">
-            Acciones rápidas
-          </h2>
+        <AnimatedSection delay={0.4}>
+          <div className="mt-12">
+            <h2 className="text-2xl text-[#2D2D2D] mb-6 font-medium">
+              Acciones rápidas
+            </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {quickActions.map((action) => (
-              <DashboardQuickAction key={action.id} {...action} />
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {quickActions.map((action) => (
+                <DashboardQuickAction key={action.id} {...action} />
+              ))}
+            </div>
           </div>
-        </div>
-      </AnimatedSection>
+        </AnimatedSection>
+      </div>
     </PageTransition>
   );
 }

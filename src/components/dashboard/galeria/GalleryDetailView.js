@@ -239,15 +239,15 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
         <Image
           src={photo.file_path}
           alt={photo.file_name || `Foto ${photoIndex + 1}`}
-          width={800}
-          height={1200}
+          width={0}
+          height={0}
+          sizes="100vw"
           className="w-full h-auto"
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           unoptimized={true}
           loading="lazy"
           placeholder="blur"
           blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
-          style={{ minHeight: '200px', maxWidth: '100%', height: 'auto' }}
+          style={{ width: '100%', height: 'auto' }}
         />
 
         {/* Drag handle - SOLO desde el icono para permitir scroll */}
@@ -1783,10 +1783,12 @@ export default function GalleryDetailView({ gallery }) {
                         <Image
                           src={workingPhotos.find(p => p.id === activeId)?.file_path}
                           alt="Arrastrando"
-                          width={400}
-                          height={400}
+                          width={0}
+                          height={0}
+                          sizes="300px"
                           className="w-[250px] sm:w-[300px] h-auto rounded-lg"
                           unoptimized={true}
+                          style={{ width: '250px', height: 'auto' }}
                         />
                       </div>
                     ) : null}
@@ -1814,14 +1816,15 @@ export default function GalleryDetailView({ gallery }) {
                           <Image
                             src={photo.file_path}
                             alt={photo.file_name || `Foto ${photoIndex + 1}`}
-                            width={800}
-                            height={800}
+                            width={0}
+                            height={0}
+                            sizes="100vw"
                             className="w-full h-auto"
-                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                             unoptimized={true}
                             loading="lazy"
                             placeholder="blur"
                             blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
+                            style={{ width: '100%', height: 'auto' }}
                           />
 
                           <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 z-10">

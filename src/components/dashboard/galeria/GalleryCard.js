@@ -285,7 +285,7 @@ export default function GalleryCard({ gallery, serviceTypes, selectionMode, isSe
             <button
               onClick={handleShare}
               disabled={isArchived}
-              className={`py-2 rounded-lg transition-all duration-200 font-fira text-xs font-semibold flex items-center justify-center gap-1.5 ${
+              className={`!text-white py-2 rounded-lg transition-all duration-200 font-fira text-xs font-semibold flex items-center justify-center gap-1.5 ${
                 isArchived
                   ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
                   : 'bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white'

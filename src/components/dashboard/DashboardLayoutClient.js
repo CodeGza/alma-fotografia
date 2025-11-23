@@ -18,6 +18,7 @@ import {
 import { createClient } from '@/lib/supabaseClient';
 import NotificationBell from '@/components/ui/NotificationBell';
 import { ToastProvider } from '@/components/ui/Toast';
+import SessionTimeout from '@/components/SessionTimeout';
 
 /**
  * REDISEÑO UI - DashboardLayoutClient
@@ -79,6 +80,7 @@ export default function DashboardLayoutClient({ children, userName }) {
 
   return (
     <ToastProvider>
+      <SessionTimeout />
     <div className="min-h-screen bg-white flex">
       {/* ============================================ */}
       {/* SIDEBAR DESKTOP */}

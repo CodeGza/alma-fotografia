@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/server';
+import { hasPermission } from '@/lib/permissions';
 
 /**
  * ============================================

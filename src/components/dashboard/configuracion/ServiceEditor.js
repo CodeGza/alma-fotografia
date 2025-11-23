@@ -291,7 +291,7 @@ export default function ServiceEditor() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-10 h-10 text-[#79502A] animate-spin" />
+        <Loader2 className="w-10 h-10 text-[#8B5E3C] animate-spin" />
       </div>
     );
   }
@@ -302,13 +302,13 @@ export default function ServiceEditor() {
     <div className="p-4 sm:p-6 max-w-6xl mx-auto">
       {/* Action button */}
       {!isEditing && (
-        <div className="mb-4 sm:mb-6">
+        <div className="mb-6">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowCreateForm(true)}
-            className="px-4 py-2.5 bg-[#79502A] !text-white rounded-lg font-fira text-sm font-semibold
-              inline-flex items-center gap-2 hover:bg-[#8B5A2F] shadow-sm transition-colors"
+            className="px-4 py-2.5 bg-[#8B5E3C] text-white rounded-lg font-fira text-sm font-semibold
+              inline-flex items-center gap-2 hover:bg-[#6d4a2f] shadow-sm transition-colors"
           >
             <Plus size={18} strokeWidth={2.5} />
             <span>Crear servicio</span>
@@ -323,18 +323,18 @@ export default function ServiceEditor() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="mb-4 sm:mb-6 p-4 sm:p-5 bg-white border-2 border-[#79502A]/30 rounded-xl shadow-md"
+            className="mb-6 p-6 bg-white rounded-2xl shadow-sm border border-gray-100"
           >
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-              <h3 className="font-fira text-sm sm:text-base font-semibold text-[#79502A] flex items-center gap-2">
+            <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-100">
+              <h3 className="font-fira text-lg font-bold text-gray-900 flex items-center gap-2">
                 {editingService ? (
                   <>
-                    <Pencil size={16} />
+                    <Pencil size={18} className="text-[#8B5E3C]" />
                     Editar servicio
                   </>
                 ) : (
                   <>
-                    <Plus size={16} />
+                    <Plus size={18} className="text-[#8B5E3C]" />
                     Nuevo servicio
                   </>
                 )}
@@ -342,16 +342,16 @@ export default function ServiceEditor() {
               <button
                 onClick={handleCancelEdit}
                 disabled={saving}
-                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <X size={18} className="text-black/40 hover:text-black" />
+                <X size={18} className="text-gray-500" />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               {/* Nombre */}
               <div>
-                <label className="block font-fira text-xs sm:text-sm font-semibold text-black mb-1.5">
+                <label className="block font-fira text-sm font-semibold text-gray-900 mb-2">
                   Nombre del servicio *
                 </label>
                 <input
@@ -359,9 +359,9 @@ export default function ServiceEditor() {
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ej: Sesión de Mascotas"
-                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg font-fira text-sm
-                    focus:outline-none focus:border-[#79502A] focus:ring-2 focus:ring-[#79502A]/10
-                    transition-all !text-black"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg font-fira text-sm
+                    focus:outline-none focus:border-[#8B5E3C] focus:ring-2 focus:ring-[#8B5E3C]/10
+                    transition-all text-gray-900"
                   disabled={saving}
                   autoFocus
                 />
@@ -369,7 +369,7 @@ export default function ServiceEditor() {
 
               {/* Descripción */}
               <div>
-                <label className="block font-fira text-xs sm:text-sm font-semibold text-black mb-1.5">
+                <label className="block font-fira text-sm font-semibold text-gray-900 mb-2">
                   Descripción (opcional)
                 </label>
                 <input
@@ -377,23 +377,23 @@ export default function ServiceEditor() {
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Ej: Fotografía y video para tu día más especial"
-                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg font-fira text-sm
-                    focus:outline-none focus:border-[#79502A] focus:ring-2 focus:ring-[#79502A]/10
-                    transition-all !text-black"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg font-fira text-sm
+                    focus:outline-none focus:border-[#8B5E3C] focus:ring-2 focus:ring-[#8B5E3C]/10
+                    transition-all text-gray-900"
                   disabled={saving}
                   maxLength={150}
                 />
-                <p className="font-fira text-[10px] sm:text-xs text-black/50 mt-1">
+                <p className="font-fira text-xs text-gray-500 mt-1.5">
                   Breve descripción que aparecerá en las cards
                 </p>
               </div>
 
               {/* Selector de icono */}
               <div>
-                <label className="block font-fira text-xs sm:text-sm font-semibold text-black mb-2">
+                <label className="block font-fira text-sm font-semibold text-gray-900 mb-3">
                   Icono del servicio *
                 </label>
-                <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2">
+                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
                   {availableIcons.map((icon) => {
                     const IconComponent = iconMap[icon.name];
                     const isSelected = formData.icon === icon.name;
@@ -405,26 +405,26 @@ export default function ServiceEditor() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setFormData(prev => ({ ...prev, icon: icon.name }))}
-                        className={`relative p-2.5 border-2 rounded-lg transition-all
+                        className={`relative p-3 border rounded-lg transition-all
                           ${isSelected
-                            ? 'border-[#79502A] bg-[#79502A]/5'
+                            ? 'border-[#8B5E3C] bg-[#8B5E3C]/5'
                             : 'border-gray-200 bg-white hover:border-gray-300'
                           }`}
                         title={icon.label}
                       >
                         <IconComponent
-                          size={20}
-                          className={isSelected ? 'text-[#79502A]' : 'text-black/60'}
-                          strokeWidth={1.8}
+                          size={22}
+                          className={isSelected ? 'text-[#8B5E3C]' : 'text-gray-600'}
+                          strokeWidth={1.5}
                         />
                         {isSelected && (
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="absolute -top-1 -right-1 w-4 h-4 bg-[#79502A] rounded-full
-                              flex items-center justify-center"
+                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#8B5E3C] rounded-full
+                              flex items-center justify-center shadow-sm"
                           >
-                            <Check size={10} className="text-white" strokeWidth={3} />
+                            <Check size={12} className="text-white" strokeWidth={3} />
                           </motion.div>
                         )}
                       </motion.button>
@@ -434,26 +434,25 @@ export default function ServiceEditor() {
               </div>
 
               {/* Botones de acción */}
-              <div className="flex gap-2 pt-3 border-t border-gray-200">
+              <div className="flex gap-3 pt-4 border-t border-gray-100">
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                   onClick={handleSave}
                   disabled={saving || !formData.name.trim()}
-                  className="flex-1 px-4 py-2 bg-[#79502A] !text-white rounded-lg font-fira text-xs sm:text-sm font-semibold
-                    disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5
-                    hover:bg-[#8B5A2F] shadow-sm transition-colors"
+                  className="flex-1 px-4 py-2.5 bg-[#8B5E3C] text-white rounded-lg font-fira text-sm font-semibold
+                    disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2
+                    hover:bg-[#6d4a2f] shadow-sm transition-colors"
                 >
                   {saving ? (
                     <>
-                      <Loader2 size={14} className="animate-spin" />
-                      <span className="hidden sm:inline">Guardando...</span>
-                      <span className="sm:hidden">...</span>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Guardando...</span>
                     </>
                   ) : (
                     <>
-                      <Check size={14} strokeWidth={2.5} />
-                      <span>{editingService ? 'Guardar' : 'Crear'}</span>
+                      <Check size={16} strokeWidth={2.5} />
+                      <span>{editingService ? 'Guardar cambios' : 'Crear servicio'}</span>
                     </>
                   )}
                 </motion.button>
@@ -462,10 +461,10 @@ export default function ServiceEditor() {
                   whileTap={{ scale: 0.99 }}
                   onClick={handleCancelEdit}
                   disabled={saving}
-                  className="px-4 py-2 border-2 border-gray-200 text-black rounded-lg font-fira text-xs sm:text-sm font-semibold
-                    hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5"
+                  className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-fira text-sm font-semibold
+                    hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                 >
-                  <X size={14} strokeWidth={2.5} />
+                  <X size={16} strokeWidth={2.5} />
                   <span>Cancelar</span>
                 </motion.button>
               </div>
@@ -474,9 +473,9 @@ export default function ServiceEditor() {
         )}
       </AnimatePresence>
 
-      {/* Lista de servicios - Diseño mejorado */}
+      {/* Lista de servicios */}
       {!isEditing && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <AnimatePresence>
             {services.map((service, index) => {
               const IconComponent = iconMap[service.icon_name] || iconMap['Camera'];
@@ -486,113 +485,78 @@ export default function ServiceEditor() {
                 <motion.div
                   key={service.id || service.slug}
                   layout
-                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8, y: -30 }}
-                  transition={{
-                    delay: index * 0.05,
-                    type: "spring",
-                    stiffness: 200,
-                    damping: 20
-                  }}
-                  whileHover={{ y: -5 }}
-                  className="relative group bg-gradient-to-br from-white to-gray-50
-                    border-2 border-gray-200 rounded-2xl overflow-hidden
-                    hover:border-[#79502A] hover:shadow-2xl transition-all
-                    flex flex-col min-h-[200px]"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="relative bg-white rounded-2xl border border-gray-100 shadow-sm
+                    hover:shadow-md hover:border-gray-200 transition-all duration-200
+                    flex flex-col p-5"
                 >
-                  {/* Patrón decorativo sutil */}
-                  <div className="absolute inset-0 opacity-[0.02]"
-                    style={{
-                      backgroundImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
-                      backgroundSize: '20px 20px'
-                    }}
-                  />
-
-                  {/* Contenido */}
-                  <div className="relative p-5 flex flex-col h-full">
-                    {/* Badge para predeterminados */}
-                    {service.is_default && (
-                      <div className="absolute top-4 right-4">
-                        <div className="px-2.5 py-1 bg-gradient-to-r from-[#79502A] to-[#8B5A2F] rounded-lg shadow-md">
-                          <span className="text-[10px] font-fira font-bold text-white tracking-wide">
-                            PREDETERMINADO
-                          </span>
-                        </div>
+                  {/* Badge para predeterminados */}
+                  {service.is_default && (
+                    <div className="absolute top-4 right-4">
+                      <div className="px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-lg">
+                        <span className="text-[10px] font-fira font-bold text-amber-700 tracking-wide">
+                          PREDETERMINADO
+                        </span>
                       </div>
-                    )}
-
-                    {/* Icon con efecto */}
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl
-                      bg-gradient-to-br from-[#79502A] to-[#8B5A2F]
-                      flex items-center justify-center mb-4 shadow-lg
-                      group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                      <IconComponent
-                        size={24}
-                        className="text-white"
-                        strokeWidth={2}
-                      />
                     </div>
+                  )}
 
-                    {/* Info */}
-                    <div className="flex-1 mb-4">
-                      <h4 className="font-fira text-base sm:text-lg font-bold text-[#79502A] mb-2 leading-tight
-                        group-hover:text-[#8B5A2F] transition-colors">
-                        {service.name}
-                      </h4>
-                      {service.description ? (
-                        <p className="font-fira text-xs sm:text-sm text-black/70 leading-relaxed line-clamp-2">
-                          {service.description}
-                        </p>
-                      ) : (
-                        <p className="font-fira text-xs text-black/40 italic">
-                          {service.is_default ? 'Servicio predeterminado del sistema' : 'Servicio personalizado'}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Actions - Siempre al fondo */}
-                    <div className="flex items-center gap-2 mt-auto">
-                      <motion.button
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => handleEdit(service)}
-                        className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#79502A] to-[#8B5A2F] text-white
-                          rounded-lg font-fira text-xs sm:text-sm font-bold
-                          hover:shadow-lg transition-all flex items-center justify-center gap-2
-                          shadow-md"
-                      >
-                        <Pencil size={14} strokeWidth={2.5} />
-                        <span>Editar</span>
-                      </motion.button>
-                      {!service.is_default && (
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleDelete(service)}
-                          disabled={isDeleting}
-                          className="px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white
-                            rounded-lg font-fira text-xs sm:text-sm font-bold
-                            hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed
-                            flex items-center justify-center shadow-md"
-                        >
-                          {isDeleting ? (
-                            <Loader2 size={14} className="animate-spin" strokeWidth={2.5} />
-                          ) : (
-                            <Trash2 size={14} strokeWidth={2.5} />
-                          )}
-                        </motion.button>
-                      )}
-                    </div>
+                  {/* Icon */}
+                  <div className="w-14 h-14 rounded-xl bg-[#8B5E3C]/10
+                    flex items-center justify-center mb-4">
+                    <IconComponent
+                      size={24}
+                      className="text-[#8B5E3C]"
+                      strokeWidth={2}
+                    />
                   </div>
 
-                  {/* Shimmer effect on hover */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.6 }}
-                  />
+                  {/* Info */}
+                  <div className="flex-1 mb-4">
+                    <h4 className="font-fira text-lg font-bold text-gray-900 mb-2 leading-tight">
+                      {service.name}
+                    </h4>
+                    {service.description ? (
+                      <p className="font-fira text-sm text-gray-600 leading-relaxed line-clamp-2">
+                        {service.description}
+                      </p>
+                    ) : (
+                      <p className="font-fira text-sm text-gray-400 italic">
+                        {service.is_default ? 'Servicio predeterminado' : 'Sin descripción'}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 mt-auto pt-4 border-t border-gray-100">
+                    <button
+                      onClick={() => handleEdit(service)}
+                      className="flex-1 px-4 py-2 bg-gray-50 text-gray-700 border border-gray-200
+                        rounded-lg font-fira text-sm font-semibold
+                        hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Pencil size={14} strokeWidth={2.5} />
+                      <span>Editar</span>
+                    </button>
+                    {!service.is_default && (
+                      <button
+                        onClick={() => handleDelete(service)}
+                        disabled={isDeleting}
+                        className="p-2 text-gray-500 hover:bg-red-50 hover:text-red-600
+                          rounded-lg transition-colors disabled:opacity-50"
+                        title="Eliminar"
+                      >
+                        {isDeleting ? (
+                          <Loader2 size={16} className="animate-spin" strokeWidth={2.5} />
+                        ) : (
+                          <Trash2 size={16} strokeWidth={2.5} />
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </motion.div>
               );
             })}
@@ -603,16 +567,16 @@ export default function ServiceEditor() {
       {/* Estado vacío */}
       {services.length === 0 && !isEditing && (
         <div className="text-center py-20">
-          <AlertCircle size={48} className="text-black/20 mx-auto mb-4" />
-          <p className="font-fira text-base text-black/40 mb-6">
+          <AlertCircle size={48} className="text-gray-300 mx-auto mb-4" />
+          <p className="font-fira text-base text-gray-500 mb-6">
             No hay servicios creados todavía
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowCreateForm(true)}
-            className="px-6 py-3 bg-[#79502A] !text-white rounded-lg font-fira text-sm font-medium
-              inline-flex items-center gap-2"
+            className="px-6 py-3 bg-[#8B5E3C] text-white rounded-lg font-fira text-sm font-semibold
+              inline-flex items-center gap-2 hover:bg-[#6d4a2f] shadow-sm transition-colors"
           >
             <Plus size={20} />
             <span>Crear primer servicio</span>

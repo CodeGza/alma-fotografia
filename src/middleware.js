@@ -69,6 +69,39 @@ export async function middleware(request) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  // Si está logueado, verificar que el usuario esté activo en user_profiles
+  if (data?.user && request.nextUrl.pathname.startsWith('/dashboard')) {
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('is_active, permissions, requires_password_change')
+      .eq('id', data.user.id)
+      .single();
+
+    // Si no se encuentra el perfil o está inactivo, cerrar sesión y redirigir
+    if (profileError || !profile || !profile.is_active) {
+      await supabase.auth.signOut();
+      const redirectUrl = new URL('/auth/login', request.url);
+      redirectUrl.searchParams.set('error', 'cuenta_deshabilitada');
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    // Si requiere cambio de contraseña, redirigir a la página de cambio
+    if (profile.requires_password_change && !request.nextUrl.pathname.startsWith('/dashboard/cambiar-contrasena')) {
+      return NextResponse.redirect(new URL('/dashboard/cambiar-contrasena', request.url));
+    }
+
+    // Validar permisos SOLO para gestión de usuarios
+    const pathname = request.nextUrl.pathname;
+
+    // Solo administradores pueden gestionar usuarios
+    if (pathname.startsWith('/dashboard/configuracion/usuarios') ||
+        pathname.startsWith('/auth/register')) {
+      if (!profile.permissions?.manage_users) {
+        return NextResponse.redirect(new URL('/dashboard?error=sin_permisos', request.url));
+      }
+    }
+  }
+
   // Si está logueado y trata de ir al login, redirigir al dashboard
   if (data?.user && request.nextUrl.pathname === '/auth/login') {
     return NextResponse.redirect(new URL('/dashboard', request.url));
@@ -78,5 +111,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/auth/login'],
+  matcher: ['/dashboard/:path*', '/auth/login', '/auth/register'],
 };

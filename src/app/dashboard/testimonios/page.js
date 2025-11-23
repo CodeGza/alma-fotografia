@@ -285,7 +285,7 @@ export default function TestimoniosPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-xl z-50"
+              className="fixed inset-x-4 top-1/2 min-w-[30vw] -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-xl z-50"
             >
               <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6">
                 <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -470,7 +470,7 @@ function EditTestimonialModal({ testimonial, onClose, onSuccess }) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-2xl z-50 max-h-[90vh] overflow-y-auto"
+        className="fixed inset-x-4 top-1/2 min-w-[30vw] -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-2xl z-50 max-h-[90vh] overflow-y-auto"
       >
         <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6">

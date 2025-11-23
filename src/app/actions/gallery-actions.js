@@ -4,6 +4,7 @@ import { createClient } from '@/lib/server';
 import { revalidatePath } from 'next/cache';
 import { deleteFolderFromCloudinary, deleteBatchFromCloudinary, deleteFromCloudinary } from '@/lib/cloudinary';
 import { notifyGalleryArchived, notifyGalleryDeleted, notifyGalleryRestored } from '@/lib/notifications/notification-helpers';
+import { hasPermission } from '@/lib/permissions';
 
 /**
  * ============================================

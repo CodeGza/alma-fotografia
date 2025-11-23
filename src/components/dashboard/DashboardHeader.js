@@ -30,7 +30,7 @@ export default function DashboardHeader({ title, subtitle, backButton, backHref 
             whileHover={{ x: -4 }}
             whileTap={{ scale: 0.96 }}
             onClick={() => backHref ? router.push(backHref) : router.back()}
-            className="flex items-center gap-2 text-[#8B5E3C] hover:text-white transition-colors duration-200 mb-6 text-sm font-medium"
+            className="flex items-center gap-2 text-[#B89968] hover:text-white transition-colors duration-200 mb-6 text-sm font-medium"
           >
             <ArrowLeft size={18} strokeWidth={2} />
             <span>Atrás</span>

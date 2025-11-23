@@ -42,7 +42,11 @@
       "Bash(.gitignore)",
       "Bash(pnpm approve-builds:*)",
       "Bash(node scripts/generate-favicons.js:*)",
-      "Bash(start:*)"
+      "Bash(start:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(echo:*)",
+      "Bash(check_triggers.sql)"
     ],
     "deny": [],
     "ask": []

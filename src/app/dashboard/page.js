@@ -204,41 +204,28 @@ async function DashboardWidgets() {
     return timeA.localeCompare(timeB);
   });
 
-  const hasPendingBookings = (pendingBookings || []).length > 0;
-
   return (
     <>
-      {/* Reservas Pendientes - Prioridad Alta */}
-      {hasPendingBookings && (
-        <AnimatedSection delay={0.3}>
-          <div className="mb-6">
-            <PendingBookingsWidget initialBookings={pendingBookings || []} />
-          </div>
-        </AnimatedSection>
-      )}
+      {/* Reservas Pendientes - Siempre arriba */}
+      <AnimatedSection delay={0.3}>
+        <div className="mb-6">
+          <PendingBookingsWidget initialBookings={pendingBookings || []} />
+        </div>
+      </AnimatedSection>
 
       {/* Grid de Próximos Eventos y Notificaciones */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <AnimatedSection delay={hasPendingBookings ? 0.4 : 0.3}>
+        <AnimatedSection delay={0.4}>
           <UpcomingEventsWidget events={upcomingEvents} />
         </AnimatedSection>
 
-        <AnimatedSection delay={hasPendingBookings ? 0.5 : 0.4}>
+        <AnimatedSection delay={0.5}>
           <RecentNotificationsWidget notifications={notifications || []} />
         </AnimatedSection>
       </div>
 
-      {/* Reservas Pendientes - Si no hay, mostrar en el grid inferior */}
-      {!hasPendingBookings && (
-        <AnimatedSection delay={0.5}>
-          <div className="mb-6">
-            <PendingBookingsWidget initialBookings={[]} />
-          </div>
-        </AnimatedSection>
-      )}
-
       {/* Storage Card */}
-      <AnimatedSection delay={hasPendingBookings ? 0.6 : 0.6}>
+      <AnimatedSection delay={0.6}>
         <StorageCard />
       </AnimatedSection>
     </>

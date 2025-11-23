@@ -34,7 +34,7 @@ const quickActions = [
     title: 'Perfil',
     description: 'Información personal y contacto',
     href: '/dashboard/configuracion/perfil',
-    disabled: true
+    disabled: false
   },
   {
     icon: Bell,
@@ -55,7 +55,7 @@ const quickActions = [
     title: 'Seguridad',
     description: 'Contraseña y sesiones',
     href: '/dashboard/configuracion/seguridad',
-    disabled: true
+    disabled: false
   },
   {
     icon: Database,

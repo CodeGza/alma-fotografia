@@ -48,6 +48,7 @@ import Link from 'next/link';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import PageTransition from '@/components/dashboard/PageTransition';
 import AnimatedSection from '@/components/dashboard/AnimatedSection';
+import { useSimpleAutoRefresh } from '@/hooks/useAutoRefresh';
 import { useToast } from '@/components/ui/Toast';
 
 // Actions públicas
@@ -95,6 +96,9 @@ export default function AgendaPage() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [processingId, setProcessingId] = useState(null);
   const { showToast } = useToast();
+
+  // Auto-refresh de la agenda cada 10 minutos
+  useSimpleAutoRefresh(10);
 
   // Cargar datos
   useEffect(() => {

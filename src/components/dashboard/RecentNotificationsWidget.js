@@ -1,12 +1,57 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Bell, Heart, Download, Calendar, User, Image as ImageIcon, AlertCircle, CheckCircle } from 'lucide-react';
+import { Bell, Heart, Download, Calendar, User, Image as ImageIcon, AlertCircle, CheckCircle, ExternalLink, Trash2, Check } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
+import { useSimpleAutoRefresh } from '@/hooks/useAutoRefresh';
+import { supabase } from '@/lib/supabaseClient';
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function RecentNotificationsWidget({ notifications = [] }) {
+export default function RecentNotificationsWidget({ notifications: initialNotifications = [] }) {
+  const [notifications, setNotifications] = useState(initialNotifications);
+  const router = useRouter();
+
+  // Auto-refresh cada 10 minutos
+  useSimpleAutoRefresh(10);
+
+  // Eliminar notificación
+  const deleteNotification = useCallback(async (notificationId) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId);
+
+      if (error) throw error;
+
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      router.refresh();
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  }, [router]);
+
+  // Marcar como leída y navegar
+  const handleNotificationClick = useCallback(async (notification) => {
+    if (!notification.read) {
+      try {
+        await supabase
+          .from('notifications')
+          .update({ read: true, read_at: new Date().toISOString() })
+          .eq('id', notification.id);
+      } catch (error) {
+        console.error('Error marking as read:', error);
+      }
+    }
+
+    if (notification.action_url) {
+      router.push(notification.action_url);
+    }
+  }, [router]);
+
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'favorite_added':
@@ -118,9 +163,9 @@ export default function RecentNotificationsWidget({ notifications = [] }) {
             transition={{ delay: index * 0.03 }}
             className={`p-3 rounded-xl border ${
               notification.read
-                ? 'bg-white border-gray-100'
-                : 'bg-amber-50/50 border-amber-100'
-            } hover:border-amber-200 transition-all duration-200`}
+                ? 'bg-gray-50/30 border-gray-100/50'
+                : 'bg-amber-50/20 border-amber-100/50'
+            } hover:border-amber-200/60 transition-all duration-200 group`}
           >
             <div className="flex items-start gap-3">
               <div className={`p-2 ${getNotificationBgColor(notification.type)} rounded-lg flex-shrink-0`}>
@@ -131,9 +176,36 @@ export default function RecentNotificationsWidget({ notifications = [] }) {
                 <p className="font-fira text-sm text-gray-900 leading-relaxed">
                   {notification.message}
                 </p>
-                <p className="font-fira text-xs text-gray-500 mt-1">
-                  {formatTimeAgo(notification.created_at)}
-                </p>
+
+                <div className="flex items-center justify-between mt-2">
+                  <p className="font-fira text-xs text-gray-500">
+                    {formatTimeAgo(notification.created_at)}
+                  </p>
+
+                  {/* Botones de acción - solo visibles al hacer hover */}
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    {notification.action_url && (
+                      <button
+                        onClick={() => handleNotificationClick(notification)}
+                        className="p-1.5 rounded-md text-[#8B5E3C] hover:bg-[#8B5E3C]/10 transition-colors"
+                        title="Ver detalles"
+                      >
+                        <ExternalLink size={14} strokeWidth={2} />
+                      </button>
+                    )}
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteNotification(notification.id);
+                      }}
+                      className="p-1.5 rounded-md text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+                      title="Eliminar"
+                    >
+                      <Trash2 size={14} strokeWidth={2} />
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {!notification.read && (

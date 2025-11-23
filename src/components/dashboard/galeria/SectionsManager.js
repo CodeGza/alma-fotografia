@@ -163,7 +163,7 @@ export default function SectionsManager({ galleryId, onSectionsChange }) {
             onClick={() => setShowCreateForm(true)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-3 py-1.5 bg-[#C6A97D] hover:bg-[#B8985F] text-black rounded-lg transition-colors font-fira text-sm font-semibold"
+            className="!text-black flex items-center gap-2 px-3 py-1.5 bg-[#C6A97D] hover:bg-[#B8985F] text-black rounded-lg transition-colors font-fira text-sm font-semibold"
           >
             <FolderPlus size={16} />
             <span className="hidden sm:inline">Nueva</span>
@@ -224,7 +224,7 @@ export default function SectionsManager({ galleryId, onSectionsChange }) {
               <div className="flex gap-2 pt-2">
                 <button
                   onClick={editingSection ? handleUpdate : handleCreate}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#C6A97D] hover:bg-[#B8985F] text-black rounded-lg transition-colors font-fira text-sm font-semibold"
+                  className="!text-black flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#C6A97D] hover:bg-[#B8985F] text-black rounded-lg transition-colors font-fira text-sm font-semibold"
                 >
                   <Check size={16} />
                   {editingSection ? 'Guardar' : 'Crear'}
@@ -233,7 +233,7 @@ export default function SectionsManager({ galleryId, onSectionsChange }) {
                   onClick={cancelForm}
                   className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors font-fira text-sm"
                 >
-                  <X size={16} />
+                  <X size={16} className='!text-gray-300' />
                 </button>
               </div>
             </div>
@@ -284,7 +284,7 @@ export default function SectionsManager({ galleryId, onSectionsChange }) {
                   </button>
                   <button
                     onClick={() => setDeletingSection(section)}
-                    className="p-1.5 hover:bg-red-500/20 rounded transition-colors"
+                    className="!text-white p-1.5 hover:bg-red-500/20 rounded transition-colors"
                     title="Eliminar"
                   >
                     <Trash2 size={14} className="text-red-400 hover:text-red-300" />
@@ -343,7 +343,7 @@ export default function SectionsManager({ galleryId, onSectionsChange }) {
                   </button>
                   <button
                     onClick={confirmDelete}
-                    className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-sm font-medium"
+                    className="!text-white flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-fira text-sm font-medium"
                   >
                     Eliminar
                   </button>

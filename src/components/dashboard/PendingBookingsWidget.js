@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Clock, User, CheckCircle, XCircle, Loader2, AlertCircle } from 'lucide-react';
 import { confirmPublicBooking, rejectPublicBooking } from '@/app/actions/public-booking-actions';
 import { useToast } from '@/components/ui/Toast';
+import { useSimpleAutoRefresh } from '@/hooks/useAutoRefresh';
 
 export default function PendingBookingsWidget({ initialBookings = [] }) {
   const [bookings, setBookings] = useState(initialBookings);
@@ -13,6 +14,9 @@ export default function PendingBookingsWidget({ initialBookings = [] }) {
   const [rejectingBooking, setRejectingBooking] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
   const { showToast } = useToast();
+
+  // Auto-refresh cada 10 minutos
+  useSimpleAutoRefresh(10);
 
   const handleConfirm = async (booking) => {
     setProcessingId(booking.id);

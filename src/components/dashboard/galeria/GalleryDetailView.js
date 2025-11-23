@@ -1637,7 +1637,7 @@ export default function GalleryDetailView({ gallery }) {
                     <>
                       <button
                         onClick={() => setSelectionMode(true)}
-                        className="px-4 sm:px-5 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center gap-2 whitespace-nowrap flex-shrink-0 shadow-sm text-white"
+                        className="!text-white px-4 sm:px-5 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center gap-2 whitespace-nowrap flex-shrink-0 shadow-sm text-white"
                       >
                         <CheckSquare size={16} />
                         <span>Seleccionar</span>
@@ -1723,7 +1723,7 @@ export default function GalleryDetailView({ gallery }) {
                       <button
                         onClick={saveNewOrder}
                         disabled={savingOrder}
-                        className="px-4 sm:px-5 py-2.5 bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 whitespace-nowrap flex-shrink-0 shadow-sm text-white"
+                        className="!text-white px-4 sm:px-5 py-2.5 bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 font-fira text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 whitespace-nowrap flex-shrink-0 shadow-sm text-white"
                       >
                         {savingOrder ? (
                           <Loader2 size={14} className="animate-spin" />

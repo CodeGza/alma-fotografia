@@ -364,7 +364,7 @@ export default function GalleriesView({ galleries, serviceTypes }) {
 
               <button
                 onClick={clearFilters}
-                className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-full font-fira text-xs font-medium flex items-center gap-1 transition-all duration-200"
+                className=" px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-full font-fira text-xs font-medium flex items-center gap-1 transition-all duration-200"
               >
                 <X size={12} />
                 Limpiar

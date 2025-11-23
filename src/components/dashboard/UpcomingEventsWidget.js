@@ -5,23 +5,27 @@ import { Calendar, Clock, User, MapPin, Briefcase, AlertCircle } from 'lucide-re
 import { format, isToday, isTomorrow, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
+import { useSimpleAutoRefresh } from '@/hooks/useAutoRefresh';
 
 export default function UpcomingEventsWidget({ events = [] }) {
+  // Auto-refresh cada 10 minutos
+  useSimpleAutoRefresh(10);
+
   const getDateLabel = (dateString) => {
     const date = new Date(dateString + 'T00:00:00');
 
     if (isToday(date)) {
-      return { text: 'Hoy', color: 'bg-red-500' };
+      return { text: 'Hoy', color: 'bg-[#8B5E3C]' };
     } else if (isTomorrow(date)) {
-      return { text: 'Mañana', color: 'bg-orange-500' };
+      return { text: 'Mañana', color: 'bg-[#A0522D]' };
     } else {
       const daysAway = differenceInDays(date, new Date());
       if (daysAway <= 7) {
-        return { text: `En ${daysAway}d`, color: 'bg-blue-500' };
+        return { text: `En ${daysAway}d`, color: 'bg-[#C6A97D]' };
       }
       return {
         text: format(date, 'd MMM', { locale: es }),
-        color: 'bg-gray-500'
+        color: 'bg-[#79502A]'
       };
     }
   };
@@ -154,15 +158,6 @@ export default function UpcomingEventsWidget({ events = [] }) {
           </Link>
         </div>
       )}
-
-      <div className="mt-4 pt-4 border-t border-gray-100">
-        <Link
-          href="/dashboard/agenda"
-          className="w-full block text-center px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-[#8B5E3C] rounded-lg font-fira text-sm font-semibold transition-all duration-200"
-        >
-          Ver agenda completa
-        </Link>
-      </div>
     </motion.div>
   );
 }

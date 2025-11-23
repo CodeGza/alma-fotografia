@@ -307,7 +307,7 @@ export default function ServiceTypeSelector({ value, onChange, isPublic, error }
                   disabled={creating || !newServiceName.trim()}
                   className="flex-1 px-4 py-2.5 bg-[#79502A] text-white rounded-lg font-fira text-sm font-semibold
                     disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2
-                    hover:bg-[#8B5A2F] transition-colors shadow-sm"
+                    hover:bg-[#8B5A2F] transition-colors shadow-sm !text-white"
                 >
                   {creating ? (
                     <>

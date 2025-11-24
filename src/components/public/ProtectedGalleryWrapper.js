@@ -13,7 +13,7 @@ import { validateGalleryPassword } from '@/app/actions/password-actions';
  * 2. Si no, muestra PasswordProtection
  * 3. Al validar, guarda en sessionStorage y muestra la galería
  */
-export default function ProtectedGalleryWrapper({ gallery, token }) {
+export default function ProtectedGalleryWrapper({ gallery, token, isPreview = false }) {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
 
@@ -22,6 +22,13 @@ export default function ProtectedGalleryWrapper({ gallery, token }) {
 
   // Verificar si ya fue desbloqueada
   useEffect(() => {
+    // Si es preview mode (desde landing), NO pedir contraseña nunca
+    if (isPreview) {
+      setIsUnlocked(true);
+      setIsChecking(false);
+      return;
+    }
+
     if (!hasPassword) {
       setIsUnlocked(true);
       setIsChecking(false);
@@ -34,7 +41,7 @@ export default function ProtectedGalleryWrapper({ gallery, token }) {
       setIsUnlocked(true);
     }
     setIsChecking(false);
-  }, [hasPassword, storageKey]);
+  }, [hasPassword, storageKey, isPreview]);
 
   const handlePasswordSubmit = async (password) => {
     const result = await validateGalleryPassword(gallery.id, password);
@@ -61,8 +68,8 @@ export default function ProtectedGalleryWrapper({ gallery, token }) {
     );
   }
 
-  // Mostrar protección por contraseña
-  if (hasPassword && !isUnlocked) {
+  // Mostrar protección por contraseña (solo si NO es preview)
+  if (hasPassword && !isUnlocked && !isPreview) {
     return (
       <PasswordProtection
         galleryTitle={gallery.title}
@@ -73,5 +80,5 @@ export default function ProtectedGalleryWrapper({ gallery, token }) {
   }
 
   // Mostrar galería
-  return <PublicGalleryView gallery={gallery} token={token} />;
+  return <PublicGalleryView gallery={gallery} token={token} isPreview={isPreview} />;
 }

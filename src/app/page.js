@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import Header from '@/components/landing/Header';
 import Hero from '@/components/landing/Hero';
 import Servicios from '@/components/landing/Servicios';
 import Testimonios from '@/components/landing/Testimonios';
@@ -12,7 +13,6 @@ import {
   getProfileInfo,
 } from '@/app/actions/landing-actions';
 import { createClient } from '@/lib/server';
-import Link from 'next/link';
 
 export const metadata = {
   title: 'Alma Fotografía | Capturando momentos especiales',
@@ -60,7 +60,6 @@ async function ContactoContent() {
   const { data: services } = await supabase
     .from('service_types')
     .select('id, name')
-    .eq('is_active', true)
     .order('name');
 
   return <Contacto services={services || []} />;
@@ -72,64 +71,12 @@ async function FooterContent() {
   return <Footer profile={profile} />;
 }
 
-// Navegación superior
-function Navigation() {
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#2d2d2d]/95 backdrop-blur-md border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="font-voga text-xl text-white">
-            Alma Fotografía
-          </Link>
-
-          {/* Nav Links */}
-          <div className="hidden md:flex items-center gap-8">
-            <a
-              href="#servicios"
-              className="font-fira text-sm text-gray-300 hover:text-[#B89968] transition-colors"
-            >
-              Servicios
-            </a>
-            <a
-              href="#testimonios"
-              className="font-fira text-sm text-gray-300 hover:text-[#B89968] transition-colors"
-            >
-              Testimonios
-            </a>
-            <a
-              href="#contacto"
-              className="font-fira text-sm text-gray-300 hover:text-[#B89968] transition-colors"
-            >
-              Contacto
-            </a>
-            <Link
-              href="/login"
-              className="px-4 py-2 bg-[#B89968] text-[#2d2d2d] font-fira text-sm font-semibold uppercase tracking-wider hover:bg-[#8B5E3C] transition-colors"
-            >
-              Acceso clientes
-            </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <Link
-            href="/login"
-            className="md:hidden px-4 py-2 bg-[#B89968] text-[#2d2d2d] font-fira text-sm font-semibold"
-          >
-            Acceder
-          </Link>
-        </div>
-      </div>
-    </nav>
-  );
-}
-
 // Página principal
 export default function Home() {
   return (
     <main className="min-h-screen">
-      {/* Navigation */}
-      <Navigation />
+      {/* Header */}
+      <Header />
 
       {/* Hero Section */}
       <Hero />

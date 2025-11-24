@@ -29,7 +29,7 @@ export const revalidate = 300;
 /**
  * GalleryContent - Componente que carga los datos
  */
-async function GalleryContent({ slug, token }) {
+async function GalleryContent({ slug, token, isPreview }) {
   // ✅ Validar token y obtener galería (TODO en getGalleryWithToken)
   const result = await getGalleryWithToken(slug, token);
 
@@ -71,6 +71,7 @@ async function GalleryContent({ slug, token }) {
         sections: sections || [],
       }}
       token={token}
+      isPreview={isPreview}
     />
   );
 }
@@ -82,6 +83,7 @@ export default async function PublicGalleryPage({ params, searchParams }) {
   const { slug } = await params;
   const resolvedSearchParams = await searchParams;
   const token = resolvedSearchParams.token;
+  const isPreview = resolvedSearchParams.preview === 'true';
 
   // Validación básica
   if (!token) {
@@ -90,7 +92,7 @@ export default async function PublicGalleryPage({ params, searchParams }) {
 
   return (
     <Suspense fallback={<PublicGallerySkeleton />}>
-      <GalleryContent slug={slug} token={token} />
+      <GalleryContent slug={slug} token={token} isPreview={isPreview} />
     </Suspense>
   );
 }

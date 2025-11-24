@@ -90,7 +90,7 @@ export default function PasswordProtection({ galleryTitle, coverImage, onPasswor
                   }}
                   placeholder="Ingresa la contraseña"
                   disabled={isValidating}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg font-fira text-sm text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg font-fira text-sm !text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#79502A] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                   autoFocus
                 />
                 <button

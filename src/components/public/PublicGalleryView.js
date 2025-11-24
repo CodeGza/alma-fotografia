@@ -52,6 +52,7 @@ const PhotoGrid = memo(({
   isSelectingFavorites,
   tempFavoriteIds,
   onToggleTemp,
+  isPreview = false,
 }) => {
   return (
     <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
@@ -113,8 +114,8 @@ const PhotoGrid = memo(({
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
               )}
 
-              {/* Botones de favorito y descarga (ocultos en modo selección) */}
-              {!isSelectingFavorites && (
+              {/* Botones de favorito y descarga (ocultos en modo selección y en preview) */}
+              {!isSelectingFavorites && !isPreview && (
                 <>
                   {/* Botón de favorito - solo si maxFavorites > 0 */}
                   {maxFavorites > 0 && (
@@ -170,7 +171,7 @@ PhotoGrid.displayName = 'PhotoGrid';
 /**
  * Componente principal - Vista pública tipo Pixieset
  */
-export default function PublicGalleryView({ gallery, token, isFavoritesView = false }) {
+export default function PublicGalleryView({ gallery, token, isFavoritesView = false, isPreview = false }) {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [clientEmail, setClientEmail] = useState('');
   const [clientName, setClientName] = useState('');
@@ -1212,14 +1213,16 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
                 </>
               ) : (
                 <>
-                  {/* Botones Desktop - Ocultos en mobile */}
-                  <button
-                    onClick={() => setShowShareModal(true)}
-                    className="hidden sm:flex p-1.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors"
-                    title="Compartir"
-                  >
-                    <Share2 size={16} className="text-black/70 sm:w-[18px] sm:h-[18px]" strokeWidth={1.5} />
-                  </button>
+                  {/* Botones Desktop - Ocultos en mobile y en modo preview */}
+                  {!isPreview && (
+                    <button
+                      onClick={() => setShowShareModal(true)}
+                      className="hidden sm:flex p-1.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors"
+                      title="Compartir"
+                    >
+                      <Share2 size={16} className="text-black/70 sm:w-[18px] sm:h-[18px]" strokeWidth={1.5} />
+                    </button>
+                  )}
 
               <button
                 onClick={toggleSlideshow}
@@ -1233,7 +1236,7 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
                 )}
               </button>
 
-              {customMessage && (
+              {!isPreview && customMessage && (
                 <button
                   onClick={handleOpenMessage}
                   className="hidden sm:flex relative p-1.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors"
@@ -1246,8 +1249,8 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
                 </button>
               )}
 
-              {/* Botón de favoritas - Modo selección */}
-              {maxFavorites > 0 && !isSelectingFavorites && (
+              {/* Botón de favoritas - Modo selección (oculto en preview) */}
+              {!isPreview && maxFavorites > 0 && !isSelectingFavorites && (
                 <button
                   onClick={() => {
                     if (!clientEmail) {
@@ -1274,8 +1277,8 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
                 </button>
               )}
 
-              {/* Botón de descargas - Desktop */}
-              {allowDownloads && (
+              {/* Botón de descargas - Desktop (oculto en preview) */}
+              {!isPreview && allowDownloads && (
                 <button
                   onClick={() => {
                     if (downloadEnabled) {
@@ -1325,8 +1328,8 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
                 </button>
               )}
 
-              {/* Botón de testimonio - Desktop */}
-              {allowComments && (
+              {/* Botón de testimonio - Desktop (oculto en preview) */}
+              {!isPreview && allowComments && (
                 <motion.button
                   onClick={() => setShowTestimonialModal(true)}
                   className="hidden sm:flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-transparent border border-[#79502A] hover:bg-[#79502A]/5 text-[#79502A] rounded-full transition-all"
@@ -1341,8 +1344,9 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
               </>
               )}
 
-              {/* Menú de tres puntos - Solo mobile */}
-              <div className="relative sm:hidden" ref={mobileMenuRef}>
+              {/* Menú de tres puntos - Solo mobile (oculto en preview) */}
+              {!isPreview && (
+                <div className="relative sm:hidden" ref={mobileMenuRef}>
                 <button
                   onClick={() => setShowMobileMenu(!showMobileMenu)}
                   className="p-1.5 hover:bg-black/5 rounded-full transition-colors"
@@ -1429,6 +1433,7 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
                   )}
                 </AnimatePresence>
               </div>
+              )}
             </div>
           </div>
         </motion.header>
@@ -1556,6 +1561,7 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
                           isSelectingFavorites={isSelectingFavorites}
                           tempFavoriteIds={tempFavoriteIds}
                           onToggleTemp={handleToggleTemp}
+                          isPreview={isPreview}
                         />
                       )}
                     </div>
@@ -1579,6 +1585,7 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
             isSelectingFavorites={isSelectingFavorites}
             tempFavoriteIds={tempFavoriteIds}
             onToggleTemp={handleToggleTemp}
+            isPreview={isPreview}
           />
         )}
       </main>
@@ -2061,24 +2068,26 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
               </span>
             </div>
 
-            {/* Botón favorito */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleToggleFavorite(selectedPhoto.id);
-              }}
-              className={`absolute bottom-6 left-6 p-3 rounded-full transition-all z-10 ${
-                favoritePhotoIds.includes(selectedPhoto.id)
-                  ? 'bg-white'
-                  : 'bg-white/10 hover:bg-white/20'
-              }`}
-            >
-              <Heart
-                size={20}
-                strokeWidth={1.5}
-                className={favoritePhotoIds.includes(selectedPhoto.id) ? 'fill-rose-500 text-rose-500' : 'text-white'}
-              />
-            </button>
+            {/* Botón favorito (oculto en preview) */}
+            {!isPreview && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleFavorite(selectedPhoto.id);
+                }}
+                className={`absolute bottom-6 left-6 p-3 rounded-full transition-all z-10 ${
+                  favoritePhotoIds.includes(selectedPhoto.id)
+                    ? 'bg-white'
+                    : 'bg-white/10 hover:bg-white/20'
+                }`}
+              >
+                <Heart
+                  size={20}
+                  strokeWidth={1.5}
+                  className={favoritePhotoIds.includes(selectedPhoto.id) ? 'fill-rose-500 text-rose-500' : 'text-white'}
+                />
+              </button>
+            )}
 
             {/* Navegación */}
             {selectedPhoto.index > 0 && (

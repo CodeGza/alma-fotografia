@@ -785,21 +785,42 @@ export default function CreateGalleryForm() {
                     className="space-y-3 sm:space-y-4"
                 >
                     {/* Galería pública */}
-                    <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-300">
-                        <input
-                            type="checkbox"
-                            id="isPublic"
-                            {...register('isPublic')}
-                            className="mt-1 w-5 h-5 accent-[#79502A] cursor-pointer flex-shrink-0"
-                        />
-                        <label htmlFor="isPublic" className="flex-1 cursor-pointer">
-                            <p className="font-fira text-sm font-medium text-black">
-                                Galería pública
-                            </p>
-                            <p className="font-fira text-xs text-black/60 mt-1">
-                                Aparecerá en tu portafolio público
-                            </p>
-                        </label>
+                    <div className="space-y-3">
+                        <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-300">
+                            <input
+                                type="checkbox"
+                                id="isPublic"
+                                {...register('isPublic')}
+                                className="mt-1 w-5 h-5 accent-[#79502A] cursor-pointer flex-shrink-0"
+                            />
+                            <label htmlFor="isPublic" className="flex-1 cursor-pointer">
+                                <p className="font-fira text-sm font-medium text-black">
+                                    Galería pública
+                                </p>
+                                <p className="font-fira text-xs text-black/60 mt-1">
+                                    Aparecerá en tu portafolio público
+                                </p>
+                            </label>
+                        </div>
+
+                        {/* Mensaje de advertencia cuando es pública */}
+                        {watch('isPublic') && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg"
+                            >
+                                <Info size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                                <div className="flex-1">
+                                    <p className="font-fira text-sm font-medium text-amber-900 mb-1">
+                                        Recomendación de seguridad
+                                    </p>
+                                    <p className="font-fira text-xs text-amber-800 leading-relaxed">
+                                        Se recomienda establecer una contraseña para esta galería. De esta forma, solo usuarios con el enlace directo desde tu portafolio podrán ver las fotos, pero no podrán acceder a funciones como descargas o favoritos sin la contraseña.
+                                    </p>
+                                </div>
+                            </motion.div>
+                        )}
                     </div>
 
                     {/* Permitir descargas */}

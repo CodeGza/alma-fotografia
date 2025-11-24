@@ -47,7 +47,9 @@
       "Bash(find:*)",
       "Bash(echo:*)",
       "Bash(check_triggers.sql)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(powershell:*)",
+      "Bash(npm cache clean:*)"
     ],
     "deny": [],
     "ask": []

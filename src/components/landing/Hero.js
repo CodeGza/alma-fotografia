@@ -45,8 +45,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-fira text-lg sm:text-xl text-gray-700 max-w-2xl mx-auto mb-12 leading-relaxed"
           >
-            Capturamos los momentos más especiales de tu vida con sensibilidad,
-            profesionalismo y una mirada artística única
+            Capturamos pedacitos de vida para que puedas recordarlos siempre que sientas esa nostalgia en el corazón.
           </motion.p>
 
           {/* Features */}

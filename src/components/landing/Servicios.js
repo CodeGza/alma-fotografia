@@ -1,69 +1,98 @@
 'use client';
 
+/**
+ * Servicios - Component
+ *
+ * Grid de servicios con lightbox interactivo
+ * Muestra galerías públicas con animaciones
+ */
+
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { X, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function Servicios({ services }) {
-  const [selectedGallery, setSelectedGallery] = useState(null);
-  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [lightboxData, setLightboxData] = useState(null);
 
-  return (
-    <section id="servicios" className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
+  const openLightbox = (gallery, photoIndex = 0) => {
+    setLightboxData({ gallery, photoIndex });
+  };
+
+  const closeLightbox = () => {
+    setLightboxData(null);
+  };
+
+  // Si no hay servicios
+  if (!services || services.length === 0) {
+    return (
+      <section id="servicios" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-voga text-4xl sm:text-5xl text-gray-900 mb-4">
             Nuestros Servicios
           </h2>
           <div className="w-20 h-1 bg-gradient-to-r from-[#8B5E3C] to-[#B89968] mx-auto rounded-full mb-6" />
-          <p className="font-fira text-gray-600 max-w-2xl mx-auto">
-            Cada sesión es única y personalizada para capturar la esencia de tus momentos especiales
+          <p className="font-fira text-gray-600">
+            Próximamente publicaremos nuestras galerías
           </p>
-        </motion.div>
-
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-              index={index}
-              onViewGallery={() => setSelectedGallery(service.gallery)}
-            />
-          ))}
         </div>
-      </div>
+      </section>
+    );
+  }
+
+  return (
+    <>
+      <section id="servicios" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="font-voga text-4xl sm:text-5xl text-gray-900 mb-4">
+              Nuestros Servicios
+            </h2>
+            <div className="w-20 h-1 bg-gradient-to-r from-[#8B5E3C] to-[#B89968] mx-auto rounded-full mb-6" />
+            <p className="font-fira text-gray-600 max-w-2xl mx-auto">
+              Cada sesión es única y personalizada para capturar la esencia de tus momentos especiales
+            </p>
+          </motion.div>
+
+          {/* Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, index) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                index={index}
+                onOpenLightbox={openLightbox}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Lightbox Modal */}
       <AnimatePresence>
-        {selectedGallery && (
-          <GalleryLightbox
-            gallery={selectedGallery}
-            onClose={() => {
-              setSelectedGallery(null);
-              setSelectedPhoto(null);
-            }}
-            selectedPhoto={selectedPhoto}
-            onSelectPhoto={setSelectedPhoto}
+        {lightboxData && (
+          <Lightbox
+            gallery={lightboxData.gallery}
+            initialIndex={lightboxData.photoIndex}
+            onClose={closeLightbox}
           />
         )}
       </AnimatePresence>
-    </section>
+    </>
   );
 }
 
 // Service Card Component
-function ServiceCard({ service, index, onViewGallery }) {
+function ServiceCard({ service, index, onOpenLightbox }) {
   const gallery = service.gallery;
+  const photos = gallery?.photos || [];
 
   return (
     <motion.div
@@ -71,13 +100,15 @@ function ServiceCard({ service, index, onViewGallery }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative bg-gray-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500"
+      whileHover={{ y: -5 }}
+      className="group relative bg-gray-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer"
+      onClick={() => photos.length > 0 && onOpenLightbox(gallery, 0)}
     >
       {/* Cover Image */}
       <div className="relative h-64 overflow-hidden">
-        {gallery?.cover_photo ? (
+        {gallery?.cover_image ? (
           <Image
-            src={gallery.cover_photo.cloudinary_url}
+            src={gallery.cover_image}
             alt={gallery.title}
             fill
             className="object-cover group-hover:scale-110 transition-transform duration-700"
@@ -91,22 +122,19 @@ function ServiceCard({ service, index, onViewGallery }) {
           </div>
         )}
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Overlay en hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
+          <p className="font-fira text-white text-sm">
+            Ver galería completa →
+          </p>
+        </div>
       </div>
 
       {/* Content */}
       <div className="p-6">
-        <div className="flex items-center gap-3 mb-3">
-          {service.icon_name && (
-            <div className="w-10 h-10 rounded-full bg-[#8B5E3C]/10 flex items-center justify-center">
-              <span className="text-xl">{getServiceIcon(service.icon_name)}</span>
-            </div>
-          )}
-          <h3 className="font-voga text-2xl text-gray-900">
-            {service.name}
-          </h3>
-        </div>
+        <h3 className="font-voga text-2xl text-gray-900 mb-2">
+          {service.name}
+        </h3>
 
         {gallery?.description && (
           <p className="font-fira text-sm text-gray-600 mb-4 line-clamp-2">
@@ -114,54 +142,34 @@ function ServiceCard({ service, index, onViewGallery }) {
           </p>
         )}
 
-        {/* Photo Count */}
-        {gallery?.photos && (
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-fira text-xs text-gray-500">
-              {gallery.photos.length} fotos
-            </span>
-          </div>
-        )}
-
-        {/* View Gallery Button */}
-        {gallery && (
-          <button
-            onClick={onViewGallery}
-            className="w-full px-4 py-2.5 bg-[#8B5E3C] text-white rounded-lg font-fira text-sm font-semibold hover:bg-[#6d4a2f] transition-colors duration-300 flex items-center justify-center gap-2 group"
-          >
-            Ver galería
-            <ExternalLink
-              size={16}
-              className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
-            />
-          </button>
+        {photos.length > 0 && (
+          <p className="font-fira text-xs text-gray-500">
+            {photos.length} {photos.length === 1 ? 'foto' : 'fotos'}
+          </p>
         )}
       </div>
     </motion.div>
   );
 }
 
-// Gallery Lightbox Component
-function GalleryLightbox({ gallery, onClose, selectedPhoto, onSelectPhoto }) {
+// Lightbox Component con keyboard navigation
+function Lightbox({ gallery, initialIndex, onClose }) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const photos = gallery.photos || [];
-  const currentIndex = selectedPhoto
-    ? photos.findIndex((p) => p.id === selectedPhoto.id)
-    : -1;
 
-  const showPhoto = (photo) => {
-    onSelectPhoto(photo);
+  // Keyboard navigation
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') onClose();
+    if (e.key === 'ArrowLeft') prevPhoto();
+    if (e.key === 'ArrowRight') nextPhoto();
   };
 
   const nextPhoto = () => {
-    if (currentIndex < photos.length - 1) {
-      showPhoto(photos[currentIndex + 1]);
-    }
+    setCurrentIndex((prev) => (prev + 1) % photos.length);
   };
 
   const prevPhoto = () => {
-    if (currentIndex > 0) {
-      showPhoto(photos[currentIndex - 1]);
-    }
+    setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length);
   };
 
   return (
@@ -171,6 +179,10 @@ function GalleryLightbox({ gallery, onClose, selectedPhoto, onSelectPhoto }) {
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
       onClick={onClose}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="dialog"
+      aria-label="Galería de fotos"
     >
       {/* Close Button */}
       <button
@@ -186,99 +198,52 @@ function GalleryLightbox({ gallery, onClose, selectedPhoto, onSelectPhoto }) {
         <h3 className="font-voga text-2xl text-white">{gallery.title}</h3>
       </div>
 
-      {/* Content */}
-      <div
-        className="w-full max-w-7xl"
+      {/* Photo */}
+      <motion.div
+        key={currentIndex}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="relative w-full max-w-6xl aspect-[4/3]"
         onClick={(e) => e.stopPropagation()}
       >
-        {selectedPhoto ? (
-          // Single Photo View
-          <div className="relative">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="relative w-full h-[80vh] flex items-center justify-center"
-            >
-              <Image
-                src={selectedPhoto.cloudinary_url}
-                alt={selectedPhoto.file_name}
-                fill
-                className="object-contain"
-                sizes="100vw"
-                priority
-              />
-            </motion.div>
+        <Image
+          src={photos[currentIndex]?.cloudinary_url}
+          alt={photos[currentIndex]?.file_name || 'Foto'}
+          fill
+          className="object-contain"
+          sizes="100vw"
+          priority
+        />
+      </motion.div>
 
-            {/* Navigation Arrows */}
-            {currentIndex > 0 && (
-              <button
-                onClick={prevPhoto}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                aria-label="Foto anterior"
-              >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-            )}
-            {currentIndex < photos.length - 1 && (
-              <button
-                onClick={nextPhoto}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                aria-label="Siguiente foto"
-              >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            )}
+      {/* Navigation Arrows */}
+      {photos.length > 1 && (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); prevPhoto(); }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            aria-label="Foto anterior"
+          >
+            <ChevronLeft size={24} className="text-white" />
+          </button>
 
-            {/* Photo Counter */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm">
-              <span className="font-fira text-sm text-white">
-                {currentIndex + 1} / {photos.length}
-              </span>
-            </div>
-          </div>
-        ) : (
-          // Grid View
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[80vh] overflow-y-auto p-4">
-            {photos.map((photo) => (
-              <motion.div
-                key={photo.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative aspect-square cursor-pointer group"
-                onClick={() => showPhoto(photo)}
-              >
-                <Image
-                  src={photo.cloudinary_url}
-                  alt={photo.file_name}
-                  fill
-                  className="object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg" />
-              </motion.div>
-            ))}
-          </div>
-        )}
+          <button
+            onClick={(e) => { e.stopPropagation(); nextPhoto(); }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            aria-label="Siguiente foto"
+          >
+            <ChevronRight size={24} className="text-white" />
+          </button>
+        </>
+      )}
+
+      {/* Counter */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm">
+        <span className="font-fira text-sm text-white">
+          {currentIndex + 1} / {photos.length}
+        </span>
       </div>
     </motion.div>
   );
-}
-
-// Helper function to get icon emoji
-function getServiceIcon(iconName) {
-  const icons = {
-    'Wedding': '💒',
-    'Portrait': '👤',
-    'Event': '🎉',
-    'Family': '👨‍👩‍👧‍👦',
-    'Maternity': '🤰',
-    'Newborn': '👶',
-    'Birthday': '🎂',
-    'Corporate': '💼',
-  };
-  return icons[iconName] || '📸';
 }

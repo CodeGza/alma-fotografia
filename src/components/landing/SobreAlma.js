@@ -1,41 +1,37 @@
-'use client';
-
+import { getProfileInfo } from '@/lib/server-actions';
 import { motion } from 'framer-motion';
 import { Heart, Camera, Sparkles, Instagram, Facebook } from 'lucide-react';
 import Image from 'next/image';
 
-export default function SobreAlma({ profile }) {
+/**
+ * Sobre Alma - Server Component
+ *
+ * Sección biográfica con información de Fernanda
+ * Layout 2 columnas: foto + bio + features + redes
+ */
+
+export default async function SobreAlmaServer() {
+  const { profile } = await getProfileInfo();
+
   return (
-    <section className="py-20 bg-white">
+    <section id="sobre-alma" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Column - Image */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative"
-          >
+          {/* Left Column - Imagen placeholder */}
+          <div className="relative">
             <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#8B5E3C]/20 to-[#B89968]/20" />
-              {/* Placeholder for photographer photo - replace with actual image */}
+              {/* Placeholder - reemplazar con foto real */}
               <div className="w-full h-full bg-gradient-to-br from-[#8B5E3C]/10 to-[#B89968]/10 flex items-center justify-center">
                 <Camera size={80} className="text-[#8B5E3C]/30" />
               </div>
             </div>
 
-            {/* Decorative element */}
+            {/* Elemento decorativo */}
             <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#B89968]/20 rounded-full blur-2xl -z-10" />
-          </motion.div>
+          </div>
 
           {/* Right Column - Content */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
+          <div>
             <h2 className="font-voga text-4xl sm:text-5xl text-gray-900 mb-4">
               Sobre Alma Fotografía
             </h2>
@@ -81,6 +77,7 @@ export default function SobreAlma({ profile }) {
             {/* Social Links */}
             <div className="flex items-center gap-4">
               <span className="font-fira text-sm text-gray-600">Seguime en:</span>
+
               {profile?.instagram && (
                 <a
                   href={`https://instagram.com/${profile.instagram.replace('@', '')}`}
@@ -92,6 +89,7 @@ export default function SobreAlma({ profile }) {
                   <Instagram size={18} className="text-[#8B5E3C] group-hover:scale-110 transition-transform" />
                 </a>
               )}
+
               {profile?.facebook && (
                 <a
                   href={`https://facebook.com/${profile.facebook}`}
@@ -103,6 +101,7 @@ export default function SobreAlma({ profile }) {
                   <Facebook size={18} className="text-[#8B5E3C] group-hover:scale-110 transition-transform" />
                 </a>
               )}
+
               {profile?.tiktok && (
                 <a
                   href={`https://tiktok.com/@${profile.tiktok.replace('@', '')}`}
@@ -117,7 +116,7 @@ export default function SobreAlma({ profile }) {
                 </a>
               )}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

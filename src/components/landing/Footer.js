@@ -1,10 +1,16 @@
-'use client';
-
-import { motion } from 'framer-motion';
+import { getProfileInfo } from '@/lib/server-actions';
 import { Heart, Instagram, Facebook, Mail, Phone } from 'lucide-react';
 import Link from 'next/link';
 
-export default function Footer({ profile }) {
+/**
+ * Footer - Server Component
+ *
+ * Footer profesional con datos del perfil
+ * 3 columnas: Brand, Enlaces, Contacto
+ */
+
+export default async function FooterServer() {
+  const { profile } = await getProfileInfo();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -12,28 +18,18 @@ export default function Footer({ profile }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Brand Column */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
+          <div>
             <h3 className="font-voga text-2xl mb-3">
               Alma Fotografía
             </h3>
             <p className="font-fira text-sm text-white/70 leading-relaxed">
-              Capturando momentos especiales con sensibilidad y arte.
-              Tu historia merece ser contada.
+              Capturamos pedacitos de vida para que puedas recordarlos siempre
+              que sientas esa nostalgia en el corazón.
             </p>
-          </motion.div>
+          </div>
 
           {/* Quick Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
+          <div>
             <h4 className="font-fira text-sm font-semibold mb-4 text-white/90">
               Enlaces rápidos
             </h4>
@@ -56,6 +52,14 @@ export default function Footer({ profile }) {
               </li>
               <li>
                 <a
+                  href="#sobre-alma"
+                  className="font-fira text-sm text-white/70 hover:text-white transition-colors"
+                >
+                  Sobre Alma
+                </a>
+              </li>
+              <li>
+                <a
                   href="#contacto"
                   className="font-fira text-sm text-white/70 hover:text-white transition-colors"
                 >
@@ -71,42 +75,16 @@ export default function Footer({ profile }) {
                 </Link>
               </li>
             </ul>
-          </motion.div>
+          </div>
 
           {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
+          <div>
             <h4 className="font-fira text-sm font-semibold mb-4 text-white/90">
               Contacto
             </h4>
 
-            <div className="space-y-3 mb-4">
-              {profile?.email && (
-                <a
-                  href={`mailto:${profile.email}`}
-                  className="flex items-center gap-2 font-fira text-sm text-white/70 hover:text-white transition-colors"
-                >
-                  <Mail size={16} />
-                  <span>{profile.email}</span>
-                </a>
-              )}
-              {profile?.phone && (
-                <a
-                  href={`tel:${profile.phone}`}
-                  className="flex items-center gap-2 font-fira text-sm text-white/70 hover:text-white transition-colors"
-                >
-                  <Phone size={16} />
-                  <span>{profile.phone}</span>
-                </a>
-              )}
-            </div>
-
             {/* Social Links */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-4">
               {profile?.instagram && (
                 <a
                   href={`https://instagram.com/${profile.instagram.replace('@', '')}`}
@@ -118,6 +96,7 @@ export default function Footer({ profile }) {
                   <Instagram size={16} className="group-hover:scale-110 transition-transform" />
                 </a>
               )}
+
               {profile?.facebook && (
                 <a
                   href={`https://facebook.com/${profile.facebook}`}
@@ -129,6 +108,7 @@ export default function Footer({ profile }) {
                   <Facebook size={16} className="group-hover:scale-110 transition-transform" />
                 </a>
               )}
+
               {profile?.tiktok && (
                 <a
                   href={`https://tiktok.com/@${profile.tiktok.replace('@', '')}`}
@@ -143,7 +123,11 @@ export default function Footer({ profile }) {
                 </a>
               )}
             </div>
-          </motion.div>
+
+            <p className="font-fira text-xs text-white/60 leading-relaxed">
+              Montevideo, Uruguay
+            </p>
+          </div>
         </div>
 
         {/* Divider */}

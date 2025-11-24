@@ -1,10 +1,30 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Send, User, Mail, Phone, Calendar, Clock, MessageSquare, CheckCircle, AlertCircle } from 'lucide-react';
+/**
+ * Contacto - Client Component
+ *
+ * Formulario de reserva pública con validación
+ * Integra con API /api/public-booking que valida disponibilidad
+ */
 
-export default function Contacto({ services, onSubmit }) {
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Send,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  Clock,
+  MessageSquare,
+  CheckCircle,
+  AlertCircle,
+  Loader2
+} from 'lucide-react';
+import { getActiveServices } from '@/lib/server-actions';
+
+export default function ContactoClient() {
+  const [services, setServices] = useState([]);
   const [formData, setFormData] = useState({
     serviceTypeId: '',
     clientName: '',
@@ -19,15 +39,23 @@ export default function Contacto({ services, onSubmit }) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  // Cargar servicios al montar
+  useEffect(() => {
+    getActiveServices().then(({ services }) => {
+      setServices(services || []);
+    });
+  }, []);
+
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    setError('');
+    setError(''); // Limpiar error al escribir
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess(false);
 
     try {
       const response = await fetch('/api/public-booking', {
@@ -44,6 +72,7 @@ export default function Contacto({ services, onSubmit }) {
         return;
       }
 
+      // Éxito
       setSuccess(true);
       setFormData({
         serviceTypeId: '',
@@ -55,10 +84,11 @@ export default function Contacto({ services, onSubmit }) {
         message: '',
       });
 
-      setTimeout(() => {
-        setSuccess(false);
-      }, 5000);
+      // Auto-ocultar mensaje de éxito después de 5s
+      setTimeout(() => setSuccess(false), 5000);
+
     } catch (err) {
+      console.error('Error submitting form:', err);
       setError('Error al enviar la reserva. Por favor intentá de nuevo.');
     } finally {
       setLoading(false);
@@ -173,7 +203,7 @@ export default function Contacto({ services, onSubmit }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block font-fira text-sm font-semibold text-gray-700 mb-2">
-                  Fecha del evento
+                  Fecha del evento (opcional)
                 </label>
                 <div className="relative">
                   <Calendar size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -181,6 +211,7 @@ export default function Contacto({ services, onSubmit }) {
                     type="date"
                     value={formData.eventDate}
                     onChange={(e) => handleChange('eventDate', e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
                     className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#8B5E3C] focus:ring-2 focus:ring-[#8B5E3C]/10 font-fira text-sm text-gray-900 transition-all"
                   />
                 </div>
@@ -188,7 +219,7 @@ export default function Contacto({ services, onSubmit }) {
 
               <div>
                 <label className="block font-fira text-sm font-semibold text-gray-700 mb-2">
-                  Hora estimada
+                  Hora estimada (opcional)
                 </label>
                 <div className="relative">
                   <Clock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -205,7 +236,7 @@ export default function Contacto({ services, onSubmit }) {
             {/* Message */}
             <div>
               <label className="block font-fira text-sm font-semibold text-gray-700 mb-2">
-                Mensaje adicional
+                Mensaje adicional (opcional)
               </label>
               <div className="relative">
                 <MessageSquare size={18} className="absolute left-3 top-3 text-gray-400" />
@@ -224,9 +255,9 @@ export default function Contacto({ services, onSubmit }) {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3"
+                className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3"
               >
-                <AlertCircle size={20} className="text-red-600 flex-shrink-0" />
+                <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
                 <p className="font-fira text-sm text-red-800">{error}</p>
               </motion.div>
             )}
@@ -236,33 +267,40 @@ export default function Contacto({ services, onSubmit }) {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3"
+                className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3"
               >
-                <CheckCircle size={20} className="text-green-600 flex-shrink-0" />
-                <p className="font-fira text-sm text-green-800">
-                  ¡Reserva enviada! Me pondré en contacto con vos a la brevedad.
-                </p>
+                <CheckCircle size={20} className="text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-fira text-sm text-green-800 font-semibold mb-1">
+                    ¡Reserva enviada con éxito!
+                  </p>
+                  <p className="font-fira text-xs text-green-700">
+                    Me pondré en contacto con vos a la brevedad para confirmar los detalles.
+                  </p>
+                </div>
               </motion.div>
             )}
 
             {/* Submit Button */}
-            <button
+            <motion.button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3.5 bg-[#8B5E3C] text-white rounded-lg font-fira text-sm font-semibold hover:bg-[#6d4a2f] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 group"
+              whileHover={{ scale: loading ? 1 : 1.02 }}
+              whileTap={{ scale: loading ? 1 : 0.98 }}
+              className="w-full px-6 py-3.5 bg-[#8B5E3C] text-white rounded-lg font-fira text-sm font-semibold hover:bg-[#6d4a2f] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <Loader2 size={18} className="animate-spin" />
                   <span>Enviando...</span>
                 </>
               ) : (
                 <>
-                  <Send size={18} className="group-hover:translate-x-0.5 transition-transform" />
+                  <Send size={18} />
                   <span>Enviar solicitud</span>
                 </>
               )}
-            </button>
+            </motion.button>
           </form>
         </motion.div>
       </div>

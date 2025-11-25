@@ -234,13 +234,11 @@ function ClientFavoritesSection({
           const photoUrl = photo.cloudinary_url || photo.file_path;
           let fetchUrl = photoUrl;
 
+          // Forzar formato JPG en Cloudinary para todas las fotos
           if (fetchUrl.includes('res.cloudinary.com')) {
             const urlParts = fetchUrl.split('/upload/');
             if (urlParts.length === 2) {
-              const isPNG = urlParts[1].toLowerCase().includes('.png') ||
-                photo.file_name?.toLowerCase().endsWith('.png');
-              const format = isPNG ? 'png' : 'jpg';
-              fetchUrl = `${urlParts[0]}/upload/q_100,f_${format}/${urlParts[1]}`;
+              fetchUrl = `${urlParts[0]}/upload/q_100,f_jpg/${urlParts[1]}`;
             }
           }
 
@@ -248,8 +246,7 @@ function ClientFavoritesSection({
           if (!response.ok) throw new Error('Error al obtener la imagen');
 
           const blob = await response.blob();
-          const extension = photo.file_name?.split('.').pop() || 'jpg';
-          const fileName = `seleccionadas_${gallerySlug}_${photoIndex}.${extension}`;
+          const fileName = `seleccionadas_${gallerySlug}_${photoIndex}.jpg`;
 
           zip.file(fileName, blob);
           photoIndex++;
@@ -1181,13 +1178,11 @@ export default function FavoritesView({ gallery, favoritesByClient }) {
             const photoUrl = photo.cloudinary_url || photo.file_path;
             let fetchUrl = photoUrl;
 
+            // Forzar formato JPG en Cloudinary
             if (fetchUrl.includes('res.cloudinary.com')) {
               const urlParts = fetchUrl.split('/upload/');
               if (urlParts.length === 2) {
-                const isPNG = urlParts[1].toLowerCase().includes('.png') ||
-                  photo.file_name?.toLowerCase().endsWith('.png');
-                const format = isPNG ? 'png' : 'jpg';
-                fetchUrl = `${urlParts[0]}/upload/q_100,f_${format}/${urlParts[1]}`;
+                fetchUrl = `${urlParts[0]}/upload/q_100,f_jpg/${urlParts[1]}`;
               }
             }
 
@@ -1195,8 +1190,7 @@ export default function FavoritesView({ gallery, favoritesByClient }) {
             if (!response.ok) throw new Error('Error al obtener la imagen');
 
             const blob = await response.blob();
-            const extension = photo.file_name?.split('.').pop() || 'jpg';
-            const fileName = `foto_favorita_${gallerySlug}_${photoIndex}.${extension}`;
+            const fileName = `foto_favorita_${gallerySlug}_${photoIndex}.jpg`;
 
             zip.file(fileName, blob);
             photoIndex++;

@@ -400,9 +400,9 @@ function BlockedDatesTab() {
                   </div>
                   <button
                     onClick={() => handleUnblock(bd.id)}
-                    className="w-full xs:w-auto px-3 py-1.5 bg-red-600 hover:bg-red-700 !text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap flex-shrink-0"
+                    className="px-2 py-1 bg-red-600 hover:bg-red-700 !text-white rounded font-fira text-[10px] font-medium transition-colors flex items-center gap-1 whitespace-nowrap"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={12} />
                     Desbloquear
                   </button>
                 </div>
@@ -686,7 +686,7 @@ function AddBlockedDateModal({ onClose, onSuccess }) {
               onChange={(e) => setReason(e.target.value)}
               rows={3}
               placeholder="Ej: Vacaciones, feriado, evento personal..."
-              className="w-full px-2.5 sm:px-3 py-2 border border-gray-300 rounded-lg font-fira text-xs sm:text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
+              className="w-full px-2.5 sm:px-3 py-2 border border-gray-300 rounded-lg font-fira text-xs sm:text-sm text-gray-900 placeholder-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-[#79502A]/20 focus:border-[#79502A]"
             />
           </div>
 
@@ -802,9 +802,9 @@ function BookingTypesTab() {
               <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 xs:gap-3">
                 <button
                   onClick={() => setEditingType(type)}
-                  className="w-full xs:flex-1 px-3 py-1.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
+                  className="px-2 py-1 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded font-fira text-[10px] font-medium transition-colors flex items-center gap-1"
                 >
-                  <Settings size={14} />
+                  <Settings size={12} />
                   Editar
                 </button>
 
@@ -926,7 +926,7 @@ function EditBookingTypeModal({ bookingType, onClose, onSuccess }) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Descripción del tipo de reunión..."
               rows={3}
-              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] resize-none"
+              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-xs sm:text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] resize-none"
             />
           </div>
 

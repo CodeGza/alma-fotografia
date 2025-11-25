@@ -68,6 +68,11 @@ export default function Reservas() {
     loadInitialData();
   }, []);
 
+  // Recargar datos bloqueados cuando cambia el mes (por si hay cambios recientes)
+  useEffect(() => {
+    refreshBlockedDates();
+  }, [currentMonth]);
+
   const loadInitialData = async () => {
     setLoading(true);
 
@@ -82,11 +87,20 @@ export default function Reservas() {
     }
 
     if (blockedResult.success) {
-      setBlockedDates(blockedResult.blockedDates);
-      setNonWorkingDays(blockedResult.nonWorkingDays);
+      setBlockedDates(blockedResult.blockedDates || []);
+      setNonWorkingDays(blockedResult.nonWorkingDays || []);
     }
 
     setLoading(false);
+  };
+
+  // Refrescar solo fechas bloqueadas (más rápido)
+  const refreshBlockedDates = async () => {
+    const blockedResult = await getBlockedDates();
+    if (blockedResult.success) {
+      setBlockedDates(blockedResult.blockedDates || []);
+      setNonWorkingDays(blockedResult.nonWorkingDays || []);
+    }
   };
 
   useEffect(() => {

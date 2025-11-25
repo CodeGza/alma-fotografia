@@ -147,9 +147,10 @@ export default function Reservas() {
     const day = String(date.getDate()).padStart(2, '0');
     const dateStr = `${year}-${month}-${day}`;
 
-    if (blockedDates.includes(dateStr)) return true;
+    // Verificar si la fecha está en blockedDates
+    const isBlocked = blockedDates.includes(dateStr);
 
-    return false;
+    return isBlocked;
   };
 
   const handleDateSelect = (date) => {

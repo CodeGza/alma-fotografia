@@ -400,10 +400,10 @@ function BlockedDatesTab() {
                   </div>
                   <button
                     onClick={() => handleUnblock(bd.id)}
-                    className="px-2 py-1 bg-red-600 hover:bg-red-700 !text-white rounded font-fira text-[10px] font-medium transition-colors flex items-center gap-1 whitespace-nowrap"
+                    className="px-1.5 py-0.5 bg-red-600 hover:bg-red-700 !text-white rounded font-fira text-[10px] font-medium transition-colors flex items-center gap-0.5"
                   >
-                    <Trash2 size={12} />
-                    Desbloquear
+                    <Trash2 size={10} />
+                    <span>Desbloquear</span>
                   </button>
                 </div>
               </div>
@@ -696,7 +696,7 @@ function AddBlockedDateModal({ onClose, onSuccess }) {
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="w-full sm:flex-1 px-4 py-2 border border-gray-300 rounded-lg font-fira text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="w-full sm:flex-1 px-4 py-2 border border-gray-300 rounded-lg font-fira text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
               Cancelar
             </button>
@@ -802,10 +802,10 @@ function BookingTypesTab() {
               <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 xs:gap-3">
                 <button
                   onClick={() => setEditingType(type)}
-                  className="px-2 py-1 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded font-fira text-[10px] font-medium transition-colors flex items-center gap-1"
+                  className="px-1.5 py-0.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded font-fira text-[10px] font-medium transition-colors flex items-center gap-0.5"
                 >
-                  <Settings size={12} />
-                  Editar
+                  <Settings size={10} />
+                  <span>Editar</span>
                 </button>
 
                 <label className="flex items-center justify-center xs:justify-start gap-2 cursor-pointer px-2 py-1">
@@ -910,7 +910,7 @@ function EditBookingTypeModal({ bookingType, onClose, onSuccess }) {
               step="15"
               value={durationMinutes}
               onChange={(e) => setDurationMinutes(e.target.value)}
-              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
+              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg font-fira text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C]"
             />
             <p className="mt-1 font-fira text-[10px] xs:text-xs text-gray-500 leading-relaxed">
               Mínimo: 15 min • Máximo: 480 min (8 horas) • Incrementos de 15 min
@@ -936,7 +936,7 @@ function EditBookingTypeModal({ bookingType, onClose, onSuccess }) {
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="w-full sm:flex-1 px-4 py-2 border border-gray-300 rounded-lg font-fira text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="w-full sm:flex-1 px-4 py-2 border border-gray-300 rounded-lg font-fira text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
               Cancelar
             </button>

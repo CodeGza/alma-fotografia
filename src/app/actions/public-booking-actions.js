@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/server';
+import { createClient, createAdminClient } from '@/lib/server';
 import { notifyNewPublicBooking, notifyBookingConfirmed } from '@/lib/notifications/notification-helpers';
 import { sendEmail } from '@/lib/email/resend-client';
 import { getEmailTemplate } from '@/lib/email/email-templates';
@@ -64,10 +64,12 @@ export async function getWorkingHours() {
 /**
  * Obtener fechas bloqueadas y días no laborables
  * Para mostrar en el calendario público de reservas
+ * Usa cliente admin para bypasear RLS (usuarios no logueados)
  */
 export async function getBlockedDates() {
   try {
-    const supabase = await createClient();
+    // Usar cliente admin para bypasear RLS y permitir lectura pública
+    const supabase = createAdminClient();
 
     // Obtener fechas bloqueadas explícitamente
     const { data: blockedDates, error: blockedError } = await supabase
@@ -91,6 +93,7 @@ export async function getBlockedDates() {
       nonWorkingDays: (workingHours || []).map(d => d.day_of_week),
     };
   } catch (error) {
+    console.error('[getBlockedDates] Error:', error);
     return { success: false, error: error.message, blockedDates: [], nonWorkingDays: [] };
   }
 }

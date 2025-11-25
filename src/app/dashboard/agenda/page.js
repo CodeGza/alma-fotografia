@@ -336,7 +336,7 @@ export default function AgendaPage() {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-xl font-fira text-sm font-semibold transition-all duration-200 flex items-center gap-2 hover:shadow-xl hover:scale-105"
+              className="px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded-xl font-fira text-sm font-semibold transition-all duration-200 flex items-center gap-2 hover:shadow-xl hover:scale-105"
             >
               <Plus size={16} />
               Nuevo Evento
@@ -669,7 +669,7 @@ function PendingBookingCard({ booking, onConfirm, onReject, processing }) {
             <button
               onClick={() => setShowRejectModal(true)}
               disabled={processing}
-              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center gap-1 hover:shadow-md"
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 !text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center gap-1 hover:shadow-md"
             >
               <XCircle size={12} />
               Rechazar
@@ -717,7 +717,7 @@ function PendingBookingCard({ booking, onConfirm, onReject, processing }) {
                 </button>
                 <button
                   onClick={handleReject}
-                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200"
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 !text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200"
                 >
                   Rechazar
                 </button>
@@ -945,7 +945,7 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onEditPub
             <button
               onClick={() => setShowRejectModal(true)}
               disabled={processing === booking.id}
-              className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
+              className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 !text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               <XCircle size={14} />
               Rechazar
@@ -958,7 +958,7 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onEditPub
             <button
               onClick={() => onEditPublic(booking)}
               disabled={processing === booking.id}
-              className="px-3 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
+              className="px-3 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               <Edit2 size={14} />
               Editar
@@ -966,7 +966,7 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onEditPub
             <button
               onClick={() => onDeletePublic(booking)}
               disabled={processing === booking.id}
-              className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
+              className="px-3 py-2 bg-red-600 hover:bg-red-700 !text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               {processing === booking.id ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -983,7 +983,7 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onEditPub
             <button
               onClick={() => onEditPrivate(booking)}
               disabled={processing === booking.id}
-              className="px-3 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
+              className="px-3 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               <Edit2 size={14} />
               Editar
@@ -991,7 +991,7 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onEditPub
             <button
               onClick={() => onDeletePrivate(booking)}
               disabled={processing === booking.id}
-              className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
+              className="px-3 py-2 bg-red-600 hover:bg-red-700 !text-white rounded-lg font-fira text-xs font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 hover:shadow-md"
             >
               {processing === booking.id ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -1043,7 +1043,7 @@ function DayBookingCard({ booking, onConfirm, onReject, onEditPrivate, onEditPub
                 </button>
                 <button
                   onClick={handleReject}
-                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200"
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 !text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200"
                 >
                   Rechazar
                 </button>
@@ -1275,7 +1275,7 @@ function CreatePrivateBookingModal({ serviceTypes, onClose, onSuccess }) {
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -1581,7 +1581,7 @@ function EditPrivateBookingModal({ booking, serviceTypes, onClose, onSuccess }) 
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -1665,7 +1665,7 @@ function DeleteConfirmationModal({ booking, onConfirm, onClose, processing }) {
             <button
               onClick={onConfirm}
               disabled={processing}
-              className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 !text-white rounded-lg font-fira text-sm font-semibold transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {processing ? (
                 <>

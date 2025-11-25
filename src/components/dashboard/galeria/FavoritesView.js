@@ -919,7 +919,7 @@ function ClientFavoritesSection({
                     e.stopPropagation();
                     handleDownloadPhoto(selectedPhoto, galleryTitle);
                   }}
-                  className="px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg font-fira text-xs sm:text-sm font-semibold flex items-center gap-1.5 sm:gap-2 transition-all shadow-lg backdrop-blur-sm"
+                  className="px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#79502A] hover:bg-[#8B5A2F] !text-white rounded-lg font-fira text-xs sm:text-sm font-semibold flex items-center gap-1.5 sm:gap-2 transition-all shadow-lg backdrop-blur-sm"
                 >
                   <Download size={14} className="sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Descargar</span>

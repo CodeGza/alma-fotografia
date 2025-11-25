@@ -309,7 +309,7 @@ export default function TestimoniosPage() {
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-200 font-fira text-sm font-medium"
+                    className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 !text-white rounded-lg transition-all duration-200 font-fira text-sm font-medium"
                   >
                     Eliminar
                   </button>
@@ -549,7 +549,7 @@ function EditTestimonialModal({ testimonial, onClose, onSuccess }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg transition-all duration-200 font-fira text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
+                className="flex-1 px-4 py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded-lg transition-all duration-200 font-fira text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
               >
                 {isSubmitting ? (
                   <>

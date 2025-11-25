@@ -1183,7 +1183,7 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
                       setIsSelectingFavorites(false);
                       setTempFavoriteIds([]);
                     }}
-                    className="px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-fira font-semibold bg-rose-500 hover:bg-rose-600 text-white rounded-lg transition-colors"
+                    className="px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-fira font-semibold bg-rose-500 hover:bg-rose-600 !text-white rounded-lg transition-colors"
                   >
                     Confirmar
                   </button>
@@ -1724,7 +1724,7 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-sm font-light text-sm tracking-wide transition-colors"
+                  className="w-full py-3 bg-[#79502A] hover:bg-[#8B5A2F] !text-white rounded-sm font-light text-sm tracking-wide transition-colors"
                 >
                   Guardar y continuar
                 </button>

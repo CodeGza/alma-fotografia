@@ -255,7 +255,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading || !isPasswordValid}
-                className="flex-1 px-6 py-2.5 bg-[#8B5E3C] text-white rounded-lg font-fira text-sm font-semibold hover:bg-[#6d4a2f] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                className="flex-1 px-6 py-2.5 bg-[#8B5E3C] !text-white rounded-lg font-fira text-sm font-semibold hover:bg-[#6d4a2f] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>

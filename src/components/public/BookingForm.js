@@ -232,7 +232,7 @@ export default function BookingForm() {
         </p>
         <button
           onClick={resetForm}
-          className="px-6 py-2 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg font-fira text-sm font-medium transition-colors"
+          className="px-6 py-2 bg-[#79502A] hover:bg-[#8B5A2F] !text-white rounded-lg font-fira text-sm font-medium transition-colors"
         >
           Agendar Otra Reunión
         </button>
@@ -586,7 +586,7 @@ export default function BookingForm() {
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-3 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg font-fira text-sm font-medium transition-colors"
+                className="flex-1 px-4 py-3 bg-[#79502A] hover:bg-[#8B5A2F] !text-white rounded-lg font-fira text-sm font-medium transition-colors"
               >
                 Continuar
               </button>
@@ -699,7 +699,7 @@ export default function BookingForm() {
               type="button"
               onClick={handleSubmit}
               disabled={submitting}
-              className="flex-1 px-4 py-3 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-400 text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-3 bg-[#79502A] hover:bg-[#8B5A2F] disabled:bg-gray-400 !text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>

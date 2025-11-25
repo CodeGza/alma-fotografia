@@ -295,7 +295,7 @@ function WorkingHoursTab() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] disabled:bg-gray-400 text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] disabled:bg-gray-400 !text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
             {saving ? (
               <>
@@ -370,7 +370,7 @@ function BlockedDatesTab() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="w-full sm:w-auto px-4 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-sm font-medium flex items-center justify-center gap-2 transition-colors whitespace-nowrap flex-shrink-0"
+            className="w-full sm:w-auto px-4 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded-lg font-fira text-sm font-medium flex items-center justify-center gap-2 transition-colors whitespace-nowrap flex-shrink-0"
           >
             <Plus size={16} />
             Bloquear Días
@@ -400,7 +400,7 @@ function BlockedDatesTab() {
                   </div>
                   <button
                     onClick={() => handleUnblock(bd.id)}
-                    className="w-full xs:w-auto px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap flex-shrink-0"
+                    className="w-full xs:w-auto px-3 py-1.5 bg-red-600 hover:bg-red-700 !text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap flex-shrink-0"
                   >
                     <Trash2 size={14} />
                     Desbloquear
@@ -703,7 +703,7 @@ function AddBlockedDateModal({ onClose, onSuccess }) {
             <button
               type="submit"
               disabled={submitting || selectedDates.length === 0}
-              className="w-full sm:flex-1 px-4 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:flex-1 px-4 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] disabled:bg-gray-400 disabled:cursor-not-allowed !text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -802,7 +802,7 @@ function BookingTypesTab() {
               <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 xs:gap-3">
                 <button
                   onClick={() => setEditingType(type)}
-                  className="w-full xs:flex-1 px-3 py-1.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full xs:flex-1 px-3 py-1.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white rounded-lg font-fira text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
                 >
                   <Settings size={14} />
                   Editar
@@ -943,7 +943,7 @@ function EditBookingTypeModal({ bookingType, onClose, onSuccess }) {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full sm:flex-1 px-4 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] disabled:bg-gray-400 text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:flex-1 px-4 py-2 bg-[#8B5E3C] hover:bg-[#6d4a2f] disabled:bg-gray-400 !text-white rounded-lg font-fira text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>

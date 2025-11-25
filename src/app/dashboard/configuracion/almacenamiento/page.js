@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Database,
@@ -10,10 +11,12 @@ import {
   CheckCircle,
   RefreshCw,
   TrendingUp,
-  Cloud
+  Cloud,
+  ArrowLeft
 } from 'lucide-react';
 
 export default function AlmacenamientoPage() {
+  const router = useRouter();
   const [storageData, setStorageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -57,29 +60,44 @@ export default function AlmacenamientoPage() {
   const status = getStorageStatus();
 
   return (
-    <div className="p-4 sm:p-6 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="font-voga text-2xl sm:text-3xl text-gray-900">
-            Almacenamiento
-          </h1>
+    <div className="max-w-5xl mx-auto">
+      {/* Header oscuro estilo dashboard */}
+      <div className="bg-gradient-to-br from-[#2D2D2D] to-[#1a1a1a] text-white rounded-2xl shadow-sm mb-6 mx-4 sm:mx-6">
+        <div className="px-5 sm:px-6 lg:px-8 py-4 sm:py-6">
+          {/* Botón volver */}
           <button
-            onClick={fetchStorageData}
-            disabled={loading}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
-            title="Actualizar"
+            onClick={() => router.push('/dashboard/configuracion')}
+            className="flex items-center gap-2 text-[#C6A97D] hover:text-[#FFF8E2] transition-colors duration-200 font-fira text-sm mb-4"
           >
-            <RefreshCw
-              size={20}
-              className={`text-gray-600 ${loading ? 'animate-spin' : ''}`}
-            />
+            <ArrowLeft size={16} />
+            <span>Volver</span>
           </button>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="font-voga text-2xl sm:text-3xl text-white">
+                Almacenamiento
+              </h1>
+              <p className="font-fira text-sm text-white/60 mt-1">
+                Gestiona tu espacio en Cloudinary
+              </p>
+            </div>
+            <button
+              onClick={fetchStorageData}
+              disabled={loading}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
+              title="Actualizar"
+            >
+              <RefreshCw
+                size={20}
+                className={`text-white/70 ${loading ? 'animate-spin' : ''}`}
+              />
+            </button>
+          </div>
         </div>
-        <p className="font-fira text-sm text-gray-600">
-          Gestiona tu espacio en Cloudinary
-        </p>
       </div>
+
+      <div className="px-4 sm:px-6">
 
       {/* Main Storage Card */}
       <motion.div
@@ -288,6 +306,7 @@ export default function AlmacenamientoPage() {
             </div>
           </div>
         </motion.div>
+      </div>
       </div>
     </div>
   );

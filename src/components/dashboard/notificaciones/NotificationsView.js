@@ -254,7 +254,7 @@ export default function NotificationsView() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             onClick={markAllAsRead}
-            className="px-4 py-2 bg-white border border-[#79502A] text-[#79502A] hover:bg-[#79502A] hover:text-white rounded-lg font-fira text-sm font-semibold transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-white border border-[#79502A] text-[#79502A] hover:bg-[#79502A] hover:!text-white rounded-lg font-fira text-sm font-semibold transition-all flex items-center gap-2"
           >
             <CheckCircle size={16} />
             Marcar todas como leídas

@@ -75,7 +75,7 @@ export default function DashboardLayoutClient({ children, userName }) {
   const handleLogout = async () => {
     const supabase = await createClient();
     await supabase.auth.signOut();
-    window.location.href = '/auth/login';
+    window.location.href = '/';
   };
 
   return (

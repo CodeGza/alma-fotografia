@@ -138,7 +138,7 @@ export default function GalleryPreviewModal({ gallery, onClose, onShare, onEdit 
         <div className="p-4 border-t border-white/10 bg-black/20 flex gap-3">
           <button
             onClick={onShare}
-            className="flex-1 py-3 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-colors font-fira text-sm font-semibold flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-[#79502A] hover:bg-[#8B5A2F] !text-white rounded-lg transition-colors font-fira text-sm font-semibold flex items-center justify-center gap-2"
           >
             <Share2 size={16} />
             Compartir

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Download } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Download, X, Loader2 } from 'lucide-react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { useToast } from '@/components/ui/Toast';
@@ -27,6 +27,8 @@ export default function PublicDownloadAllButton({
   const [downloadType, setDownloadType] = useState('all'); // 'all' | 'favorites'
   const [showMenu, setShowMenu] = useState(false);
   const { showToast } = useToast();
+  const abortControllerRef = useRef(null);
+  const isCancelledRef = useRef(false);
 
     /**
      * Obtiene la URL de máxima calidad desde Cloudinary
@@ -77,6 +79,18 @@ export default function PublicDownloadAllButton({
         }
     };
 
+    // Cancelar descarga
+    const handleCancelDownload = () => {
+        isCancelledRef.current = true;
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+        setIsDownloading(false);
+        setProgress(0);
+        setStatus('');
+        showToast({ message: 'Descarga cancelada', type: 'info' });
+    };
+
     const handleDownloadAll = async (type = 'all') => {
         // Filtrar fotos según el tipo seleccionado
         let photosToDownload = photos;
@@ -95,6 +109,8 @@ export default function PublicDownloadAllButton({
         }
 
         setShowMenu(false);
+        isCancelledRef.current = false;
+        abortControllerRef.current = new AbortController();
 
         setIsDownloading(true);
         setProgress(0);
@@ -185,6 +201,11 @@ export default function PublicDownloadAllButton({
             setStatus('Descargando fotos...');
 
             for (let i = 0; i < photosToDownload.length; i += BATCH_SIZE) {
+                // Verificar si fue cancelada
+                if (isCancelledRef.current) {
+                    return;
+                }
+
                 const batch = photosToDownload.slice(i, i + BATCH_SIZE);
 
                 const promises = batch.map((photo, batchIndex) =>
@@ -192,6 +213,11 @@ export default function PublicDownloadAllButton({
                 );
 
                 await Promise.allSettled(promises);
+
+                // Verificar de nuevo después del batch
+                if (isCancelledRef.current) {
+                    return;
+                }
 
                 completedCount += batch.length;
                 const progressPercent = Math.round((completedCount / total) * 100);
@@ -256,25 +282,35 @@ export default function PublicDownloadAllButton({
     // Si hay favoritas, mostrar dropdown con opciones
     if (showFavoritesOption && favoritePhotoIds.length > 0) {
         return (
-            <div className="relative">
-                <button
-                    onClick={() => setShowMenu(!showMenu)}
-                    disabled={isDownloading}
-                    className="px-4 py-2.5 bg-brown hover:bg-brown/90 text-white rounded-lg transition-all duration-200 flex items-center gap-2 font-fira text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-sm hover:shadow-md"
-                >
-                    <Download size={16} className={isDownloading ? 'animate-bounce' : ''} />
-                    {isDownloading ? (
-                        <span className="hidden sm:inline">
-                            {progress > 0 ? `${progress}%` : 'Preparando...'}
-                        </span>
-                    ) : (
+            <div className="relative flex items-center gap-2">
+                {isDownloading ? (
+                    <>
+                        {/* Estado de descarga con spinner y progreso */}
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-brown text-white rounded-lg font-fira text-sm font-medium">
+                            <Loader2 size={16} className="animate-spin" />
+                            <span>{progress > 0 ? `${progress}%` : 'Preparando...'}</span>
+                        </div>
+                        <button
+                            onClick={handleCancelDownload}
+                            className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                            title="Cancelar descarga"
+                        >
+                            <X size={16} />
+                        </button>
+                    </>
+                ) : (
+                    <button
+                        onClick={() => setShowMenu(!showMenu)}
+                        className="px-4 py-2.5 bg-brown hover:bg-brown/90 text-white rounded-lg transition-all duration-200 flex items-center gap-2 font-fira text-sm font-medium active:scale-95 shadow-sm hover:shadow-md"
+                    >
+                        <Download size={16} />
                         <span className="hidden sm:inline">Descargar</span>
-                    )}
-                </button>
+                    </button>
+                )}
 
                 {/* Barra de progreso visual */}
                 {isDownloading && (
-                    <div className="absolute left-0 right-0 -bottom-3 h-1.5 bg-white/30 rounded-full overflow-hidden">
+                    <div className="absolute left-0 right-10 -bottom-3 h-1.5 bg-white/30 rounded-full overflow-hidden">
                         <div
                             className="h-full bg-[#C6A97D] transition-all duration-300 ease-out rounded-full"
                             style={{ width: `${progress}%` }}
@@ -314,26 +350,38 @@ export default function PublicDownloadAllButton({
 
     // Botón simple si no hay favoritas
     return (
-        <div className="relative">
-            <button
-                onClick={() => handleDownloadAll('all')}
-                disabled={isDownloading || !photos || photos.length === 0}
-                className="px-4 py-2.5 bg-brown hover:bg-brown/90 text-white rounded-lg transition-all duration-200 flex items-center gap-2 font-fira text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-sm hover:shadow-md"
-                title={status || 'Descargar todas las fotos'}
-            >
-                <Download size={16} className={isDownloading ? 'animate-bounce' : ''} />
-                {isDownloading ? (
-                    <span className="hidden sm:inline">
-                        {progress > 0 ? `${progress}%` : 'Preparando...'}
-                    </span>
-                ) : (
+        <div className="relative flex items-center gap-2">
+            {isDownloading ? (
+                <>
+                    {/* Estado de descarga con spinner y progreso */}
+                    <div className="flex items-center gap-2 px-4 py-2.5 bg-brown text-white rounded-lg font-fira text-sm font-medium">
+                        <Loader2 size={16} className="animate-spin" />
+                        <span className="hidden sm:inline">{progress > 0 ? `${progress}%` : 'Preparando...'}</span>
+                        <span className="sm:hidden">{progress}%</span>
+                    </div>
+                    <button
+                        onClick={handleCancelDownload}
+                        className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                        title="Cancelar descarga"
+                    >
+                        <X size={16} />
+                    </button>
+                </>
+            ) : (
+                <button
+                    onClick={() => handleDownloadAll('all')}
+                    disabled={!photos || photos.length === 0}
+                    className="px-4 py-2.5 bg-brown hover:bg-brown/90 text-white rounded-lg transition-all duration-200 flex items-center gap-2 font-fira text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-sm hover:shadow-md"
+                    title="Descargar todas las fotos"
+                >
+                    <Download size={16} />
                     <span className="hidden sm:inline">Descargar todas</span>
-                )}
-            </button>
+                </button>
+            )}
 
             {/* Barra de progreso visual */}
             {isDownloading && (
-                <div className="absolute left-0 right-0 -bottom-3 h-1.5 bg-white/30 rounded-full overflow-hidden">
+                <div className="absolute left-0 right-10 -bottom-3 h-1.5 bg-white/30 rounded-full overflow-hidden">
                     <div
                         className="h-full bg-[#C6A97D] transition-all duration-300 ease-out rounded-full"
                         style={{ width: `${progress}%` }}

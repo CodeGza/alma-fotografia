@@ -483,15 +483,18 @@ export default function Reservas() {
                               onClick={() => handleDateSelect(day)}
                               disabled={isUnavailable}
                               className={`
-                                aspect-square flex items-center justify-center font-fira text-xs sm:text-sm transition-all duration-200
+                                aspect-square flex items-center justify-center font-fira text-xs sm:text-sm transition-all duration-200 rounded-md
                                 ${isSelected
                                   ? 'bg-[#8B5E3C] text-white shadow-md'
-                                  : isUnavailable
-                                    ? 'text-[#c5c0b8] line-through cursor-not-allowed'
-                                    : 'text-[#4a4a4a] hover:bg-[#f5f2ee] hover:text-[#8B5E3C]'
+                                  : isBlocked
+                                    ? 'bg-red-50 text-red-400 line-through cursor-not-allowed'
+                                    : isPast
+                                      ? 'text-[#c5c0b8] cursor-not-allowed'
+                                      : 'text-[#4a4a4a] hover:bg-[#f5f2ee] hover:text-[#8B5E3C]'
                                 }
                                 ${isCurrentDay && !isSelected && !isUnavailable ? 'ring-1 ring-[#8B5E3C]/50' : ''}
                               `}
+                              title={isBlocked ? 'Día no disponible' : isPast ? 'Fecha pasada' : ''}
                             >
                               {format(day, 'd')}
                             </button>

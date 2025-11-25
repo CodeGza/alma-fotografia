@@ -16,6 +16,7 @@ const heroImages = [
   '/assets/fotos/fondo3.jpg',
   '/assets/fotos/fondo4.jpg',
   '/assets/fotos/fondo5.jpg',
+  '/assets/fotos/fondo6.jpg',
 ];
 
 export default function Hero() {

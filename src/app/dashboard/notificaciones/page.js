@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import DashboardHeader from '../DashboardHeader';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import NotificationsView from '@/components/dashboard/notificaciones/NotificationsView';
 import NotificationsSkeleton from '@/components/dashboard/notificaciones/NotificationsSkeleton';
 

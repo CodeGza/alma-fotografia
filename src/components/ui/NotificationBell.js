@@ -33,18 +33,19 @@ export default function NotificationBell({ className = '', isMobile = false }) {
     setMounted(true);
   }, []);
 
-  // Cargar notificaciones
+  // Cargar notificaciones - COMPARTIDAS entre todos los admins
   const loadNotifications = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Cargar TODAS las notificaciones (sin filtrar por user_id)
+      // Las notificaciones son compartidas entre todos los admins
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(30);
 
       if (error) {
         console.error('Supabase error loading notifications:', {
@@ -88,15 +89,16 @@ export default function NotificationBell({ className = '', isMobile = false }) {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
+        // Escuchar TODAS las notificaciones (sin filtro de user_id)
+        // Las notificaciones son compartidas entre todos los admins
         channel = supabase
-          .channel(`notifications-user-${user.id}`)
+          .channel('notifications-all-admins')
           .on(
             'postgres_changes',
             {
               event: '*',
               schema: 'public',
               table: 'notifications',
-              filter: `user_id=eq.${user.id}`,
             },
             (payload) => {
               loadNotifications();
@@ -137,16 +139,16 @@ export default function NotificationBell({ className = '', isMobile = false }) {
     }
   }, []);
 
-  // Marcar todas como leídas
+  // Marcar todas como leídas - Afecta TODAS las notificaciones (compartidas)
   const markAllAsRead = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Marcar todas las no leídas (sin filtrar por user_id)
       const { error } = await supabase
         .from('notifications')
         .update({ is_read: true, read_at: new Date().toISOString() })
-        .eq('user_id', user.id)
         .eq('is_read', false);
 
       if (error) throw error;

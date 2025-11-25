@@ -1360,8 +1360,8 @@ export default function FavoritesView({ gallery, favoritesByClient }) {
 
   return (
     <div className="w-full">
-      {/* Header mejorado */}
-      <div className="mb-4 px-2 sm:px-4">
+      {/* Header mejorado - sin padding para alinearse con header principal */}
+      <div className="mb-4 px-4 sm:px-6">
         <button
           onClick={() => router.push(`/dashboard/galerias/${gallery.id}`)}
           className="flex items-center gap-2 text-[#8B5E3C] hover:text-[#6d4a2f] transition-colors font-fira text-sm font-semibold group"
@@ -1372,7 +1372,7 @@ export default function FavoritesView({ gallery, favoritesByClient }) {
       </div>
 
       {/* Lista de clientes */}
-      <div className="space-y-4 px-2 sm:px-4">
+      <div className="space-y-4 px-4 sm:px-6">
         {filteredAndSortedClients.length === 0 && favoritesByClient.length === 0 ? (
           <div className="bg-gradient-to-br from-neutral-900/50 to-neutral-900/30 border border-neutral-800 rounded-2xl p-12 sm:p-16 text-center shadow-2xl">
             <div className="max-w-md mx-auto">

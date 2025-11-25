@@ -122,11 +122,17 @@ export default function Reservas() {
   // Verificar si una fecha está bloqueada
   const isDateBlocked = (date) => {
     // Verificar si es un día no laborable (por día de la semana)
+    // En JavaScript: 0=Domingo, 1=Lunes, etc.
     const dayOfWeek = date.getDay();
     if (nonWorkingDays.includes(dayOfWeek)) return true;
 
     // Verificar si está en la lista de fechas bloqueadas específicas
-    const dateStr = format(date, 'yyyy-MM-dd');
+    // Formatear la fecha local sin timezone issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+
     if (blockedDates.includes(dateStr)) return true;
 
     return false;

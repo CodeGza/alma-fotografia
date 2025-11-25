@@ -272,6 +272,16 @@ export default function PublicDownloadAllButton({
                     )}
                 </button>
 
+                {/* Barra de progreso visual */}
+                {isDownloading && (
+                    <div className="absolute left-0 right-0 -bottom-3 h-1.5 bg-white/30 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-[#C6A97D] transition-all duration-300 ease-out rounded-full"
+                            style={{ width: `${progress}%` }}
+                        />
+                    </div>
+                )}
+
                 {showMenu && !isDownloading && (
                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border-2 border-gray-200 overflow-hidden z-50">
                         <button
@@ -304,20 +314,32 @@ export default function PublicDownloadAllButton({
 
     // Botón simple si no hay favoritas
     return (
-        <button
-            onClick={() => handleDownloadAll('all')}
-            disabled={isDownloading || !photos || photos.length === 0}
-            className="px-4 py-2.5 bg-brown hover:bg-brown/90 text-white rounded-lg transition-all duration-200 flex items-center gap-2 font-fira text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-sm hover:shadow-md"
-            title={status || 'Descargar todas las fotos'}
-        >
-            <Download size={16} className={isDownloading ? 'animate-bounce' : ''} />
-            {isDownloading ? (
-                <span className="hidden sm:inline">
-                    {progress > 0 ? `${progress}%` : 'Preparando...'}
-                </span>
-            ) : (
-                <span className="hidden sm:inline">Descargar todas</span>
+        <div className="relative">
+            <button
+                onClick={() => handleDownloadAll('all')}
+                disabled={isDownloading || !photos || photos.length === 0}
+                className="px-4 py-2.5 bg-brown hover:bg-brown/90 text-white rounded-lg transition-all duration-200 flex items-center gap-2 font-fira text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-sm hover:shadow-md"
+                title={status || 'Descargar todas las fotos'}
+            >
+                <Download size={16} className={isDownloading ? 'animate-bounce' : ''} />
+                {isDownloading ? (
+                    <span className="hidden sm:inline">
+                        {progress > 0 ? `${progress}%` : 'Preparando...'}
+                    </span>
+                ) : (
+                    <span className="hidden sm:inline">Descargar todas</span>
+                )}
+            </button>
+
+            {/* Barra de progreso visual */}
+            {isDownloading && (
+                <div className="absolute left-0 right-0 -bottom-3 h-1.5 bg-white/30 rounded-full overflow-hidden">
+                    <div
+                        className="h-full bg-[#C6A97D] transition-all duration-300 ease-out rounded-full"
+                        style={{ width: `${progress}%` }}
+                    />
+                </div>
             )}
-        </button>
+        </div>
     );
 }

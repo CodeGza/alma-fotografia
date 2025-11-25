@@ -56,13 +56,13 @@ async function FavoritesContent({ galleryId }) {
   // Obtener IDs únicos de fotos
   const photoIds = [...new Set((favoritesData || []).map(f => f.photo_id).filter(Boolean))];
 
-  // Obtener datos de las fotos
+  // Obtener datos de las fotos - SOLO de esta galería
   let photosData = [];
   if (photoIds.length > 0) {
-    // Intentar query más simple primero
     const { data: photos } = await supabase
       .from('photos')
       .select('*')
+      .eq('gallery_id', galleryId)
       .in('id', photoIds);
 
     photosData = photos || [];
@@ -157,7 +157,7 @@ export default async function FavoritesPage({ params }) {
         subtitle="Revisa las selecciones de tus clientes"
       />
 
-      <div className="p-6">
+      <div className="px-0">
         <Suspense fallback={
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C6A97D]"></div>

@@ -85,9 +85,6 @@ const nextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
-  // Optimización de bundle
-  swcMinify: true,
-
   // Optimización de producción
   productionBrowserSourceMaps: false,
 

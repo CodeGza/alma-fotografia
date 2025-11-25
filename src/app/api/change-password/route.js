@@ -85,7 +85,6 @@ export async function POST(request) {
       .eq('id', user.id);
 
     if (updateError) {
-      console.error('Error actualizando requires_password_change:', updateError);
       return NextResponse.json(
         { success: false, error: 'Error al actualizar el perfil' },
         { status: 500 }
@@ -97,7 +96,6 @@ export async function POST(request) {
       message: 'Contraseña cambiada correctamente',
     });
   } catch (error) {
-    console.error('Error cambiando contraseña:', error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }

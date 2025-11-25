@@ -59,7 +59,6 @@ export async function archiveGalleries(galleryIds) {
       .in('gallery_id', galleryIds);
 
     if (linksError) {
-      console.error('[archiveGalleries] Error desactivando enlaces:', linksError);
     }
 
     // Enviar notificaciones para cada galería archivada
@@ -67,7 +66,6 @@ export async function archiveGalleries(galleryIds) {
       try {
         await notifyGalleryArchived(galleryId, user.id);
       } catch (notifyError) {
-        console.error(`[archiveGalleries] Error en notificación para ${galleryId}:`, notifyError);
       }
     }
 
@@ -75,7 +73,6 @@ export async function archiveGalleries(galleryIds) {
 
     return { success: true };
   } catch (error) {
-    console.error('[archiveGalleries] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -123,7 +120,6 @@ export async function deleteGalleries(galleryIds) {
       .in('id', galleryIds);
 
     if (galleriesError) {
-      console.error('❌ Error obteniendo galerías:', galleriesError);
       throw new Error(`Error al obtener galerías: ${galleriesError.message}`);
     }
 
@@ -280,7 +276,6 @@ export async function deleteGalleries(galleryIds) {
       try {
         await notifyGalleryDeleted(galleryInfo.title, galleryInfo.userId);
       } catch (notifyError) {
-        console.error(`Error enviando notificación para galería "${galleryInfo.title}":`, notifyError);
         // Continuar con las demás
       }
     }
@@ -297,7 +292,6 @@ export async function deleteGalleries(galleryIds) {
     };
 
   } catch (error) {
-    console.error('❌ Error en deleteGalleries:', error.message);
 
     return {
       success: false,
@@ -342,7 +336,6 @@ export async function restoreGalleries(galleryIds) {
       try {
         await notifyGalleryRestored(galleryId, user.id);
       } catch (notifyError) {
-        console.error(`Error enviando notificación para galería ${galleryId}:`, notifyError);
         // Continuar con las demás
       }
     }
@@ -351,7 +344,6 @@ export async function restoreGalleries(galleryIds) {
 
     return { success: true };
   } catch (error) {
-    console.error('❌ Error restoring galleries:', error);
     return { success: false, error: error.message };
   }
 }
@@ -377,7 +369,6 @@ export async function deleteCloudinaryImage(publicId) {
     const result = await deleteFromCloudinary(publicId);
     return result;
   } catch (error) {
-    console.error('❌ Error eliminando imagen de Cloudinary:', error);
     return { success: false, error: error.message };
   }
 }
@@ -488,7 +479,6 @@ export async function cleanOrphanedPhotos() {
     };
 
   } catch (error) {
-    console.error('❌ Error en cleanOrphanedPhotos:', error.message);
 
     return {
       success: false,
@@ -540,7 +530,6 @@ export async function updateAllowShareFavorites(galleryId, allowShare) {
     return { success: true };
 
   } catch (error) {
-    console.error('❌ Error en updateAllowShareFavorites:', error.message);
     return {
       success: false,
       error: `No se pudo actualizar la configuración: ${error.message}`
@@ -591,7 +580,6 @@ export async function updateShowAllSections(galleryId, showAll) {
     return { success: true };
 
   } catch (error) {
-    console.error('❌ Error en updateShowAllSections:', error.message);
     return {
       success: false,
       error: `No se pudo actualizar la configuración: ${error.message}`

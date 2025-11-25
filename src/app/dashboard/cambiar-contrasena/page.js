@@ -68,6 +68,12 @@ export default function CambiarContrasenaPage() {
         }),
       });
 
+      if (!response.ok) {
+        setErrorMsg('Error del servidor. Por favor intentá de nuevo.');
+        setLoading(false);
+        return;
+      }
+
       const result = await response.json();
 
       if (!result.success) {

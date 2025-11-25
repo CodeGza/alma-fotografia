@@ -331,11 +331,6 @@ export default function GalleryDetailView({ gallery }) {
   const [allowShareFavorites, setAllowShareFavorites] = useState(gallery.allow_share_favorites || false);
   const [isUpdatingShareSetting, setIsUpdatingShareSetting] = useState(false);
 
-  // Debug: verificar que allow_share_favorites existe
-  useEffect(() => {
-    console.log('🔍 [GalleryDetailView] allow_share_favorites:', gallery.allow_share_favorites);
-    console.log('🔍 [GalleryDetailView] allowShareFavorites state:', allowShareFavorites);
-  }, []);
 
   // Actualizar localPhotos cuando cambien las fotos desde el servidor
   useEffect(() => {
@@ -422,11 +417,6 @@ export default function GalleryDetailView({ gallery }) {
     })
     : null;
 
-  // Sincronizar localPhotos cuando gallery.photos cambie (después de refresh)
-  useEffect(() => {
-    setLocalPhotos(gallery.photos);
-  }, [gallery.photos]);
-
   // Cargar conteo de favoritos
   useEffect(() => {
     const loadFavoritesCount = async () => {
@@ -438,13 +428,11 @@ export default function GalleryDetailView({ gallery }) {
           .eq('gallery_id', id);
 
         if (error) {
-          console.error('Error loading favorites count:', error);
           setFavoritesCount(0);
         } else {
           setFavoritesCount(count || 0);
         }
       } catch (error) {
-        console.error('Error loading favorites count:', error);
         setFavoritesCount(0);
       }
     };
@@ -464,7 +452,6 @@ export default function GalleryDetailView({ gallery }) {
           .order('display_order', { ascending: true });
 
         if (error) {
-          console.error('Error loading sections:', error);
           setSections([]);
         } else {
           const loadedSections = data || [];
@@ -476,7 +463,6 @@ export default function GalleryDetailView({ gallery }) {
           }
         }
       } catch (error) {
-        console.error('Error loading sections:', error);
         setSections([]);
       }
     };
@@ -492,9 +478,7 @@ export default function GalleryDetailView({ gallery }) {
       const photosWithoutSection = localPhotos.filter(photo => !photo.section_id);
 
       if (photosWithoutSection.length > 0) {
-        console.log(`📸 Encontradas ${photosWithoutSection.length} fotos sin sección, asignando a primera sección...`);
-
-        try {
+        try{
           const supabase = createClient();
           const firstSectionId = sections[0].id;
 
@@ -504,10 +488,7 @@ export default function GalleryDetailView({ gallery }) {
             .update({ section_id: firstSectionId })
             .in('id', photosWithoutSection.map(p => p.id));
 
-          if (error) {
-            console.error('❌ Error asignando fotos a sección:', error);
-          } else {
-            console.log('✅ Fotos asignadas automáticamente a la primera sección');
+          if (!error) {
             // Actualizar localPhotos para reflejar el cambio
             setLocalPhotos(prev => prev.map(photo =>
               photosWithoutSection.some(p => p.id === photo.id)
@@ -516,7 +497,7 @@ export default function GalleryDetailView({ gallery }) {
             ));
           }
         } catch (error) {
-          console.error('❌ Error en auto-asignación:', error);
+          // Error en auto-asignación
         }
       }
     };
@@ -553,7 +534,6 @@ export default function GalleryDetailView({ gallery }) {
       const size = parseInt(response.headers.get('content-length') || '0');
       setCoverImageSize(size);
     } catch (err) {
-      console.error('Error getting cover image size:', err);
       setCoverImageSize(0);
     }
   };
@@ -572,7 +552,7 @@ export default function GalleryDetailView({ gallery }) {
         setServiceName(data.name);
       }
     } catch (err) {
-      console.error('Error loading service icon:', err);
+      // Error loading service icon
     }
   };
 
@@ -594,7 +574,6 @@ export default function GalleryDetailView({ gallery }) {
       });
 
       if (!allLoaded) {
-        console.log('🔄 Algunas imágenes no cargaron, refrescando nuevamente...');
         router.refresh();
       }
     }, 1000);
@@ -660,7 +639,6 @@ export default function GalleryDetailView({ gallery }) {
       setSelectionMode(false);
       router.refresh();
     } catch (error) {
-      console.error('Error asignando fotos a sección:', error);
       showModal({
         title: 'Error',
         message: error.message || 'No se pudieron asignar las fotos a la sección.',
@@ -740,7 +718,6 @@ export default function GalleryDetailView({ gallery }) {
       // Verificar si hubo errores
       const errors = results.filter(r => r.error);
       if (errors.length > 0) {
-        console.error('Errores en actualización:', errors);
         throw new Error('Algunas fotos no se pudieron actualizar');
       }
 
@@ -754,7 +731,6 @@ export default function GalleryDetailView({ gallery }) {
       router.refresh();
 
     } catch (error) {
-      console.error('Error guardando orden:', error);
       showModal({
         title: 'Error',
         message: 'No se pudo guardar el nuevo orden.',
@@ -787,8 +763,6 @@ export default function GalleryDetailView({ gallery }) {
     setDeletingGallery(true);
 
     try {
-      console.log('🗑️ Eliminando galería:', id);
-
       // Usar Server Action con atomicidad (todo o nada)
       const result = await deleteGalleries([id]);
 
@@ -796,14 +770,11 @@ export default function GalleryDetailView({ gallery }) {
         throw new Error(result.error || 'Error desconocido al eliminar galería');
       }
 
-      console.log('✅ Galería eliminada exitosamente');
-
       // Navegación forzada para evitar errores de re-renderizado
       // En lugar de router.replace(), usar window.location para navegación completa
       window.location.href = '/dashboard/galerias';
 
     } catch (error) {
-      console.error('❌ Error eliminando galería:', error);
       showModal({
         title: 'Error al eliminar',
         message: error.message || 'No se pudo eliminar la galería. Por favor intenta nuevamente.',
@@ -823,7 +794,6 @@ export default function GalleryDetailView({ gallery }) {
       const fullPath = pathParts.join('/');
       return fullPath.replace(/\.[^/.]+$/, '');
     } catch (error) {
-      console.error('Error extracting public_id:', error);
       return null;
     }
   };
@@ -868,8 +838,6 @@ export default function GalleryDetailView({ gallery }) {
       const photosToDelete = workingPhotos.filter(p => selectedPhotos.has(p.id));
       const supabase = await createClient();
 
-      console.log(`🗑️ Eliminando ${photosToDelete.length} fotos...`);
-
       // 1. Eliminar de base de datos primero
       const { error: dbError } = await supabase
         .from('photos')
@@ -878,35 +846,23 @@ export default function GalleryDetailView({ gallery }) {
 
       if (dbError) throw dbError;
 
-      console.log('✅ Fotos eliminadas de BD');
-
       // 2. Eliminar de Cloudinary en paralelo con Promise.all
       const deletePromises = photosToDelete.map(async (photo) => {
         const publicId = extractPublicIdFromUrl(photo.file_path);
         if (publicId) {
-          console.log('🗑️ Eliminando foto de Cloudinary:', publicId);
           const result = await deleteCloudinaryImage(publicId);
-
-          if (result.success) {
-            console.log('✅ Foto eliminada:', publicId);
-          } else {
-            console.warn('⚠️ No se pudo eliminar foto:', publicId, result.error);
-          }
-
           return result;
         }
         return { success: true };
       });
 
       await Promise.all(deletePromises);
-      console.log('✅ Todas las fotos eliminadas de Cloudinary');
 
       setSelectedPhotos(new Set());
       setSelectionMode(false);
       router.refresh();
 
     } catch (error) {
-      console.error('Error eliminando fotos:', error);
       showModal({
         title: 'Error',
         message: 'No se pudieron eliminar las fotos.',
@@ -938,14 +894,7 @@ export default function GalleryDetailView({ gallery }) {
         if (!isGalleryPhoto) {
           const publicId = extractPublicIdFromUrl(previousCoverUrl);
           if (publicId) {
-            console.log('🗑️ Eliminando portada anterior:', publicId);
-            const deleteResult = await deleteCloudinaryImage(publicId);
-
-            if (deleteResult.success) {
-              console.log('✅ Portada anterior eliminada de Cloudinary');
-            } else {
-              console.warn('⚠️ No se pudo eliminar portada anterior:', deleteResult.error);
-            }
+            await deleteCloudinaryImage(publicId);
           }
         }
       }
@@ -953,7 +902,6 @@ export default function GalleryDetailView({ gallery }) {
       router.refresh();
 
     } catch (error) {
-      console.error('Error cambiando portada:', error);
       showModal({
         title: 'Error',
         message: 'No se pudo cambiar la portada.',
@@ -996,24 +944,14 @@ export default function GalleryDetailView({ gallery }) {
         if (!isGalleryPhoto) {
           const publicId = extractPublicIdFromUrl(imageToDelete);
           if (publicId) {
-            console.log('🗑️ Eliminando portada:', publicId);
-            const deleteResult = await deleteCloudinaryImage(publicId);
-
-            if (deleteResult.success) {
-              console.log('✅ Portada eliminada de Cloudinary:', publicId);
-            } else {
-              console.warn('⚠️ No se pudo eliminar portada de Cloudinary:', deleteResult.error);
-            }
+            await deleteCloudinaryImage(publicId);
           }
-        } else {
-          console.log('ℹ️ Portada es foto de galería, no se elimina de Cloudinary');
         }
       }
 
       router.refresh();
 
     } catch (error) {
-      console.error('Error quitando portada:', error);
       showModal({
         title: 'Error',
         message: 'No se pudo quitar la portada.',
@@ -1104,7 +1042,6 @@ export default function GalleryDetailView({ gallery }) {
       router.refresh();
 
     } catch (error) {
-      console.error('Error subiendo portada:', error);
       showModal({
         title: 'Error al subir',
         message: error.message || 'No se pudo subir la portada.',

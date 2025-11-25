@@ -50,7 +50,8 @@
       "Bash(curl:*)",
       "Bash(powershell:*)",
       "Bash(npm cache clean:*)",
-      "Bash(node scripts/getGoogleToken.js:*)"
+      "Bash(node scripts/getGoogleToken.js:*)",
+      "Bash(node cleanup-console.js:*)"
     ],
     "deny": [],
     "ask": []

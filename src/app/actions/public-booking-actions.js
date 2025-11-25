@@ -34,7 +34,6 @@ export async function getPublicBookingTypes() {
       bookingTypes: data || [],
     };
   } catch (error) {
-    console.error('[getPublicBookingTypes] Error:', error);
     return { success: false, error: error.message, bookingTypes: [] };
   }
 }
@@ -58,7 +57,6 @@ export async function getWorkingHours() {
       workingHours: data || [],
     };
   } catch (error) {
-    console.error('[getWorkingHours] Error:', error);
     return { success: false, error: error.message, workingHours: [] };
   }
 }
@@ -153,7 +151,6 @@ export async function getAvailableSlots(bookingTypeId, date) {
       bookingType: bookingType,
     };
   } catch (error) {
-    console.error('[getAvailableSlots] Error:', error);
     return { success: false, error: error.message, slots: [] };
   }
 }
@@ -285,7 +282,6 @@ export async function createPublicBooking({
       booking: data,
     };
   } catch (error) {
-    console.error('[createPublicBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -313,7 +309,6 @@ export async function getAllPublicBookings() {
       bookings: data || [],
     };
   } catch (error) {
-    console.error('[getAllPublicBookings] Error:', error);
     return { success: false, error: error.message, bookings: [] };
   }
 }
@@ -342,7 +337,6 @@ export async function getPendingPublicBookings() {
       bookings: data || [],
     };
   } catch (error) {
-    console.error('[getPendingPublicBookings] Error:', error);
     return { success: false, error: error.message, bookings: [] };
   }
 }
@@ -422,7 +416,6 @@ export async function confirmPublicBooking(bookingId, internalNotes = null) {
       booking: data,
     };
   } catch (error) {
-    console.error('[confirmPublicBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -450,8 +443,6 @@ export async function rejectPublicBooking(bookingId, reason) {
 
     if (error) throw error;
 
-    console.log('[rejectPublicBooking] Preparando email de rechazo para:', data.client_email);
-
     // Enviar email de rechazo al cliente
     const bookingTypeName = data.booking_type?.name || 'Reunión';
     const formattedDate = new Date(data.booking_date + 'T00:00:00').toLocaleDateString('es-UY', {
@@ -469,15 +460,11 @@ export async function rejectPublicBooking(bookingId, reason) {
     });
 
     if (clientEmailTemplate) {
-      console.log('[rejectPublicBooking] Template generado, enviando email...');
-      const emailResult = await sendEmail({
+      await sendEmail({
         to: data.client_email,
         subject: clientEmailTemplate.subject,
         html: clientEmailTemplate.html,
       });
-      console.log('[rejectPublicBooking] Resultado del envío:', emailResult);
-    } else {
-      console.error('[rejectPublicBooking] No se pudo generar el template de email');
     }
 
     return {
@@ -485,7 +472,6 @@ export async function rejectPublicBooking(bookingId, reason) {
       booking: data,
     };
   } catch (error) {
-    console.error('[rejectPublicBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -545,7 +531,6 @@ export async function updatePublicBooking(bookingId, updates) {
       booking: data,
     };
   } catch (error) {
-    console.error('[updatePublicBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -571,7 +556,6 @@ export async function cancelPublicBooking(bookingId) {
       booking: data,
     };
   } catch (error) {
-    console.error('[cancelPublicBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -639,7 +623,6 @@ export async function deletePublicBooking(bookingId) {
       message: 'Reserva eliminada exitosamente',
     };
   } catch (error) {
-    console.error('[deletePublicBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }

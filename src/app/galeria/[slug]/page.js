@@ -195,7 +195,6 @@ export async function generateMetadata({ params, searchParams }) {
       robots: 'noindex, nofollow', // Galerías privadas no deben indexarse
     };
   } catch (error) {
-    console.error('Error generating metadata:', error);
     return {
       title: 'Galería | Alma Fotografía',
       robots: 'noindex, nofollow',

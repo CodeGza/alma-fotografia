@@ -46,7 +46,6 @@ export async function POST(request) {
       booking: result.booking,
     });
   } catch (error) {
-    console.error('Error in public-booking API:', error);
     return NextResponse.json(
       { success: false, error: 'Error interno del servidor' },
       { status: 500 }

@@ -70,7 +70,6 @@ export default function ServiceEditor() {
 
       setServices(data || defaultServiceTypes);
     } catch (error) {
-      console.error('Error loading services:', error);
       setServices(defaultServiceTypes);
     } finally {
       setLoading(false);
@@ -181,7 +180,6 @@ export default function ServiceEditor() {
       setShowCreateForm(false);
       setFormData({ name: '', icon: 'Camera', description: '' });
     } catch (error) {
-      console.error('Error saving service:', error);
       showModal({
         title: 'Error al guardar',
         message: 'Ocurrió un error al guardar el servicio',
@@ -205,7 +203,6 @@ export default function ServiceEditor() {
         .eq('service_type', service.slug);
 
       if (galleriesError) {
-        console.error('Error al verificar galerías:', galleriesError);
         throw galleriesError;
       }
 
@@ -237,7 +234,6 @@ export default function ServiceEditor() {
       });
 
     } catch (error) {
-      console.error('Error al verificar servicio:', error);
       showModal({
         title: 'Error',
         message: 'Ocurrió un error al verificar el servicio',
@@ -253,8 +249,6 @@ export default function ServiceEditor() {
     try {
       const supabase = await createClient();
 
-      console.log('Eliminando servicio:', service.id);
-
       const { error, data } = await supabase
         .from('service_types')
         .delete()
@@ -262,11 +256,8 @@ export default function ServiceEditor() {
         .select();
 
       if (error) {
-        console.error('Error de Supabase:', error);
         throw error;
       }
-
-      console.log('Servicio eliminado exitosamente:', data);
 
       // ✅ Actualizar estado local
       setServices(prev => prev.filter(s => s.id !== service.id));
@@ -277,7 +268,6 @@ export default function ServiceEditor() {
         type: 'success'
       });
     } catch (error) {
-      console.error('Error deleting service:', error);
       showModal({
         title: 'Error al eliminar',
         message: `No se pudo eliminar el servicio: ${error.message}`,

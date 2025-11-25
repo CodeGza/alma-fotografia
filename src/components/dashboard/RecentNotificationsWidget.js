@@ -30,7 +30,7 @@ export default function RecentNotificationsWidget({ notifications: initialNotifi
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
       router.refresh();
     } catch (error) {
-      console.error('Error deleting notification:', error);
+      // Error deleting notification
     }
   }, [router]);
 
@@ -43,7 +43,7 @@ export default function RecentNotificationsWidget({ notifications: initialNotifi
           .update({ read: true, read_at: new Date().toISOString() })
           .eq('id', notification.id);
       } catch (error) {
-        console.error('Error marking as read:', error);
+        // Error marking as read
       }
     }
 

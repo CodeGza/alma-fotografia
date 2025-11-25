@@ -90,17 +90,8 @@ export async function checkAvailability({ serviceTypeId, eventDate, eventTime })
       }
     }
 
-    // 6. TODO: Verificar bloqueos de calendario (si existe tabla calendar_blocks)
-    // const { data: blocks } = await supabase
-    //   .from('calendar_blocks')
-    //   .select('*')
-    //   .eq('date', eventDate)
-    //   .eq('is_active', true);
-    // ... lógica de bloqueos
-
     return { available: true };
   } catch (error) {
-    console.error('Error checking availability:', error);
     return { available: false, reason: 'Error al verificar disponibilidad' };
   }
 }
@@ -170,12 +161,8 @@ export async function createPublicBooking(payload) {
 
     if (error) throw error;
 
-    // TODO: Enviar notificación a Fernanda (email/webhook)
-    // TODO: Enviar confirmación al cliente
-
     return { success: true, booking: data };
   } catch (error) {
-    console.error('Error creating public booking:', error);
     return {
       success: false,
       error: 'Error al crear la reserva. Por favor intentá de nuevo.'

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Instagram, Mail, Phone, MapPin, X, ChevronRight } from 'lucide-react';
+import { CONTACT, getWhatsAppUrl, getMailtoUrl } from '@/config/contact';
 
 /**
  * Footer - Footer profesional con políticas legales
@@ -40,7 +41,7 @@ export default function Footer({ profile }) {
               {/* Redes sociales */}
               <div className="flex items-center gap-3">
                 <a
-                  href="https://instagram.com/almafotografiauy"
+                  href={CONTACT.instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-full bg-white/5 hover:bg-[#8B5E3C] flex items-center justify-center text-gray-400 hover:!text-white transition-all duration-300"
@@ -49,14 +50,14 @@ export default function Footer({ profile }) {
                   <Instagram size={18} />
                 </a>
                 <a
-                  href="mailto:contacto@almafotografia.com"
+                  href={getMailtoUrl()}
                   className="w-9 h-9 rounded-full bg-white/5 hover:bg-[#8B5E3C] flex items-center justify-center text-gray-400 hover:!text-white transition-all duration-300"
                   aria-label="Email"
                 >
                   <Mail size={18} />
                 </a>
                 <a
-                  href="https://wa.me/59892021392"
+                  href={getWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-full bg-white/5 hover:bg-[#8B5E3C] flex items-center justify-center text-gray-400 hover:!text-white transition-all duration-300"
@@ -154,19 +155,19 @@ export default function Footer({ profile }) {
                 <li className="flex items-start gap-3">
                   <MapPin size={16} className="text-[#8B5E3C] flex-shrink-0 mt-0.5" />
                   <span className="font-fira text-sm text-gray-400">
-                    Montevideo, Uruguay
+                    {CONTACT.location}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Phone size={16} className="text-[#8B5E3C] flex-shrink-0 mt-0.5" />
-                  <a href="https://wa.me/59892021392" className="font-fira text-sm text-gray-400 hover:text-[#B89968] transition-colors">
-                    +598 92 021 392
+                  <a href={getWhatsAppUrl()} className="font-fira text-sm text-gray-400 hover:text-[#B89968] transition-colors">
+                    {CONTACT.phone}
                   </a>
                 </li>
                 <li className="flex items-start gap-3">
                   <Mail size={16} className="text-[#8B5E3C] flex-shrink-0 mt-0.5" />
-                  <a href="mailto:contacto@almafotografia.com" className="font-fira text-sm text-gray-400 hover:text-[#B89968] transition-colors">
-                    contacto@almafotografia.com
+                  <a href={getMailtoUrl()} className="font-fira text-sm text-gray-400 hover:text-[#B89968] transition-colors">
+                    {CONTACT.email}
                   </a>
                 </li>
               </ul>

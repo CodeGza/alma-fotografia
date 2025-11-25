@@ -41,7 +41,6 @@ export async function isAdmin() {
     // Los admins son identificados por el role en metadata
     return user.user_metadata?.role === 'admin';
   } catch (error) {
-    console.error('Error verificando admin:', error);
     return false;
   }
 }
@@ -77,11 +76,8 @@ export async function getAllUsers() {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error('Auth error:', authError);
       return { success: false, error: 'No autenticado' };
     }
-
-    console.log('Usuario autenticado:', user.email);
 
     // Obtener perfil del usuario actual para verificar permisos
     const { data: currentProfile, error: profileError } = await supabase
@@ -89,9 +85,6 @@ export async function getAllUsers() {
       .select('*')
       .eq('id', user.id)
       .single();
-
-    console.log('Perfil actual:', currentProfile);
-    console.log('Error de perfil:', profileError);
 
     if (profileError) {
       return {
@@ -121,7 +114,6 @@ export async function getAllUsers() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error obteniendo usuarios:', error);
       return { success: false, error: error.message };
     }
 
@@ -130,7 +122,6 @@ export async function getAllUsers() {
       users: users || []
     };
   } catch (error) {
-    console.error('Error obteniendo usuarios:', error);
     return { success: false, error: error.message };
   }
 }
@@ -212,7 +203,6 @@ export async function createUser({ email, password, full_name, permissions }) {
       user: data.user
     };
   } catch (error) {
-    console.error('Error creando usuario:', error);
     return { success: false, error: error.message };
   }
 }
@@ -280,7 +270,6 @@ export async function updateUser({ userId, full_name, username, permissions }) {
 
     return { success: true };
   } catch (error) {
-    console.error('Error actualizando usuario:', error);
     return { success: false, error: error.message };
   }
 }
@@ -366,7 +355,6 @@ export async function toggleUserStatus({ userId, isActive }) {
 
     return { success: true };
   } catch (error) {
-    console.error('Error actualizando estado:', error);
     return { success: false, error: error.message };
   }
 }
@@ -488,7 +476,6 @@ export async function changeUserPassword({ userId, newPassword }) {
 
     return { success: true, message: 'Contraseña actualizada. El usuario deberá cambiarla en su próximo inicio de sesión.' };
   } catch (error) {
-    console.error('Error cambiando contraseña:', error);
     return { success: false, error: error.message };
   }
 }
@@ -589,7 +576,6 @@ export async function deleteUser(userId) {
 
     return { success: true };
   } catch (error) {
-    console.error('Error eliminando usuario:', error);
     return { success: false, error: error.message };
   }
 }

@@ -34,7 +34,6 @@ export async function getAllPrivateBookings() {
       bookings: data || [],
     };
   } catch (error) {
-    console.error('[getAllPrivateBookings] Error:', error);
     return { success: false, error: error.message, bookings: [] };
   }
 }
@@ -64,7 +63,6 @@ export async function getPrivateBookingsByDateRange(startDate, endDate) {
       bookings: data || [],
     };
   } catch (error) {
-    console.error('[getPrivateBookingsByDateRange] Error:', error);
     return { success: false, error: error.message, bookings: [] };
   }
 }
@@ -190,7 +188,6 @@ export async function createPrivateBooking({
       booking: data,
     };
   } catch (error) {
-    console.error('[createPrivateBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -256,7 +253,6 @@ export async function updatePrivateBooking(bookingId, updates) {
       booking: data,
     };
   } catch (error) {
-    console.error('[updatePrivateBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -290,7 +286,6 @@ export async function cancelPrivateBooking(bookingId) {
       booking: data,
     };
   } catch (error) {
-    console.error('[cancelPrivateBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -333,7 +328,6 @@ export async function deletePrivateBooking(bookingId) {
 
     return { success: true };
   } catch (error) {
-    console.error('[deletePrivateBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -383,7 +377,6 @@ export async function checkDateAvailability(date) {
           : `${slotsRemaining} ${slotsRemaining === 1 ? 'cupo disponible' : 'cupos disponibles'}`,
     };
   } catch (error) {
-    console.error('[checkDateAvailability] Error:', error);
     return { success: false, error: error.message };
   }
 }

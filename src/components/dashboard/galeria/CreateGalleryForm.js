@@ -210,7 +210,6 @@ export default function CreateGalleryForm() {
                 console.log(`📸 Portada optimizada → ${prettyFileName}: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(optimizedBlob.size / 1024 / 1024).toFixed(2)}MB (-${reduction}%)`);
             }
         } catch (error) {
-            console.error('Error optimizing image:', error);
             showModal({
                 title: 'Error procesando imagen',
                 message: 'Error al procesar la imagen',
@@ -245,7 +244,6 @@ export default function CreateGalleryForm() {
 
             return result.url;
         } catch (error) {
-            console.error('Error uploading cover:', error);
             throw error;
         }
     };
@@ -257,7 +255,6 @@ export default function CreateGalleryForm() {
         let uploadedCoverUrl = null; // Rastrear la portada subida para cleanup
 
         try {
-            console.log('📋 Iniciando creación de galería...', data);
 
             const supabase = await createClient();
             const { data: { user } } = await supabase.auth.getUser();
@@ -271,7 +268,6 @@ export default function CreateGalleryForm() {
                 return;
             }
 
-            console.log('👤 Usuario autenticado:', user.id);
 
             // ✅ Validar que siempre tenga tipo de servicio
             if (!data.serviceType) {
@@ -363,14 +359,9 @@ export default function CreateGalleryForm() {
                 .single();
 
             if (error) {
-                console.error('❌ Error de Supabase:', error);
-                console.error('❌ Error code:', error.code);
-                console.error('❌ Error message:', error.message);
-                console.error('❌ Error details:', error.details);
 
                 // Cleanup: eliminar portada subida si falla la creación
                 if (uploadedCoverUrl) {
-                    console.log('🧹 Limpiando portada huérfana...');
                     try {
                         const publicId = uploadedCoverUrl.match(/\/v\d+\/(.+)\.\w+$/)?.[1];
                         if (publicId) {
@@ -379,10 +370,8 @@ export default function CreateGalleryForm() {
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ publicId })
                             });
-                            console.log('✅ Portada huérfana eliminada');
                         }
                     } catch (cleanupError) {
-                        console.error('⚠️ No se pudo eliminar portada huérfana:', cleanupError);
                     }
                 }
 
@@ -422,11 +411,9 @@ export default function CreateGalleryForm() {
                 return;
             }
 
-            console.log('✅ Galería creada exitosamente:', gallery);
 
             // Crear sección por defecto "Galería"
             try {
-                console.log('📁 Creando sección por defecto...');
                 const { error: sectionError } = await supabase
                     .from('photo_sections')
                     .insert({
@@ -437,17 +424,13 @@ export default function CreateGalleryForm() {
                     });
 
                 if (sectionError) {
-                    console.error('⚠️ Error creando sección por defecto:', sectionError);
                 } else {
-                    console.log('✅ Sección por defecto creada');
                 }
             } catch (sectionError) {
-                console.error('⚠️ Error creando sección por defecto:', sectionError);
             }
 
             // Enviar notificación de creación de galería
             try {
-                console.log('📬 Enviando notificación de creación...');
                 const notifResponse = await fetch('/api/galleries/created', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -455,10 +438,8 @@ export default function CreateGalleryForm() {
                 });
 
                 const notifData = await notifResponse.json();
-                console.log('📥 Notificación resultado:', notifData);
             } catch (notifError) {
                 // Error silencioso - no afectar UX
-                console.error('⚠️ Error enviando notificación de creación:', notifError);
             }
 
             showModal({
@@ -469,11 +450,9 @@ export default function CreateGalleryForm() {
             });
 
         } catch (error) {
-            console.error('❌ Error creating gallery:', error);
 
             // Cleanup: eliminar portada subida si hubo error general
             if (uploadedCoverUrl) {
-                console.log('🧹 Limpiando portada huérfana...');
                 try {
                     const publicId = uploadedCoverUrl.match(/\/v\d+\/(.+)\.\w+$/)?.[1];
                     if (publicId) {
@@ -482,10 +461,8 @@ export default function CreateGalleryForm() {
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ publicId })
                         });
-                        console.log('✅ Portada huérfana eliminada');
                     }
                 } catch (cleanupError) {
-                    console.error('⚠️ No se pudo eliminar portada huérfana:', cleanupError);
                 }
             }
 

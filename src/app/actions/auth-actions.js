@@ -77,12 +77,8 @@ export async function registerUser({ username, email, password, full_name }) {
     });
 
     if (error) {
-      console.error('❌ Error creando usuario en Auth:', error);
       return { success: false, error: error.message };
     }
-
-    console.log('✅ Usuario creado en Auth:', data.user.id);
-    console.log('✅ Perfil creado automáticamente por trigger');
 
     return {
       success: true,
@@ -90,7 +86,6 @@ export async function registerUser({ username, email, password, full_name }) {
       user: data.user
     };
   } catch (error) {
-    console.error('Error al registrar usuario:', error);
     return { success: false, error: error.message };
   }
 }
@@ -130,10 +125,7 @@ export async function loginUser({ usernameOrEmail, password }) {
       .ilike('username', usernameOrEmail)
       .single();
 
-    console.log('🔍 Login attempt:', { usernameOrEmail, profile, profileError });
-
     if (profileError || !profile) {
-      console.error('❌ Profile not found:', profileError);
       return { success: false, error: 'Usuario o contraseña incorrectos' };
     }
 
@@ -148,10 +140,7 @@ export async function loginUser({ usernameOrEmail, password }) {
       password: password,
     });
 
-    console.log('🔐 Auth attempt:', { email: profile.email, success: !error, error });
-
     if (error) {
-      console.error('❌ Auth failed:', error);
       return { success: false, error: 'Usuario o contraseña incorrectos' };
     }
 
@@ -160,7 +149,6 @@ export async function loginUser({ usernameOrEmail, password }) {
       user: data.user
     };
   } catch (error) {
-    console.error('Error al iniciar sesión:', error);
     return { success: false, error: error.message };
   }
 }
@@ -201,7 +189,6 @@ export async function logoutUser() {
 
     return { success: true };
   } catch (error) {
-    console.error('Error al cerrar sesión:', error);
     return { success: false, error: error.message };
   }
 }

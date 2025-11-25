@@ -22,11 +22,9 @@ export default function Servicios({ services }) {
       if (result.success) {
         window.open(result.url, '_blank');
       } else {
-        console.error('Error obteniendo enlace:', result.error);
         window.open(`/galeria/${gallery.slug}`, '_blank');
       }
     } catch (error) {
-      console.error('Error al abrir galería:', error);
       window.open(`/galeria/${gallery.slug}`, '_blank');
     } finally {
       setIsLoadingGallery(false);

@@ -22,6 +22,11 @@ export default function Hero() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
+  const nextImage = () => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+  };
+
   // Auto-play del carrusel
   useEffect(() => {
     const timer = setInterval(() => {
@@ -29,12 +34,8 @@ export default function Hero() {
     }, 5000); // Cambia cada 5 segundos
 
     return () => clearInterval(timer);
-  }, [currentIndex]);
-
-  const nextImage = () => {
-    setDirection(1);
-    setCurrentIndex((prev) => (prev + 1) % heroImages.length);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const prevImage = () => {
     setDirection(-1);

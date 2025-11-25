@@ -291,7 +291,6 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
         setFavoritePhotoIds(result.favorites.map(f => f.photo_id));
       }
     } catch (error) {
-      console.error('Error loading favorites:', error);
     } finally {
       setIsLoadingFavorites(false);
     }
@@ -345,58 +344,47 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
     // Limpiar timer anterior si existe
     if (favoritesDebounceRef.current) {
       clearTimeout(favoritesDebounceRef.current);
-      console.log('[Debounce] Timer reseteado - nueva actividad detectada');
     }
 
     // Programar nuevo auto-submit para 5 minutos (300000 ms)
     favoritesDebounceRef.current = setTimeout(async () => {
-      console.log('[Debounce] 5 minutos de inactividad - enviando notificación...');
 
       if (!clientEmail) {
-        console.log('[Debounce] No hay email del cliente, cancelando');
         return;
       }
 
       if (favoritePhotoIds.length === 0) {
-        console.log('[Debounce] No hay favoritos seleccionados, cancelando');
         return;
       }
 
       // Evitar enviar notificación duplicada
       if (lastNotificationSentRef.current) {
-        console.log('[Debounce] Notificación ya enviada, cancelando');
         return;
       }
 
       // ANTI-DUPLICADOS: Si ya hay una submission en proceso, cancelar
       if (isSubmittingRef.current) {
-        console.log('[Debounce] Ya hay una submission en proceso, cancelando');
         return;
       }
 
       try {
         isSubmittingRef.current = true;
-        console.log(`[Debounce] Enviando notificación para ${favoritePhotoIds.length} favoritos`);
         const result = await submitFavoritesSelection(galleryId, clientEmail, clientName);
 
         if (result.success) {
           lastNotificationSentRef.current = true;
-          console.log('[Debounce] Notificación enviada exitosamente');
           showToast({
             message: 'Tu selección ha sido guardada',
             type: 'success'
           });
         } else {
-          console.error('[Debounce] Error al enviar notificación:', result.error);
         }
       } catch (error) {
-        console.error('[Debounce] Error inesperado:', error);
       } finally {
         isSubmittingRef.current = false;
       }
     }, 300000); // 5 minutos
 
-    console.log('[Debounce] Nuevo timer de 5 minutos iniciado');
   }, [clientEmail, clientName, galleryId, favoritePhotoIds, showToast]);
 
   // Limpiar timer al desmontar componente
@@ -422,7 +410,6 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
           }
         }
       } catch (error) {
-        console.error('Error loading sections:', error);
       }
     };
 
@@ -438,7 +425,6 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
       if (favoritesDebounceRef.current && clientEmail && favoritePhotoIds.length > 0) {
         // ANTI-DUPLICADOS: Si ya hay una submission en proceso, no enviar otra
         if (isSubmittingRef.current) {
-          console.log('[Exit] Ya hay una submission en proceso, cancelando');
           return;
         }
 
@@ -451,14 +437,11 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
           // Enviar notificación de forma síncrona con keepalive
           // keepalive garantiza que la petición se complete incluso si se cierra la página
           submitFavoritesSelection(galleryId, clientEmail, clientName).then(() => {
-            console.log('[Exit] Notificación enviada antes de salir');
             isSubmittingRef.current = false;
           }).catch((error) => {
-            console.error('[Exit] Error al enviar notificación:', error);
             isSubmittingRef.current = false;
           });
         } catch (error) {
-          console.error('[Exit] Error al enviar notificación:', error);
           isSubmittingRef.current = false;
         }
       }
@@ -560,7 +543,6 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
         // Resetear el timer de auto-submit después de cada cambio exitoso
         scheduleAutoSubmit();
 
-        console.log(`[Toggle] Favorito ${wasFavorite ? 'removido' : 'agregado'}, timer reseteado`);
       }
     } catch (error) {
       // Revertir cambio si hubo error
@@ -569,7 +551,6 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
       } else {
         setFavoritePhotoIds(prev => prev.filter(id => id !== photoId));
       }
-      console.error('[Toggle] Error:', error);
     }
   };
 
@@ -599,7 +580,6 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
           }),
         });
       } catch (error) {
-        console.error('Error registering gallery view:', error);
         sessionStorage.removeItem(storageKey);
         hasRegisteredView.current = false;
       }
@@ -873,7 +853,6 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
         type: 'success'
       });
     } catch (error) {
-      console.error('Error downloading photo:', error);
       showToast({
         message: 'Error al descargar la foto',
         type: 'error'
@@ -951,7 +930,6 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
         setIsDownloading(false);
       }, 1000);
     } catch (error) {
-      console.error('Error downloading gallery:', error);
       showToast({
         message: error.message || 'Error al descargar la galería',
         type: 'error'
@@ -1169,7 +1147,6 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
 
                       // ANTI-DUPLICADOS: Verificar si ya hay una submission en proceso
                       if (isSubmittingRef.current) {
-                        console.log('[Confirmar] Ya hay una submission en proceso, cancelando');
                         showToast({ message: 'Procesando selección...', type: 'info' });
                         return;
                       }

@@ -36,7 +36,6 @@ export async function getFeaturedTestimonials() {
 
     return { success: true, testimonials: data || [] };
   } catch (error) {
-    console.error('Error fetching featured testimonials:', error);
     return { success: false, testimonials: [], error: error.message };
   }
 }
@@ -99,7 +98,6 @@ export async function getPublicGalleriesPreview() {
       services: servicesWithPublicGalleries
     };
   } catch (error) {
-    console.error('Error fetching public galleries:', error);
     return { success: false, services: [], error: error.message };
   }
 }
@@ -126,7 +124,6 @@ export async function getProfileInfo() {
       }
     };
   } catch (error) {
-    console.error('Error fetching profile:', error);
     // Fallback con datos por defecto si falla
     return {
       success: false,
@@ -154,7 +151,6 @@ export async function getActiveServices() {
 
     return { success: true, services: data || [] };
   } catch (error) {
-    console.error('Error fetching services:', error);
     return { success: false, services: [], error: error.message };
   }
 }

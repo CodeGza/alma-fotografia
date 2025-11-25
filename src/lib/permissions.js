@@ -51,7 +51,6 @@ export async function hasPermission(permission) {
     // Verificar el permiso específico
     return profile.permissions?.[permission] === true;
   } catch (error) {
-    console.error('Error verificando permiso:', error);
     return false;
   }
 }
@@ -99,7 +98,6 @@ export async function getCurrentUserProfile() {
 
     return profile;
   } catch (error) {
-    console.error('Error obteniendo perfil:', error);
     return null;
   }
 }

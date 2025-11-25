@@ -36,7 +36,6 @@ export async function notifyLinkExpired(shareId) {
       .single();
 
     if (error || !share) {
-      console.error('[notifyLinkExpired] Share not found:', shareId);
       return { success: false, error: 'Share not found' };
     }
 
@@ -81,7 +80,6 @@ export async function notifyLinkExpired(shareId) {
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyLinkExpired] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -110,7 +108,6 @@ export async function notifyLinkDeactivated(shareId, userId) {
       .single();
 
     if (error || !share) {
-      console.error('[notifyLinkDeactivated] Share not found:', shareId);
       return { success: false, error: 'Share not found' };
     }
 
@@ -155,7 +152,6 @@ export async function notifyLinkDeactivated(shareId, userId) {
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyLinkDeactivated] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -177,7 +173,6 @@ export async function notifyGalleryArchived(galleryId, userId) {
       .single();
 
     if (error || !gallery) {
-      console.error('[notifyGalleryArchived] Gallery not found:', galleryId);
       return { success: false, error: 'Gallery not found' };
     }
 
@@ -233,7 +228,6 @@ export async function notifyGalleryArchived(galleryId, userId) {
 
     return notificationResult;
   } catch (error) {
-    console.error('[notifyGalleryArchived] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -255,7 +249,6 @@ export async function notifyGalleryRestored(galleryId, userId) {
       .single();
 
     if (error || !gallery) {
-      console.error('[notifyGalleryRestored] Gallery not found:', galleryId);
       return { success: false, error: 'Gallery not found' };
     }
 
@@ -297,7 +290,6 @@ export async function notifyGalleryRestored(galleryId, userId) {
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyGalleryRestored] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -348,7 +340,6 @@ export async function notifyGalleryDeleted(galleryTitle, userId) {
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyGalleryDeleted] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -367,11 +358,9 @@ export async function notifyExpiringLinks() {
 
     if (error) throw error;
 
-    console.log(`[notifyExpiringLinks] Notificados ${data} enlaces que expiran pronto`);
 
     return { success: true, notified: data };
   } catch (error) {
-    console.error('[notifyExpiringLinks] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -390,11 +379,9 @@ export async function cleanupOldNotifications() {
 
     if (error) throw error;
 
-    console.log(`[cleanupOldNotifications] Eliminadas ${data} notificaciones antiguas`);
 
     return { success: true, deleted: data };
   } catch (error) {
-    console.error('[cleanupOldNotifications] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -417,7 +404,6 @@ export async function notifyGalleryView(galleryId, clientInfo = null, isFavorite
       .single();
 
     if (error || !gallery) {
-      console.error('[notifyGalleryView] Gallery not found:', galleryId, error);
       return { success: false, error: 'Gallery not found' };
     }
 
@@ -478,7 +464,6 @@ export async function notifyGalleryView(galleryId, clientInfo = null, isFavorite
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyGalleryView] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -501,7 +486,6 @@ export async function notifyFavoritesSelected(galleryId, favoritesCount, clientE
       .single();
 
     if (error || !gallery) {
-      console.error('[notifyFavoritesSelected] Gallery not found:', galleryId);
       return { success: false, error: 'Gallery not found' };
     }
 
@@ -566,7 +550,6 @@ export async function notifyFavoritesSelected(galleryId, favoritesCount, clientE
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyFavoritesSelected] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -601,7 +584,6 @@ export async function notifyFavoritesSubmitted(
       .single();
 
     if (error || !gallery) {
-      console.error('[notifyFavoritesSubmitted] Gallery not found:', galleryId);
       return { success: false, error: 'Gallery not found' };
     }
 
@@ -680,7 +662,6 @@ export async function notifyFavoritesSubmitted(
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyFavoritesSubmitted] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -704,7 +685,6 @@ export async function notifyFavoriteAdded(galleryId, clientEmail, currentCount) 
       .single();
 
     if (error || !gallery) {
-      console.error('[notifyFavoriteAdded] Gallery not found:', galleryId);
       return { success: false, error: 'Gallery not found' };
     }
 
@@ -772,7 +752,6 @@ export async function notifyFavoriteAdded(galleryId, clientEmail, currentCount) 
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyFavoriteAdded] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -795,7 +774,6 @@ export async function notifyFavoriteRemoved(galleryId, clientEmail, remainingCou
       .single();
 
     if (error || !gallery) {
-      console.error('[notifyFavoriteRemoved] Gallery not found:', galleryId);
       return { success: false, error: 'Gallery not found' };
     }
 
@@ -847,7 +825,6 @@ export async function notifyFavoriteRemoved(galleryId, clientEmail, remainingCou
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyFavoriteRemoved] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -868,7 +845,6 @@ export async function notifyGalleryCreated(galleryId) {
       .single();
 
     if (error || !gallery) {
-      console.error('[notifyGalleryCreated] Gallery not found:', galleryId, error);
       return { success: false, error: 'Gallery not found' };
     }
 
@@ -894,7 +870,6 @@ export async function notifyGalleryCreated(galleryId) {
         });
 
       if (insertError) {
-        console.error('[notifyGalleryCreated] Error creando preferencias:', insertError);
       }
     }
 
@@ -933,7 +908,6 @@ export async function notifyGalleryCreated(galleryId) {
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyGalleryCreated] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -967,7 +941,6 @@ export async function notifyTestimonialReceived(testimonialId) {
       .single();
 
     if (error || !testimonial) {
-      console.error('[notifyTestimonialReceived] Testimonial not found:', testimonialId, error);
       return { success: false, error: 'Testimonial not found' };
     }
 
@@ -991,7 +964,6 @@ export async function notifyTestimonialReceived(testimonialId) {
         });
 
       if (insertError) {
-        console.error('[notifyTestimonialReceived] Error creando preferencias:', insertError);
       }
     }
 
@@ -1032,7 +1004,6 @@ export async function notifyTestimonialReceived(testimonialId) {
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyTestimonialReceived] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -1066,14 +1037,12 @@ export async function notifyNewPublicBooking(bookingId) {
       .single();
 
     if (error || !booking) {
-      console.error('[notifyNewPublicBooking] Booking not found:', bookingId, error);
       return { success: false, error: 'Booking not found' };
     }
 
     // Obtener el usuario admin (el primero que se registró)
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      console.error('[notifyNewPublicBooking] No authenticated user');
       return { success: false, error: 'No authenticated user' };
     }
 
@@ -1127,7 +1096,6 @@ export async function notifyNewPublicBooking(bookingId) {
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyNewPublicBooking] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -1156,7 +1124,6 @@ export async function notifyBookingConfirmed(bookingId) {
       .single();
 
     if (error || !booking) {
-      console.error('[notifyBookingConfirmed] Booking not found:', bookingId, error);
       return { success: false, error: 'Booking not found' };
     }
 
@@ -1212,7 +1179,6 @@ export async function notifyBookingConfirmed(bookingId) {
 
     return notificationResult || { success: true, skipped: 'In-app disabled' };
   } catch (error) {
-    console.error('[notifyBookingConfirmed] Error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -1249,7 +1215,6 @@ export async function notifyUpcomingBookings() {
     if (error) throw error;
 
     if (!bookings || bookings.length === 0) {
-      console.log('[notifyUpcomingBookings] No bookings for tomorrow');
       return { success: true, notified: 0 };
     }
 
@@ -1309,10 +1274,8 @@ export async function notifyUpcomingBookings() {
       }
     }
 
-    console.log(`[notifyUpcomingBookings] Notified ${notifiedCount} upcoming bookings`);
     return { success: true, notified: notifiedCount };
   } catch (error) {
-    console.error('[notifyUpcomingBookings] Error:', error);
     return { success: false, error: error.message };
   }
 }

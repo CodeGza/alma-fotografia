@@ -31,7 +31,6 @@ export default function AlmacenamientoPage() {
         setLastUpdated(new Date());
       }
     } catch (error) {
-      console.error('Error fetching storage:', error);
     } finally {
       setLoading(false);
     }

@@ -39,7 +39,6 @@ function getCalendarClient() {
 export async function createCalendarEvent(booking) {
   try {
     if (!process.env.GOOGLE_REFRESH_TOKEN) {
-      console.log('[GoogleCalendar] No configurado, saltando...');
       return { success: true, skipped: true };
     }
 
@@ -74,10 +73,8 @@ export async function createCalendarEvent(booking) {
       resource: event,
     });
 
-    console.log('[GoogleCalendar] Evento creado:', response.data.id);
     return { success: true, eventId: response.data.id };
   } catch (error) {
-    console.error('[GoogleCalendar] Error creando evento:', error.message);
     return { success: false, error: error.message };
   }
 }
@@ -97,7 +94,6 @@ export async function createCalendarEvent(booking) {
 export async function createAllDayEvent(booking) {
   try {
     if (!process.env.GOOGLE_REFRESH_TOKEN) {
-      console.log('[GoogleCalendar] No configurado, saltando...');
       return { success: true, skipped: true };
     }
 
@@ -128,10 +124,8 @@ export async function createAllDayEvent(booking) {
       resource: event,
     });
 
-    console.log('[GoogleCalendar] Evento all-day creado:', response.data.id);
     return { success: true, eventId: response.data.id };
   } catch (error) {
-    console.error('[GoogleCalendar] Error creando evento all-day:', error.message);
     return { success: false, error: error.message };
   }
 }
@@ -146,7 +140,6 @@ export async function createAllDayEvent(booking) {
 export async function updateCalendarEvent(eventId, booking) {
   try {
     if (!process.env.GOOGLE_REFRESH_TOKEN || !eventId) {
-      console.log('[GoogleCalendar] No configurado o sin eventId, saltando...');
       return { success: true, skipped: true };
     }
 
@@ -179,10 +172,8 @@ export async function updateCalendarEvent(eventId, booking) {
       resource: event,
     });
 
-    console.log('[GoogleCalendar] Evento actualizado:', eventId);
     return { success: true };
   } catch (error) {
-    console.error('[GoogleCalendar] Error actualizando evento:', error.message);
     return { success: false, error: error.message };
   }
 }
@@ -197,7 +188,6 @@ export async function updateCalendarEvent(eventId, booking) {
 export async function updateAllDayEvent(eventId, booking) {
   try {
     if (!process.env.GOOGLE_REFRESH_TOKEN || !eventId) {
-      console.log('[GoogleCalendar] No configurado o sin eventId, saltando...');
       return { success: true, skipped: true };
     }
 
@@ -227,10 +217,8 @@ export async function updateAllDayEvent(eventId, booking) {
       resource: event,
     });
 
-    console.log('[GoogleCalendar] Evento all-day actualizado:', eventId);
     return { success: true };
   } catch (error) {
-    console.error('[GoogleCalendar] Error actualizando evento all-day:', error.message);
     return { success: false, error: error.message };
   }
 }
@@ -244,7 +232,6 @@ export async function updateAllDayEvent(eventId, booking) {
 export async function deleteCalendarEvent(eventId) {
   try {
     if (!process.env.GOOGLE_REFRESH_TOKEN || !eventId) {
-      console.log('[GoogleCalendar] No configurado o sin eventId, saltando...');
       return { success: true, skipped: true };
     }
 
@@ -255,15 +242,12 @@ export async function deleteCalendarEvent(eventId) {
       eventId: eventId,
     });
 
-    console.log('[GoogleCalendar] Evento eliminado:', eventId);
     return { success: true };
   } catch (error) {
     // Si el evento ya no existe, no es un error crítico
     if (error.code === 404 || error.code === 410) {
-      console.log('[GoogleCalendar] Evento ya no existe:', eventId);
       return { success: true };
     }
-    console.error('[GoogleCalendar] Error eliminando evento:', error.message);
     return { success: false, error: error.message };
   }
 }

@@ -37,7 +37,6 @@ export async function getProfileData() {
       .single();
 
     if (profileError) {
-      console.error('Error obteniendo user_profile:', profileError);
     }
 
     return {
@@ -57,7 +56,6 @@ export async function getProfileData() {
       }
     };
   } catch (error) {
-    console.error('Error al obtener perfil:', error);
     return { success: false, error: error.message };
   }
 }
@@ -108,7 +106,6 @@ export async function updateProfile(formData) {
 
     return { success: true };
   } catch (error) {
-    console.error('Error al actualizar perfil:', error);
     return { success: false, error: error.message };
   }
 }
@@ -152,7 +149,6 @@ export async function updateEmail(newEmail) {
       message: 'Se ha enviado un correo de confirmación a tu nueva dirección'
     };
   } catch (error) {
-    console.error('Error al actualizar email:', error);
     return { success: false, error: error.message };
   }
 }

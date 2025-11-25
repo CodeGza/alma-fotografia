@@ -18,11 +18,8 @@ export async function getFeaturedTestimonials() {
       .limit(10);
 
     if (testimonialsError) {
-      console.error('Error obteniendo testimonials:', testimonialsError);
       throw testimonialsError;
     }
-
-    console.log('Testimonios destacados encontrados:', testimonials?.length || 0);
 
     // Si no hay testimonios, retornar array vacío
     if (!testimonials || testimonials.length === 0) {
@@ -79,11 +76,8 @@ export async function getFeaturedTestimonials() {
         : null
     }));
 
-    console.log('Primer testimonio formateado:', JSON.stringify(formattedTestimonials[0], null, 2));
-
     return { success: true, testimonials: formattedTestimonials };
   } catch (error) {
-    console.error('Error en getFeaturedTestimonials:', error);
     return { success: false, testimonials: [], error: error.message };
   }
 }
@@ -102,11 +96,8 @@ export async function getPublicGalleriesPreview() {
       .order('name', { ascending: true });
 
     if (servicesError) {
-      console.error('Error obteniendo servicios:', servicesError);
       throw servicesError;
     }
-
-    console.log('Servicios encontrados:', services?.length || 0);
 
     // Para cada servicio, obtener una galería pública con fotos
     const servicesWithGalleries = await Promise.all(
@@ -134,10 +125,8 @@ export async function getPublicGalleriesPreview() {
           .maybeSingle();
 
         if (galleryError) {
-          console.error(`Error obteniendo galería para servicio ${service.name}:`, galleryError);
+          // Error obteniendo galería, continuar con siguiente servicio
         }
-
-        console.log(`Servicio: ${service.name}, Galería encontrada:`, !!gallery, 'Fotos:', gallery?.photos?.length || 0);
 
         // Si no hay cover_image pero hay fotos, usar la foto marcada como cover o la primera
         if (gallery && !gallery.cover_image && gallery.photos && gallery.photos.length > 0) {
@@ -160,15 +149,11 @@ export async function getPublicGalleriesPreview() {
       s => s.gallery !== null && s.gallery.photos && s.gallery.photos.length > 0
     );
 
-    console.log('Servicios con galerías públicas:', servicesWithPublicGalleries.length);
-    console.log('Datos finales:', JSON.stringify(servicesWithPublicGalleries, null, 2));
-
     return {
       success: true,
       services: servicesWithPublicGalleries
     };
   } catch (error) {
-    console.error('Error en getPublicGalleriesPreview:', error);
     return { success: false, services: [], error: error.message };
   }
 }
@@ -260,7 +245,6 @@ export async function getOrCreateLandingGalleryLink(galleryId, gallerySlug) {
     return { success: true, url, token, isNew: true };
 
   } catch (error) {
-    console.error('Error en getOrCreateLandingGalleryLink:', error);
     return { success: false, error: error.message };
   }
 }
@@ -297,9 +281,6 @@ export async function createPublicBooking({
       .single();
 
     if (error) throw error;
-
-    // TODO: Enviar notificación al fotógrafo
-    // TODO: Enviar email de confirmación al cliente
 
     return { success: true, booking: data };
   } catch (error) {

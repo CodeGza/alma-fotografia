@@ -367,9 +367,9 @@ function ClientFavoritesSection({
         );
       default:
         return (
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-500/30 rounded-full">
-            <Clock size={14} className="text-amber-400" />
-            <span className="text-xs font-fira font-medium text-amber-300">Seleccionando</span>
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-[#8B5E3C]/20 border border-[#8B5E3C]/40 rounded-full">
+            <Clock size={14} className="text-[#8B5E3C]" />
+            <span className="text-xs font-fira font-medium text-[#6d4a2f]">Seleccionando</span>
           </div>
         );
     }
@@ -458,7 +458,7 @@ function ClientFavoritesSection({
             className={`px-3 py-1.5 rounded-lg transition-all font-fira text-xs font-semibold flex items-center gap-1.5 ${
               allowShareFavorites
                 ? 'bg-pink-100 text-pink-700 border border-pink-300'
-                : 'bg-[#8B5E3C] hover:bg-[#6d4a2f] text-white'
+                : 'bg-[#8B5E3C] hover:bg-[#6d4a2f] !text-white'
             } ${isUpdatingShareSetting ? 'opacity-50' : ''}`}
           >
             <Share2 size={14} />
@@ -471,7 +471,7 @@ function ClientFavoritesSection({
               disabled={downloadProgress.show}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-3 py-1.5 bg-[#79502A] hover:bg-[#8B5A2F] text-white rounded-lg transition-colors font-fira text-xs font-semibold flex items-center gap-1.5 disabled:opacity-70"
+              className="px-3 py-1.5 bg-[#79502A] hover:bg-[#8B5A2F] !text-white rounded-lg transition-colors font-fira text-xs font-semibold flex items-center gap-1.5 disabled:opacity-70"
             >
               {downloadProgress.show ? (
                 <>

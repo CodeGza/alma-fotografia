@@ -51,7 +51,13 @@
       "Bash(powershell:*)",
       "Bash(npm cache clean:*)",
       "Bash(node scripts/getGoogleToken.js:*)",
-      "Bash(node cleanup-console.js:*)"
+      "Bash(node cleanup-console.js:*)",
+      "Bash(npm run build:*)",
+      "Bash(done)",
+      "Bash(for dir in ./src/app/dashboard/galerias ./src/app/dashboard/testimonios ./src/app/dashboard/agenda ./src/app/dashboard/configuracion)",
+      "Bash(do if [ ! -f \"$dir/loading.js\" ])",
+      "Bash(then echo \"MISSING: $dir/loading.js\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []

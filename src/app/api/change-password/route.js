@@ -79,12 +79,12 @@ export async function POST(request) {
     }
 
     // Marcar que ya no requiere cambio de contraseña
-    const { error: updateError } = await supabase
+    const { error: profileUpdateError } = await supabase
       .from('user_profiles')
       .update({ requires_password_change: false })
       .eq('id', user.id);
 
-    if (updateError) {
+    if (profileUpdateError) {
       return NextResponse.json(
         { success: false, error: 'Error al actualizar el perfil' },
         { status: 500 }

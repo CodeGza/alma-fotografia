@@ -34,12 +34,8 @@ async function FavoritesContent({ galleryId }) {
     .single();
 
   if (galleryError || !gallery) {
-    console.error('Gallery not found:', galleryId);
     notFound();
   }
-
-  // Log para debugging
-  console.log('[FavoritesContent] Fetching favorites for gallery:', galleryId);
 
   // Primero obtener los favoritos
   const { data: favoritesData, error: favoritesError } = await supabase
@@ -49,7 +45,6 @@ async function FavoritesContent({ galleryId }) {
     .order('created_at', { ascending: false });
 
   if (favoritesError) {
-    console.error('[FavoritesContent] Error fetching favorites:', favoritesError);
     return (
       <div className="p-6 text-center">
         <p className="text-white/60">Error al cargar favoritas</p>
@@ -61,35 +56,16 @@ async function FavoritesContent({ galleryId }) {
   // Obtener IDs únicos de fotos
   const photoIds = [...new Set((favoritesData || []).map(f => f.photo_id).filter(Boolean))];
 
-  console.log('[FavoritesContent] Photo IDs to fetch:', {
-    count: photoIds.length,
-    ids: photoIds
-  });
-
   // Obtener datos de las fotos
   let photosData = [];
   if (photoIds.length > 0) {
     // Intentar query más simple primero
-    const { data: photos, error: photosError } = await supabase
+    const { data: photos } = await supabase
       .from('photos')
       .select('*')
       .in('id', photoIds);
 
-    console.log('[FavoritesContent] Photos query result:', {
-      errorType: typeof photosError,
-      errorKeys: photosError ? Object.keys(photosError) : null,
-      hasError: !!photosError && Object.keys(photosError).length > 0,
-      photosCount: photos?.length,
-      photosReceived: !!photos,
-      samplePhoto: photos?.[0]
-    });
-
     photosData = photos || [];
-
-    console.log('[FavoritesContent] PhotosData final:', {
-      count: photosData.length,
-      sample: photosData[0]
-    });
   }
 
   // Mapear fotos a un objeto para fácil acceso
@@ -98,26 +74,11 @@ async function FavoritesContent({ galleryId }) {
     photosMap[photo.id] = photo;
   });
 
-  console.log('[FavoritesContent] PhotosMap created:', {
-    mapSize: Object.keys(photosMap).length,
-    photoIds: Object.keys(photosMap),
-    sampleMapping: Object.entries(photosMap)[0]
-  });
-
   // Combinar datos de favoritos con fotos
   const favorites = (favoritesData || []).map(fav => ({
     ...fav,
     photo: photosMap[fav.photo_id] || null
   }));
-
-  console.log('[FavoritesContent] Favorites result:', {
-    count: favorites?.length,
-    withPhotos: favorites.filter(f => f.photo).length,
-    withoutPhotos: favorites.filter(f => !f.photo).length,
-    sampleFavorite: favorites?.[0],
-    samplePhotoId: favorites?.[0]?.photo_id,
-    samplePhotoFound: favorites?.[0] ? !!photosMap[favorites[0].photo_id] : null
-  });
 
   // Obtener historial de actividad
   const { data: historyData } = await supabase
@@ -125,11 +86,6 @@ async function FavoritesContent({ galleryId }) {
     .select('id, client_email, client_name, action_type, photo_count, added_count, removed_count, created_at')
     .eq('gallery_id', galleryId)
     .order('created_at', { ascending: false });
-
-  console.log('[FavoritesContent] History data:', {
-    count: historyData?.length || 0,
-    sample: historyData?.[0]
-  });
 
   // Obtener notas de las fotos
   const { data: notesData } = await supabase
@@ -141,11 +97,6 @@ async function FavoritesContent({ galleryId }) {
   const notesMap = {};
   (notesData || []).forEach(note => {
     notesMap[note.photo_id] = note.note;
-  });
-
-  console.log('[FavoritesContent] Notes loaded:', {
-    count: Object.keys(notesMap).length,
-    sampleNote: notesData?.[0]
   });
 
   // Agrupar historial por cliente
@@ -184,14 +135,6 @@ async function FavoritesContent({ galleryId }) {
   });
 
   const finalData = Object.values(favoritesByClient);
-
-  console.log('[FavoritesContent] Grouped by client:', {
-    clientCount: Object.keys(favoritesByClient).length,
-    clients: Object.keys(favoritesByClient),
-    fullData: favoritesByClient,
-    finalDataToComponent: finalData,
-    firstClientPhotos: finalData[0]?.photos
-  });
 
   return (
     <FavoritesView

@@ -58,7 +58,8 @@
       "Bash(do if [ ! -f \"$dir/loading.js\" ])",
       "Bash(then echo \"MISSING: $dir/loading.js\")",
       "Bash(fi)",
-      "Bash(pnpm run build)"
+      "Bash(pnpm run build)",
+      "Bash(git remote add:*)"
     ],
     "deny": [],
     "ask": []

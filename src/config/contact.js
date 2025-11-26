@@ -5,7 +5,7 @@
 
 export const CONTACT = {
   // Email principal
-  email: 'contacto@almafotografia.com',
+  email: 'almafotografiauy@gmail.com',
 
   // WhatsApp (solo números, sin +)
   whatsapp: '59892021392',
@@ -14,8 +14,8 @@ export const CONTACT = {
   phone: '+598 92 021 392',
 
   // Redes sociales
-  instagram: '@almafotografiauy',
-  instagramUrl: 'https://instagram.com/almafotografiauy',
+  instagram: '@alma_fotografia.uy',
+  instagramUrl: 'https://www.instagram.com/alma_fotografia.uy/',
 
   facebook: 'Alma Fotografía',
   facebookUrl: 'https://facebook.com/almafotografiauy',

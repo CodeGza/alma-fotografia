@@ -9,11 +9,12 @@ export async function getFeaturedTestimonials() {
   try {
     const supabase = await createClient();
 
-    // Obtener testimonios destacados (sin relaciones complejas)
+    // Obtener testimonios destacados Y aprobados (sin relaciones complejas)
     const { data: testimonials, error: testimonialsError } = await supabase
       .from('testimonials')
       .select('id, client_name, rating, message, created_at, gallery_id')
       .eq('is_featured', true)
+      .eq('is_approved', true)
       .order('created_at', { ascending: false })
       .limit(10);
 

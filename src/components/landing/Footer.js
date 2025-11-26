@@ -166,7 +166,12 @@ export default function Footer({ profile }) {
                 </li>
                 <li className="flex items-start gap-3">
                   <Mail size={16} className="text-[#8B5E3C] flex-shrink-0 mt-0.5" />
-                  <a href={getMailtoUrl()} className="font-fira text-sm text-gray-400 hover:text-[#B89968] transition-colors">
+                  <a
+                    href={getMailtoUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-fira text-sm text-gray-400 hover:text-[#B89968] transition-colors"
+                  >
                     {CONTACT.email}
                   </a>
                 </li>

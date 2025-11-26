@@ -48,6 +48,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import ShareGalleryModal from './ShareGalleryModal';
+import { getThumbnailUrl } from '@/lib/image-utils';
 import EditGalleryModal from './EditGalleryModal';
 import PhotoUploader from './PhotoUploader';
 import SectionsManager from './SectionsManager';
@@ -238,13 +239,12 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
     >
       <div className="relative w-full max-w-full bg-gray-200 overflow-hidden">
         <Image
-          src={photo.file_path}
+          src={getThumbnailUrl(photo.file_path)}
           alt={photo.file_name || `Foto ${photoIndex + 1}`}
-          width={0}
-          height={0}
+          width={400}
+          height={400}
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
           className="w-full max-w-full h-auto block"
-          unoptimized={true}
           loading="lazy"
           placeholder="blur"
           blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
@@ -1577,8 +1577,7 @@ export default function GalleryDetailView({ gallery }) {
                         className="!text-white px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 bg-[#8B5E3C] hover:bg-[#6d4a2f] rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs md:text-sm font-medium flex items-center gap-1 sm:gap-1.5 md:gap-2 whitespace-nowrap flex-shrink-0 shadow-sm text-white"
                       >
                         <CheckSquare size={12} className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
-                        <span className="hidden xs:inline">Seleccionar</span>
-                        <span className="xs:hidden">Sel.</span>
+                        <span>Seleccionar</span>
                       </button>
                       {workingPhotos.length > 1 && (
                         <button
@@ -1586,8 +1585,7 @@ export default function GalleryDetailView({ gallery }) {
                           className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs md:text-sm font-medium flex items-center gap-1 sm:gap-1.5 md:gap-2 whitespace-nowrap flex-shrink-0 shadow-sm text-gray-900"
                         >
                           <GripVertical size={12} className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
-                          <span className="hidden xs:inline">Reordenar</span>
-                          <span className="xs:hidden">Ord.</span>
+                          <span>Reordenar</span>
                         </button>
                       )}
                       <button

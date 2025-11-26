@@ -49,9 +49,8 @@ export async function sendEmail({ to, subject, html, from }) {
       };
     }
 
-    // En desarrollo/sandbox, usar el email onboarding de Resend
-    // Este puede enviar a cualquier email verificado en tu cuenta de Resend
-    const fromEmail = from || 'Alma Fotografía <onboarding@resend.dev>';
+    // Email de envío con dominio verificado
+    const fromEmail = from || 'Alma Fotografía <hola@almafotografiauy.com>';
 
     console.log('📧 Enviando email a:', to);
     console.log('📧 Desde:', fromEmail);

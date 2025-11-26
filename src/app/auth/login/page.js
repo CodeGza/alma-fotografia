@@ -59,8 +59,12 @@ export default function LoginPage() {
       setErrorMsg(result.error || 'Credenciales incorrectas');
     } else {
       setSuccess(true);
-      // Redirigir inmediatamente sin delay para mayor velocidad
-      router.replace('/dashboard');
+      // Refrescar para que el middleware reconozca la nueva sesión
+      router.refresh();
+      // Pequeño delay para asegurar que las cookies se establezcan
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 100);
     }
   }
 

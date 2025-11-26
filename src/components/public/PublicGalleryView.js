@@ -543,15 +543,17 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
     };
   }, [clientEmail, clientName, galleryId, favoritePhotoIds.length]);
 
-  // Filtrar fotos según sección seleccionada
+  // Filtrar fotos según sección seleccionada y ordenar por display_order
   useEffect(() => {
     if (selectedSection) {
-      const filtered = photos.filter(photo => photo.section_id === selectedSection);
+      const filtered = photos
+        .filter(photo => photo.section_id === selectedSection)
+        .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
       setFilteredPhotos(filtered);
     } else {
-      // Si no hay sección seleccionada aún, mostrar todas las fotos
-      // (esto permite que funcionen los favoritos mientras carga)
-      setFilteredPhotos(photos);
+      // Si no hay sección seleccionada aún, mostrar todas las fotos ordenadas
+      const sorted = [...photos].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+      setFilteredPhotos(sorted);
     }
   }, [selectedSection, photos]);
 
@@ -1586,9 +1588,11 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
                     </div>
                   );
                 } else {
-                  // Renderizar header de sección + sus fotos
+                  // Renderizar header de sección + sus fotos (ordenadas por display_order)
                   const section = item.data;
-                  const sectionPhotos = photos.filter(p => p.section_id === section.id);
+                  const sectionPhotos = photos
+                    .filter(p => p.section_id === section.id)
+                    .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
 
                   return (
                     <div key={`section-${section.id}`}>

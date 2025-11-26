@@ -80,6 +80,31 @@ export async function registerUser({ username, email, password, full_name }) {
       return { success: false, error: error.message };
     }
 
+    // Crear el perfil en user_profiles
+    const { error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .insert({
+        id: data.user.id,
+        email: email,
+        username: username,
+        full_name: full_name || 'Fernanda',
+        is_active: true,
+        permissions: {
+          manage_users: false,
+          edit_bookings: true,
+          edit_galleries: true,
+          delete_bookings: false,
+          delete_galleries: false
+        },
+        requires_password_change: false
+      });
+
+    if (profileError) {
+      // Si falla crear el perfil, eliminar el usuario de auth
+      await supabaseAdmin.auth.admin.deleteUser(data.user.id);
+      return { success: false, error: 'Error al crear perfil de usuario: ' + profileError.message };
+    }
+
     return {
       success: true,
       message: 'Usuario registrado correctamente',

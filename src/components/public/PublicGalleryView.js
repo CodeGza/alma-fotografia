@@ -41,6 +41,7 @@ SectionHeader.displayName = 'SectionHeader';
  */
 /**
  * PhotoItem - Componente individual de foto con lazy loading optimizado
+ * Mantiene aspect ratio original para masonry layout
  */
 const PhotoItem = memo(({
   photo,
@@ -66,21 +67,20 @@ const PhotoItem = memo(({
   const imageUrl = photo.cloudinary_url || photo.file_path;
 
   // Optimizar URL de Cloudinary para thumbnails (más rápido)
-  const getOptimizedUrl = (url, isThumb = true) => {
+  const getOptimizedUrl = (url) => {
     if (!url || !url.includes('cloudinary.com')) return url;
     const parts = url.split('/upload/');
     if (parts.length !== 2) return url;
     // Para thumbnails en grid: calidad 80, ancho máximo 600px, formato auto
-    const transforms = isThumb ? 'q_80,w_600,f_auto' : 'q_90,f_auto';
-    return `${parts[0]}/upload/${transforms}/${parts[1]}`;
+    return `${parts[0]}/upload/q_80,w_600,f_auto/${parts[1]}`;
   };
 
   const optimizedUrl = getOptimizedUrl(imageUrl);
 
   return (
-    <div className="group relative break-inside-avoid mb-2">
+    <div className="group relative break-inside-avoid">
       <div
-        className={`relative w-full overflow-hidden cursor-pointer ${
+        className={`relative w-full bg-gray-100 overflow-hidden cursor-pointer ${
           isSelectingFavorites && isSelected ? 'ring-4 ring-rose-500 rounded-lg' : ''
         }`}
         onClick={() => {
@@ -91,47 +91,41 @@ const PhotoItem = memo(({
           }
         }}
       >
-        {/* Skeleton placeholder con aspect ratio estimado */}
-        <div
-          className={`relative w-full bg-gray-100 ${!isLoaded ? 'animate-pulse' : ''}`}
-          style={{
-            aspectRatio: photo.width && photo.height
-              ? `${photo.width}/${photo.height}`
-              : '4/3' // Aspect ratio por defecto
-          }}
-        >
-          {!hasError && (
-            <Image
-              src={optimizedUrl}
-              alt={`${galleryTitle} - ${photo.file_name || `Foto ${index + 1}`}`}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className={`object-cover transition-all duration-500 group-hover:scale-105 ${
-                isLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              loading={isPriority ? 'eager' : 'lazy'}
-              priority={isPriority}
-              quality={80}
-              onLoad={() => setIsLoaded(true)}
-              onError={() => {
-                setHasError(true);
-                setIsLoaded(true);
-              }}
-            />
-          )}
+        {/* Imagen con aspect ratio natural (masonry) */}
+        {!hasError && (
+          <Image
+            src={optimizedUrl}
+            alt={`${galleryTitle} - ${photo.file_name || `Foto ${index + 1}`}`}
+            width={0}
+            height={0}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className={`w-full h-auto transition-all duration-500 group-hover:scale-105 ${
+              isLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{ width: '100%', height: 'auto' }}
+            loading={isPriority ? 'eager' : 'lazy'}
+            priority={isPriority}
+            quality={80}
+            unoptimized
+            onLoad={() => setIsLoaded(true)}
+            onError={() => {
+              setHasError(true);
+              setIsLoaded(true);
+            }}
+          />
+        )}
 
-          {/* Error placeholder */}
-          {hasError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
-              <span className="text-gray-400 text-xs">Error</span>
-            </div>
-          )}
+        {/* Skeleton loader mientras carga - altura mínima para evitar colapso */}
+        {!isLoaded && !hasError && (
+          <div className="w-full min-h-[200px] bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse" />
+        )}
 
-          {/* Skeleton loader mientras carga */}
-          {!isLoaded && !hasError && (
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse" />
-          )}
-        </div>
+        {/* Error placeholder */}
+        {hasError && (
+          <div className="w-full min-h-[150px] flex items-center justify-center bg-gray-200">
+            <span className="text-gray-400 text-xs">Error</span>
+          </div>
+        )}
 
         {/* Overlay en modo selección */}
         {isSelectingFavorites && (
@@ -216,7 +210,7 @@ const PhotoGrid = memo(({
   const PRIORITY_COUNT = 8;
 
   return (
-    <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2">
+    <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
       {photos.map((photo, index) => (
         <PhotoItem
           key={photo.id}

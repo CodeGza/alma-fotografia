@@ -56,49 +56,59 @@ async function FavoritesGalleryContent({ slug, hash, token }) {
     return <ErrorPage message="El enlace de favoritos no es válido." />;
   }
 
-  // Obtener share activo
+  // Obtener share activo - necesita política RLS pública
   const { data: shareData, error: shareError } = await supabase
     .from('gallery_shares')
     .select('gallery_id, is_active, expires_at')
     .eq('share_token', token)
-    .single();
+    .maybeSingle();
 
-  // Verificar error real de share
-  if (shareError && (shareError.message || shareError.code)) {
+  // Verificar error de share
+  if (shareError) {
     console.error('[FavoritesPage] Share error:', shareError);
-    notFound();
+    return <ErrorPage message="Error al verificar el enlace. Verifica que el enlace sea correcto." />;
   }
 
-  if (!shareData || !shareData.is_active) {
-    console.error('[FavoritesPage] Share not active or not found');
-    notFound();
+  if (!shareData) {
+    console.error('[FavoritesPage] Share not found for token');
+    return <ErrorPage message="El enlace no es válido o ha expirado." />;
+  }
+
+  if (!shareData.is_active) {
+    console.error('[FavoritesPage] Share not active');
+    return <ErrorPage message="Este enlace ha sido desactivado." />;
   }
 
   // Verificar expiración
   if (shareData.expires_at && new Date(shareData.expires_at) < new Date()) {
     console.error('[FavoritesPage] Share expired');
-    notFound();
+    return <ErrorPage message="Este enlace ha expirado." />;
   }
 
-  // Obtener galería primero - usar solo gallery_id del share (slug ya fue validado en el share)
+  // Obtener galería
   const { data: gallery, error: galleryError } = await supabase
     .from('galleries')
     .select('*')
     .eq('id', shareData.gallery_id)
-    .single();
+    .maybeSingle();
 
-  if (galleryError || !gallery) {
+  if (galleryError) {
     console.error('[FavoritesPage] Gallery error:', galleryError);
-    notFound();
+    return <ErrorPage message="Error al cargar la galería." />;
   }
 
-  // Verificar que el slug coincide (case-insensitive)
-  if (gallery.slug && gallery.slug.toLowerCase() !== slug.toLowerCase()) {
+  if (!gallery) {
+    console.error('[FavoritesPage] Gallery not found for id:', shareData.gallery_id);
+    return <ErrorPage message="La galería no existe." />;
+  }
+
+  // Verificar que el slug coincide (case-insensitive) - solo si hay slug
+  if (gallery.slug && slug && gallery.slug.toLowerCase() !== slug.toLowerCase()) {
     console.error('[FavoritesPage] Slug mismatch:', { expected: gallery.slug, received: slug });
-    notFound();
+    return <ErrorPage message="El enlace no corresponde a esta galería." />;
   }
 
-  // Buscar favoritos - usar ILIKE para case-insensitive
+  // Buscar favoritos
   const normalizedEmail = clientEmail.toLowerCase().trim();
 
   const { data: favorites, error: favError } = await supabase
@@ -107,14 +117,15 @@ async function FavoritesGalleryContent({ slug, hash, token }) {
     .eq('gallery_id', gallery.id)
     .ilike('client_email', normalizedEmail);
 
-  if (favError && favError.code !== 'PGRST116') {
+  if (favError) {
     console.error('[FavoritesPage] Favorites error:', favError);
+    return <ErrorPage message="Error al cargar los favoritos." />;
   }
 
-  // Si no hay favoritos, mostrar error con info adicional
+  // Si no hay favoritos
   if (!favorites || favorites.length === 0) {
     console.log('[FavoritesPage] No favorites found for:', normalizedEmail, 'in gallery:', gallery.id);
-    return <ErrorPage message="Este cliente aún no ha seleccionado fotos favoritas." />;
+    return <ErrorPage message={`No se encontraron fotos favoritas para ${normalizedEmail.split('@')[0]}.`} />;
   }
 
   const favoritePhotoIds = favorites.map(f => f.photo_id);

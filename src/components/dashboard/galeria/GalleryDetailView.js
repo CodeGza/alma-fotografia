@@ -229,26 +229,30 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
     transition: transition || 'transform 200ms cubic-bezier(0.25, 1, 0.5, 1)',
   };
 
+  // En modo reordenar: aspect-square para grid uniforme
+  // En modo normal: aspect ratio natural para masonry
+  const containerClass = isReorderMode
+    ? `group relative aspect-square ${isDragging ? 'opacity-40 scale-105' : 'opacity-100'}`
+    : `group relative mb-0.5 sm:mb-2 break-inside-avoid max-w-full ${isDragging ? 'opacity-40' : 'opacity-100'}`;
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative mb-0.5 sm:mb-2 break-inside-avoid max-w-full ${
-        isDragging ? 'opacity-40' : 'opacity-100'
-      }`}
+      className={containerClass}
     >
-      <div className="relative w-full max-w-full bg-gray-200 overflow-hidden">
+      <div className={`relative w-full ${isReorderMode ? 'h-full' : 'max-w-full'} bg-gray-200 overflow-hidden rounded-lg`}>
         <Image
           src={getThumbnailUrl(photo.file_path)}
           alt={photo.file_name || `Foto ${photoIndex + 1}`}
           width={400}
           height={400}
-          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-          className="w-full max-w-full h-auto block"
+          sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 16vw"
+          className={isReorderMode ? "w-full h-full object-cover" : "w-full max-w-full h-auto block"}
           loading="lazy"
           placeholder="blur"
           blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
-          style={{ width: '100%', maxWidth: '100%', height: 'auto', display: 'block' }}
+          style={isReorderMode ? {} : { width: '100%', maxWidth: '100%', height: 'auto', display: 'block' }}
         />
 
         {/* Drag handle - SOLO desde el icono para permitir scroll */}
@@ -321,6 +325,7 @@ export default function GalleryDetailView({ gallery }) {
   const [deletingPhotos, setDeletingPhotos] = useState(false);
   const [changingCover, setChangingCover] = useState(false);
   const [localPhotos, setLocalPhotos] = useState(gallery.photos);
+  const [photosBeforeReorder, setPhotosBeforeReorder] = useState(null); // Para restaurar al cancelar
   const [savingOrder, setSavingOrder] = useState(false);
   const [collapsedBlocks, setCollapsedBlocks] = useState(new Set()); // Para trackear bloques colapsados
   const [deletingGallery, setDeletingGallery] = useState(false);
@@ -718,6 +723,7 @@ export default function GalleryDetailView({ gallery }) {
 
       showToast({ message: 'Orden guardado correctamente', type: 'success' });
 
+      setPhotosBeforeReorder(null); // Limpiar estado de respaldo
       setReorderMode(false);
 
     } catch (error) {
@@ -729,7 +735,11 @@ export default function GalleryDetailView({ gallery }) {
 
   // Cancelar reordenamiento
   const cancelReorder = () => {
-    setLocalPhotos(gallery.photos); // Restaurar orden original
+    // Restaurar al estado antes de entrar en modo reordenar (no al original del servidor)
+    if (photosBeforeReorder) {
+      setLocalPhotos(photosBeforeReorder);
+    }
+    setPhotosBeforeReorder(null);
     setReorderMode(false);
   };
 
@@ -1565,7 +1575,10 @@ export default function GalleryDetailView({ gallery }) {
                       </button>
                       {workingPhotos.length > 1 && (
                         <button
-                          onClick={() => setReorderMode(true)}
+                          onClick={() => {
+                            setPhotosBeforeReorder([...localPhotos]); // Guardar estado actual antes de reordenar
+                            setReorderMode(true);
+                          }}
                           className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-all duration-200 font-fira text-[10px] sm:text-xs md:text-sm font-medium flex items-center gap-1 sm:gap-1.5 md:gap-2 whitespace-nowrap flex-shrink-0 shadow-sm text-gray-900"
                         >
                           <GripVertical size={12} className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
@@ -1691,7 +1704,8 @@ export default function GalleryDetailView({ gallery }) {
                     items={workingPhotos.map(p => p.id)}
                     strategy={rectSortingStrategy}
                   >
-                    <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-1.5 sm:gap-2 space-y-1.5 sm:space-y-2">
+                    {/* Grid regular para reordenar (no masonry) - más predecible para drag & drop */}
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
                       {workingPhotos.map((photo, index) => (
                         <SortablePhoto
                           key={photo.id}
@@ -1709,21 +1723,19 @@ export default function GalleryDetailView({ gallery }) {
                   {/* DragOverlay: Preview flotante durante el drag */}
                   <DragOverlay
                     dropAnimation={{
-                      duration: 300,
-                      easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+                      duration: 250,
+                      easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
                     }}
                   >
                     {activeId ? (
-                      <div className="shadow-2xl ring-2 ring-[#79502A] rotate-3 opacity-95">
+                      <div className="shadow-2xl ring-3 ring-[#79502A] rounded-lg overflow-hidden rotate-2 scale-105">
                         <Image
-                          src={workingPhotos.find(p => p.id === activeId)?.file_path}
+                          src={getThumbnailUrl(workingPhotos.find(p => p.id === activeId)?.file_path)}
                           alt="Arrastrando"
-                          width={0}
-                          height={0}
-                          sizes="300px"
-                          className="w-[250px] sm:w-[300px] h-auto rounded-lg"
+                          width={150}
+                          height={150}
+                          className="w-24 h-24 sm:w-28 sm:h-28 object-cover"
                           unoptimized={true}
-                          style={{ width: '250px', height: 'auto' }}
                         />
                       </div>
                     ) : null}

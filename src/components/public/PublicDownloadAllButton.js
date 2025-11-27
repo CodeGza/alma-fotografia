@@ -237,20 +237,20 @@ export default function PublicDownloadAllButton({
                 throw new Error('No se pudo descargar ninguna foto. Verifica tu conexión.');
             }
 
-            // Generar el ZIP con callback de progreso
-            setStatus('Comprimiendo archivos...');
+            // Generar el ZIP SIN compresión (STORE) - Las fotos JPG ya están comprimidas
+            // Esto hace que la generación sea casi instantánea
+            setStatus('Generando archivo ZIP...');
+            setProgress(92);
 
             const zipBlob = await zip.generateAsync(
                 {
                     type: 'blob',
-                    compression: 'DEFLATE',
-                    compressionOptions: { level: 3 } // Nivel más bajo = más rápido
+                    compression: 'STORE' // Sin compresión = mucho más rápido
                 },
                 (metadata) => {
-                    // Actualizar progreso durante la compresión (90-99%)
-                    const zipProgress = Math.round(90 + (metadata.percent * 0.09));
+                    // Actualizar progreso durante la generación (92-99%)
+                    const zipProgress = Math.round(92 + (metadata.percent * 0.07));
                     setProgress(zipProgress);
-                    setStatus(`Comprimiendo... ${Math.round(metadata.percent)}%`);
                 }
             );
 

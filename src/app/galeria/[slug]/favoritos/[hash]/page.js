@@ -23,14 +23,23 @@ export const revalidate = 300;
  */
 function decodeHash(hash) {
   try {
-    // Primero intentar con Buffer (Node.js)
-    const decoded = Buffer.from(hash, 'base64').toString('utf-8');
+    // Decodificar el hash URL-safe primero
+    const cleanHash = decodeURIComponent(hash);
+
+    // Decodificar base64 a UTF-8
+    const decoded = Buffer.from(cleanHash, 'base64').toString('utf-8');
+
+    console.log('[decodeHash] Input:', hash, '-> Decoded:', decoded);
+
     // Validar que es un email válido
     if (decoded && decoded.includes('@')) {
       return decoded.toLowerCase().trim();
     }
+
+    console.log('[decodeHash] Invalid email format');
     return null;
-  } catch {
+  } catch (error) {
+    console.error('[decodeHash] Error:', error.message);
     return null;
   }
 }
@@ -108,18 +117,33 @@ async function FavoritesGalleryContent({ slug, hash, token }) {
     return <ErrorPage message="El enlace no corresponde a esta galería." />;
   }
 
-  // Buscar favoritos
+  // Buscar favoritos - usar ilike para búsqueda case-insensitive
   const normalizedEmail = clientEmail.toLowerCase().trim();
 
   console.log('[FavoritesPage] Searching favorites for email:', normalizedEmail, 'gallery:', gallery.id);
 
-  const { data: favorites, error: favError } = await supabase
+  // Primero intentar búsqueda exacta
+  let { data: favorites, error: favError } = await supabase
     .from('favorites')
     .select('photo_id, client_email')
     .eq('gallery_id', gallery.id)
     .eq('client_email', normalizedEmail);
 
-  console.log('[FavoritesPage] Query result:', { favorites, favError });
+  console.log('[FavoritesPage] Exact match result:', { count: favorites?.length, favError });
+
+  // Si no hay resultados, intentar con ilike (case-insensitive)
+  if ((!favorites || favorites.length === 0) && !favError) {
+    console.log('[FavoritesPage] Trying case-insensitive search...');
+    const ilikeResult = await supabase
+      .from('favorites')
+      .select('photo_id, client_email')
+      .eq('gallery_id', gallery.id)
+      .ilike('client_email', normalizedEmail);
+
+    favorites = ilikeResult.data;
+    favError = ilikeResult.error;
+    console.log('[FavoritesPage] Case-insensitive result:', { count: favorites?.length, favError });
+  }
 
   if (favError) {
     console.error('[FavoritesPage] Favorites error:', favError);

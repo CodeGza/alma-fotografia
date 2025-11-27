@@ -1704,8 +1704,8 @@ export default function GalleryDetailView({ gallery }) {
                     items={workingPhotos.map(p => p.id)}
                     strategy={rectSortingStrategy}
                   >
-                    {/* Grid regular para reordenar (no masonry) - más predecible para drag & drop */}
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
+                    {/* Grid de 4 columnas para reordenar - mismo layout que vista pública */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2">
                       {workingPhotos.map((photo, index) => (
                         <SortablePhoto
                           key={photo.id}

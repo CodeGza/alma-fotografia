@@ -229,8 +229,8 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
     transition: transition || 'transform 200ms cubic-bezier(0.25, 1, 0.5, 1)',
   };
 
-  // En modo reordenar: aspect-square para grid uniforme
-  // En modo normal: aspect ratio natural para masonry
+  // Modo reordenar: grid con aspect-square
+  // Modo normal: masonry con aspect ratio natural
   const containerClass = isReorderMode
     ? `group relative aspect-square ${isDragging ? 'opacity-40 scale-105' : 'opacity-100'}`
     : `group relative mb-0.5 sm:mb-2 break-inside-avoid max-w-full ${isDragging ? 'opacity-40' : 'opacity-100'}`;
@@ -241,18 +241,19 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
       style={style}
       className={containerClass}
     >
-      <div className={`relative w-full ${isReorderMode ? 'h-full' : 'max-w-full'} bg-gray-200 overflow-hidden rounded-lg`}>
+      <div className={`relative w-full ${isReorderMode ? 'h-full' : ''} bg-gray-200 overflow-hidden rounded-lg`}>
         <Image
           src={getThumbnailUrl(photo.file_path)}
           alt={photo.file_name || `Foto ${photoIndex + 1}`}
-          width={400}
-          height={400}
-          sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 16vw"
-          className={isReorderMode ? "w-full h-full object-cover" : "w-full max-w-full h-auto block"}
+          width={isReorderMode ? undefined : 400}
+          height={isReorderMode ? undefined : 400}
+          fill={isReorderMode}
+          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+          className={isReorderMode ? "object-cover" : "w-full h-auto block"}
           loading="lazy"
           placeholder="blur"
           blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
-          style={isReorderMode ? {} : { width: '100%', maxWidth: '100%', height: 'auto', display: 'block' }}
+          style={isReorderMode ? {} : { width: '100%', height: 'auto' }}
         />
 
         {/* Drag handle - SOLO desde el icono para permitir scroll */}
@@ -1743,7 +1744,7 @@ export default function GalleryDetailView({ gallery }) {
                 </DndContext>
               </div>
             ) : selectionMode ? (
-              /* Modo selección: checkboxes */
+              /* Modo selección: masonry con checkboxes */
               <div className="px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 lg:py-8 max-w-full overflow-hidden">
                 <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-1.5 sm:gap-2 space-y-1.5 sm:space-y-2">
                   {photosToShow.map((photo, index) => {
@@ -1758,19 +1759,18 @@ export default function GalleryDetailView({ gallery }) {
                           isSelected ? 'ring-2 sm:ring-4 ring-[#79502A]' : ''
                         }`}
                       >
-                        <div className="relative w-full max-w-full bg-gray-200 overflow-hidden">
+                        <div className="relative w-full max-w-full bg-gray-200 overflow-hidden rounded-lg">
                           <Image
                             src={photo.file_path}
                             alt={photo.file_name || `Foto ${index + 1}`}
-                            width={0}
-                            height={0}
-                            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                            className="w-full max-w-full h-auto block"
-                            unoptimized={true}
+                            width={400}
+                            height={400}
+                            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                            className="w-full h-auto block"
                             loading="lazy"
                             placeholder="blur"
                             blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgZmlsbD0iI2UwZTBlMCIvPjwvc3ZnPg=="
-                            style={{ width: '100%', maxWidth: '100%', height: 'auto', display: 'block' }}
+                            style={{ width: '100%', height: 'auto' }}
                           />
 
                           <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 z-10">
@@ -1798,7 +1798,7 @@ export default function GalleryDetailView({ gallery }) {
                 </div>
               </div>
             ) : (
-              /* Modo normal: visualización sin paginación (scroll infinito con lazy loading) */
+              /* Modo normal: masonry layout */
               <div className="px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 lg:py-8 max-w-full overflow-hidden">
                 <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-1.5 sm:gap-2 space-y-1.5 sm:space-y-2">
                   {photosToShow.map((photo, index) => (

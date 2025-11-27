@@ -8,8 +8,7 @@ import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 import PendingBookingsWidget from '@/components/dashboard/PendingBookingsWidget';
 import UpcomingEventsWidget from '@/components/dashboard/UpcomingEventsWidget';
 import RecentNotificationsWidget from '@/components/dashboard/RecentNotificationsWidget';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/server';
 import StorageCard from '@/components/dashboard/StorageCard';
 import { startOfMonth, endOfMonth, format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -17,20 +16,7 @@ import { es } from 'date-fns/locale';
 export const revalidate = 60;
 
 async function getUserInfo() {
-  const cookieStore = await cookies();
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get(name) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
-
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   const userName = user?.user_metadata?.full_name ||
@@ -41,19 +27,7 @@ async function getUserInfo() {
 }
 
 async function DashboardStats() {
-  const cookieStore = await cookies();
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get(name) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
+  const supabase = await createClient();
 
   // Obtener fechas del mes actual
   const now = new Date();
@@ -134,19 +108,7 @@ async function DashboardStats() {
 }
 
 async function DashboardWidgets() {
-  const cookieStore = await cookies();
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get(name) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
+  const supabase = await createClient();
 
   const today = format(new Date(), 'yyyy-MM-dd');
 

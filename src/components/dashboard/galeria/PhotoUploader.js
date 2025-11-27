@@ -92,6 +92,56 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
 
   const optimizeImage = async (file) => {
     return new Promise((resolve, reject) => {
+      // Usar createImageBitmap para decodificación más rápida (si disponible)
+      if (typeof createImageBitmap !== 'undefined') {
+        createImageBitmap(file)
+          .then((bitmap) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const MAX_DIMENSION = 1920;
+            let width = bitmap.width;
+            let height = bitmap.height;
+
+            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+              const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+              width = Math.round(width * ratio);
+              height = Math.round(height * ratio);
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(bitmap, 0, 0, width, height);
+            bitmap.close(); // Liberar memoria
+
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  resolve(blob);
+                } else {
+                  reject(new Error('Error al optimizar'));
+                }
+              },
+              'image/webp',
+              0.82 // Ligeramente más comprimido para subida más rápida
+            );
+          })
+          .catch(() => {
+            // Fallback al método tradicional si createImageBitmap falla
+            optimizeImageFallback(file).then(resolve).catch(reject);
+          });
+      } else {
+        optimizeImageFallback(file).then(resolve).catch(reject);
+      }
+    });
+  };
+
+  // Método fallback para navegadores sin createImageBitmap
+  const optimizeImageFallback = async (file) => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
       reader.onload = (e) => {
@@ -106,17 +156,9 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
           let height = img.height;
 
           if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-            if (width > height) {
-              if (width > MAX_DIMENSION) {
-                height = (height * MAX_DIMENSION) / width;
-                width = MAX_DIMENSION;
-              }
-            } else {
-              if (height > MAX_DIMENSION) {
-                width = (width * MAX_DIMENSION) / height;
-                height = MAX_DIMENSION;
-              }
-            }
+            const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
           }
 
           canvas.width = width;
@@ -135,7 +177,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
               }
             },
             'image/webp',
-            0.85
+            0.82
           );
         };
 
@@ -362,8 +404,8 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
 
     setUploading(true);
 
-    // ✅ Batch size de 3 para evitar saturar servidor y Cloudinary
-    const BATCH_SIZE = 3;
+    // ✅ Batch size de 5 para mejor balance velocidad/estabilidad
+    const BATCH_SIZE = 5;
     const batches = [];
 
     // Crear batches con índice global correcto

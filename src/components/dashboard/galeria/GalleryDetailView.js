@@ -418,58 +418,63 @@ export default function GalleryDetailView({ gallery }) {
     })
     : null;
 
-  // Cargar conteo de favoritos
+  // Cargar datos iniciales en paralelo: favoritos, secciones, servicio
   useEffect(() => {
-    const loadFavoritesCount = async () => {
-      try {
-        const supabase = createClient();
-        const { count, error } = await supabase
+    const loadInitialData = async () => {
+      const supabase = createClient();
+
+      // Ejecutar todas las consultas en paralelo
+      const [favoritesResult, sectionsResult, serviceResult] = await Promise.all([
+        // Favoritos
+        supabase
           .from('favorites')
           .select('*', { count: 'exact', head: true })
-          .eq('gallery_id', id);
-
-        if (error) {
-          setFavoritesCount(0);
-        } else {
-          setFavoritesCount(count || 0);
-        }
-      } catch (error) {
-        setFavoritesCount(0);
-      }
-    };
-
-    loadFavoritesCount();
-  }, [id]);
-
-  // Cargar secciones de la galería y auto-seleccionar la primera
-  useEffect(() => {
-    const loadSections = async () => {
-      try {
-        const supabase = createClient();
-        const { data, error} = await supabase
+          .eq('gallery_id', id),
+        // Secciones
+        supabase
           .from('photo_sections')
           .select('*')
           .eq('gallery_id', id)
-          .order('display_order', { ascending: true });
+          .order('display_order', { ascending: true }),
+        // Servicio (solo si hay service_type)
+        service_type
+          ? supabase
+              .from('service_types')
+              .select('icon_name, name')
+              .eq('slug', service_type)
+              .maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
+      ]);
 
-        if (error) {
-          setSections([]);
-        } else {
-          const loadedSections = data || [];
-          setSections(loadedSections);
+      // Procesar favoritos
+      if (!favoritesResult.error) {
+        setFavoritesCount(favoritesResult.count || 0);
+      } else {
+        setFavoritesCount(0);
+      }
 
-          // Auto-seleccionar la primera sección si no hay ninguna seleccionada
-          if (loadedSections.length > 0 && !selectedSection) {
-            setSelectedSection(loadedSections[0].id);
-          }
+      // Procesar secciones
+      if (!sectionsResult.error) {
+        const loadedSections = sectionsResult.data || [];
+        setSections(loadedSections);
+
+        // Auto-seleccionar la primera sección
+        if (loadedSections.length > 0) {
+          setSelectedSection(loadedSections[0].id);
         }
-      } catch (error) {
+      } else {
         setSections([]);
+      }
+
+      // Procesar servicio
+      if (serviceResult.data) {
+        setServiceIcon(serviceResult.data.icon_name);
+        setServiceName(serviceResult.data.name);
       }
     };
 
-    loadSections();
-  }, [id]);
+    loadInitialData();
+  }, [id, service_type]);
 
   // Auto-asignar fotos sin section_id a la primera sección
   useEffect(() => {
@@ -506,13 +511,6 @@ export default function GalleryDetailView({ gallery }) {
     autoAssignPhotos();
   }, [sections, localPhotos.length]);
 
-  // Cargar ícono del servicio si existe
-  useEffect(() => {
-    if (service_type) {
-      loadServiceIcon();
-    }
-  }, [service_type]);
-
   // Calcular tamaño de portada si es independiente
   useEffect(() => {
     if (cover_image) {
@@ -539,23 +537,6 @@ export default function GalleryDetailView({ gallery }) {
     }
   };
 
-  const loadServiceIcon = async () => {
-    try {
-      const supabase = await createClient();
-      const { data, error } = await supabase
-        .from('service_types')
-        .select('icon_name, name')
-        .eq('slug', service_type)
-        .maybeSingle();
-
-      if (!error && data) {
-        setServiceIcon(data.icon_name);
-        setServiceName(data.name);
-      }
-    } catch (err) {
-      // Error loading service icon
-    }
-  };
 
   const handleUploadComplete = async () => {
     // Dar un breve tiempo para que Cloudinary procese las imágenes

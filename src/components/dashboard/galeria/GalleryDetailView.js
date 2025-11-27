@@ -229,7 +229,46 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
     transition: transition || 'transform 200ms cubic-bezier(0.25, 1, 0.5, 1)',
   };
 
-  // Mismo estilo en todos los modos - foto con proporción natural
+  // En modo reordenar: grid con fotos cuadradas para fácil drag & drop
+  // En modo normal: masonry con proporción natural
+  if (isReorderMode) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`group relative ${isDragging ? 'opacity-40 scale-105 z-50' : 'opacity-100'}`}
+      >
+        <div className="relative w-full aspect-square bg-gray-200 overflow-hidden">
+          <Image
+            src={getThumbnailUrl(photo.file_path)}
+            alt={photo.file_name || `Foto ${photoIndex + 1}`}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+            className="object-cover"
+            loading="lazy"
+          />
+
+          {/* Drag handle */}
+          <div
+            {...attributes}
+            {...listeners}
+            className="absolute top-2 left-2 p-1.5 bg-[#79502A] rounded shadow-md cursor-grab active:cursor-grabbing z-20 touch-none hover:bg-[#8B5A2F] hover:scale-110 active:scale-95 transition-all duration-150"
+          >
+            <GripVertical size={18} className="text-white" />
+          </div>
+
+          {/* Número de orden */}
+          <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded">
+            <span className="font-fira text-xs font-bold text-white">
+              #{photoIndex + 1}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Modo normal: masonry con proporción natural
   return (
     <div
       ref={setNodeRef}
@@ -250,23 +289,8 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
           style={{ width: '100%', height: 'auto' }}
         />
 
-        {/* Drag handle - SOLO desde el icono para permitir scroll */}
-        {isReorderMode && (
-          <>
-            {/* Icono de agarre - ÚNICO punto draggable - COMPACTO Y PROFESIONAL */}
-            <div
-              {...attributes}
-              {...listeners}
-              className="absolute top-2 left-2 p-1.5 bg-[#79502A] rounded shadow-md cursor-grab active:cursor-grabbing z-20 touch-none hover:bg-[#8B5A2F] hover:scale-110 active:scale-95 transition-all duration-150"
-            >
-              <GripVertical size={18} className="text-white" />
-            </div>
-          </>
-        )}
-
-
-        {/* Badge de portada - arriba izquierda (prioridad sobre sección) */}
-        {isCover && !isReorderMode && (
+        {/* Badge de portada */}
+        {isCover && (
           <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-black/70 backdrop-blur-sm rounded">
             <span className="font-fira text-[8px] sm:text-[9px] font-bold text-white flex items-center gap-1">
               <Star size={8} className="sm:w-[10px] sm:h-[10px] fill-[#79502A] text-[#79502A]" />
@@ -275,35 +299,31 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
           </div>
         )}
 
-        {/* Botones hover - solo cuando NO está en modo reordenar */}
-        {!isReorderMode && (
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-200">
-            <div className="absolute bottom-0 left-0 right-0 p-1 sm:p-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-              {!isCover && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSetAsCover(photo.file_path);
-                  }}
-                  disabled={changingCover}
-                  className="flex-1 py-1 sm:py-1.5 bg-white/95 hover:bg-white rounded text-[9px] sm:text-[10px] font-fira font-bold text-black flex items-center justify-center gap-1 disabled:opacity-50"
-                >
-                  <Star size={10} />
-                  <span className="hidden sm:inline">PORTADA</span>
-                </button>
-              )}
-            </div>
+        {/* Botones hover */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-200">
+          <div className="absolute bottom-0 left-0 right-0 p-1 sm:p-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+            {!isCover && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSetAsCover(photo.file_path);
+                }}
+                disabled={changingCover}
+                className="flex-1 py-1 sm:py-1.5 bg-white/95 hover:bg-white rounded text-[9px] sm:text-[10px] font-fira font-bold text-black flex items-center justify-center gap-1 disabled:opacity-50"
+              >
+                <Star size={10} />
+                <span className="hidden sm:inline">PORTADA</span>
+              </button>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Número de foto */}
-        {!isReorderMode && (
-          <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 px-1 sm:px-1.5 py-0.5 bg-black/70 backdrop-blur-sm rounded">
-            <span className="font-fira text-[8px] sm:text-[9px] font-bold text-white">
-              #{photoIndex + 1}
-            </span>
-          </div>
-        )}
+        <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 px-1 sm:px-1.5 py-0.5 bg-black/70 backdrop-blur-sm rounded">
+          <span className="font-fira text-[8px] sm:text-[9px] font-bold text-white">
+            #{photoIndex + 1}
+          </span>
+        </div>
       </div>
     </div>
   );

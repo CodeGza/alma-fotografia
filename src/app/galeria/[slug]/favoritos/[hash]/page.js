@@ -111,11 +111,15 @@ async function FavoritesGalleryContent({ slug, hash, token }) {
   // Buscar favoritos
   const normalizedEmail = clientEmail.toLowerCase().trim();
 
+  console.log('[FavoritesPage] Searching favorites for email:', normalizedEmail, 'gallery:', gallery.id);
+
   const { data: favorites, error: favError } = await supabase
     .from('favorites')
-    .select('photo_id')
+    .select('photo_id, client_email')
     .eq('gallery_id', gallery.id)
-    .ilike('client_email', normalizedEmail);
+    .eq('client_email', normalizedEmail);
+
+  console.log('[FavoritesPage] Query result:', { favorites, favError });
 
   if (favError) {
     console.error('[FavoritesPage] Favorites error:', favError);
@@ -124,9 +128,11 @@ async function FavoritesGalleryContent({ slug, hash, token }) {
 
   // Si no hay favoritos
   if (!favorites || favorites.length === 0) {
-    console.log('[FavoritesPage] No favorites found for:', normalizedEmail, 'in gallery:', gallery.id);
+    console.log('[FavoritesPage] No favorites found for:', normalizedEmail, 'gallery_id:', gallery.id);
     return <ErrorPage message={`No se encontraron fotos favoritas para ${normalizedEmail.split('@')[0]}.`} />;
   }
+
+  console.log('[FavoritesPage] Found', favorites.length, 'favorites');
 
   const favoritePhotoIds = favorites.map(f => f.photo_id);
 

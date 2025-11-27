@@ -123,8 +123,8 @@ export default function PublicDownloadAllButton({
             let successCount = 0;
             let errorCount = 0;
 
-            // Reducir a 3 descargas simultáneas para mayor estabilidad
-            const BATCH_SIZE = 5;
+            // Batch más grande para descargas paralelas (las fotos son pequeñas ~300KB)
+            const BATCH_SIZE = 8;
 
             /**
              * Descarga una foto usando fetch con CORS
@@ -224,9 +224,9 @@ export default function PublicDownloadAllButton({
                 setProgress(progressPercent);
                 setStatus(`Descargando ${completedCount} de ${total}...`);
 
-                // Pequeña pausa entre lotes para no saturar
+                // Pausa mínima entre lotes (solo para UI)
                 if (i + BATCH_SIZE < photosToDownload.length) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await new Promise(resolve => setTimeout(resolve, 50));
                 }
             }
 
@@ -238,19 +238,29 @@ export default function PublicDownloadAllButton({
             }
 
             // Generar el ZIP SIN compresión (STORE) - Las fotos JPG ya están comprimidas
-            // Esto hace que la generación sea casi instantánea
-            setStatus('Generando archivo ZIP...');
-            setProgress(92);
+            // streamFiles: true mejora el uso de memoria en archivos grandes
+            setStatus('Preparando archivo ZIP...');
+            setProgress(91);
 
             const zipBlob = await zip.generateAsync(
                 {
                     type: 'blob',
-                    compression: 'STORE' // Sin compresión = mucho más rápido
+                    compression: 'STORE', // Sin compresión = mucho más rápido
+                    streamFiles: true, // Mejor manejo de memoria
                 },
                 (metadata) => {
-                    // Actualizar progreso durante la generación (92-99%)
-                    const zipProgress = Math.round(92 + (metadata.percent * 0.07));
+                    // Actualizar progreso durante la generación (91-99%)
+                    const zipProgress = Math.round(91 + (metadata.percent * 0.08));
                     setProgress(zipProgress);
+
+                    // Actualizar status con info más detallada
+                    if (metadata.percent < 50) {
+                        setStatus('Preparando archivos...');
+                    } else if (metadata.percent < 90) {
+                        setStatus('Creando ZIP...');
+                    } else {
+                        setStatus('Finalizando...');
+                    }
                 }
             );
 

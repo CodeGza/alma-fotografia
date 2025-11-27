@@ -703,21 +703,23 @@ export default function GalleryDetailView({ gallery }) {
         throw new Error('Algunas fotos no se pudieron actualizar');
       }
 
-      showModal({
-        title: '¡Orden guardado!',
-        message: 'El nuevo orden se ha guardado exitosamente.',
-        type: 'success'
+      // Actualizar localPhotos con los nuevos display_order ANTES de salir del modo reordenar
+      const updatedPhotos = localPhotos.map(photo => {
+        const indexInSection = workingPhotos.findIndex(p => p.id === photo.id);
+        if (indexInSection !== -1) {
+          return { ...photo, display_order: indexInSection + 1 };
+        }
+        return photo;
       });
+      setLocalPhotos(updatedPhotos);
+
+      showToast({ message: 'Orden guardado correctamente', type: 'success' });
 
       setReorderMode(false);
-      router.refresh();
+      setPhotosPage(0); // Volver a la primera página
 
     } catch (error) {
-      showModal({
-        title: 'Error',
-        message: 'No se pudo guardar el nuevo orden.',
-        type: 'error'
-      });
+      showToast({ message: 'Error al guardar el orden', type: 'error' });
     } finally {
       setSavingOrder(false);
     }

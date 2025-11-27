@@ -37,11 +37,8 @@ const SectionHeader = memo(({ section }) => {
 SectionHeader.displayName = 'SectionHeader';
 
 /**
- * PhotoGrid - Grid masonry responsivo tipo Pixieset
- */
-/**
  * PhotoItem - Componente individual de foto con lazy loading optimizado
- * Mantiene aspect ratio original para masonry layout
+ * Mantiene aspect ratio original con CSS Grid
  */
 const PhotoItem = memo(({
   photo,
@@ -62,7 +59,6 @@ const PhotoItem = memo(({
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [naturalHeight, setNaturalHeight] = useState(null);
 
   // Usar cloudinary_url primero, luego file_path
   const imageUrl = photo.cloudinary_url || photo.file_path;
@@ -78,17 +74,12 @@ const PhotoItem = memo(({
 
   const optimizedUrl = getOptimizedUrl(imageUrl);
 
-  // Altura estimada basada en el índice (variación para simular masonry antes de cargar)
-  // Esto evita que todas tengan la misma altura y se vea artificial
-  const estimatedHeight = 200 + ((index % 4) * 50); // 200, 250, 300, 350px
-
   return (
-    <div className="group relative break-inside-avoid mb-2">
+    <div className="group relative">
       <div
-        className={`relative w-full bg-gray-100 overflow-hidden cursor-pointer ${
-          isSelectingFavorites && isSelected ? 'ring-4 ring-rose-500 rounded-lg' : ''
+        className={`relative w-full bg-gray-100 overflow-hidden cursor-pointer rounded-lg ${
+          isSelectingFavorites && isSelected ? 'ring-4 ring-rose-500' : ''
         }`}
-        style={{ minHeight: !isLoaded && !hasError ? `${estimatedHeight}px` : 'auto' }}
         onClick={() => {
           if (isSelectingFavorites) {
             onToggleTemp(photo.id);
@@ -97,13 +88,13 @@ const PhotoItem = memo(({
           }
         }}
       >
-        {/* Imagen con aspect ratio natural (masonry) */}
+        {/* Imagen con aspect ratio natural */}
         {!hasError && (
           <Image
             src={optimizedUrl}
             alt={`${galleryTitle} - ${photo.file_name || `Foto ${index + 1}`}`}
-            width={0}
-            height={0}
+            width={400}
+            height={400}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className={`w-full h-auto transition-opacity duration-300 group-hover:scale-105 ${
               isLoaded ? 'opacity-100' : 'opacity-0'
@@ -113,8 +104,7 @@ const PhotoItem = memo(({
             priority={isPriority}
             quality={80}
             unoptimized
-            onLoad={(e) => {
-              setNaturalHeight(e.target.naturalHeight);
+            onLoad={() => {
               setIsLoaded(true);
             }}
             onError={() => {
@@ -124,11 +114,9 @@ const PhotoItem = memo(({
           />
         )}
 
-        {/* Skeleton loader mientras carga - altura estimada para evitar reflow */}
+        {/* Skeleton loader mientras carga */}
         {!isLoaded && !hasError && (
-          <div
-            className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse"
-          />
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse" />
         )}
 
         {/* Error placeholder */}
@@ -221,7 +209,7 @@ const PhotoGrid = memo(({
   const PRIORITY_COUNT = 8;
 
   return (
-    <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2">
       {photos.map((photo, index) => (
         <PhotoItem
           key={photo.id}

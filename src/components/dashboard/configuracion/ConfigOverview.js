@@ -10,7 +10,8 @@ import {
   Database,
   Calendar,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Video
 } from 'lucide-react';
 
 const quickActions = [
@@ -19,6 +20,13 @@ const quickActions = [
     title: 'Tipos de Servicio',
     description: 'Gestiona los servicios que ofreces',
     href: '/dashboard/configuracion/servicios',
+    disabled: false
+  },
+  {
+    icon: Video,
+    title: 'Videos Landing',
+    description: 'Videos de la página principal',
+    href: '/dashboard/configuracion/landing',
     disabled: false
   },
   {

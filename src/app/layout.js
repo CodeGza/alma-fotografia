@@ -6,10 +6,19 @@ import { ToastProvider } from '@/components/ui/Toast';
 import ImageProtection from '@/components/ImageProtection';
 
 export const metadata = {
-  metadataBase: new URL('https://alma-fotografia.vercel.app'),
+  metadataBase: new URL('https://almafotografiauy.com'),
   title: {
     default: 'Alma Fotografía | Fotografía Profesional de Eventos',
     template: '%s | Alma Fotografía'
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   description: 'Alma Fotografía - Capturamos los momentos más especiales de tu vida. Fotografía profesional de bodas, eventos, retratos y sesiones corporativas. Galerías privadas y descarga de fotos en alta calidad.',
   keywords: ['fotografía profesional', 'fotógrafa de bodas', 'fotografía de eventos', 'sesiones fotográficas', 'retratos profesionales', 'fotografía corporativa', 'galerías privadas', 'descargas de fotos'],
@@ -24,16 +33,16 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'es_ES',
-    url: 'https://alma-fotografia.vercel.app',
+    url: 'https://almafotografiauy.com',
     title: 'Alma Fotografía | Fotografía Profesional de Eventos',
     description: 'Capturamos los momentos más especiales de tu vida. Fotografía profesional de bodas, eventos y retratos.',
     siteName: 'Alma Fotografía',
     images: [
       {
-        url: '/img/logos/logo_BN_SF.png',
+        url: 'https://res.cloudinary.com/dav2dvukf/image/upload/b_rgb:2D2D2D,c_pad,g_center,h_630,w_1200/alma-fotografia/logo-og.png',
         width: 1200,
         height: 630,
-        alt: 'Alma Fotografía Logo',
+        alt: 'Alma Fotografía - Fotografía Profesional',
       },
     ],
   },
@@ -41,7 +50,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Alma Fotografía | Fotografía Profesional de Eventos',
     description: 'Capturamos los momentos más especiales de tu vida. Fotografía profesional de bodas, eventos y retratos.',
-    images: ['/img/logos/logo_BN_SF.png'],
+    images: ['https://res.cloudinary.com/dav2dvukf/image/upload/b_rgb:2D2D2D,c_pad,g_center,h_630,w_1200/alma-fotografia/logo-og.png'],
   },
   robots: {
     index: true,
@@ -82,9 +91,9 @@ export default function RootLayout({ children }) {
               '@context': 'https://schema.org',
               '@type': 'ProfessionalService',
               name: 'Alma Fotografía',
-              image: 'https://alma-fotografia.vercel.app/img/logos/logo_BN_SF.png',
-              '@id': 'https://alma-fotografia.vercel.app',
-              url: 'https://alma-fotografia.vercel.app',
+              image: 'https://res.cloudinary.com/dav2dvukf/image/upload/b_rgb:2D2D2D,c_pad,g_center,h_630,w_1200/alma-fotografia/logo-og.png',
+              '@id': 'https://almafotografiauy.com',
+              url: 'https://almafotografiauy.com',
               telephone: '+598 92021392',
               priceRange: '$$',
               address: {
@@ -115,7 +124,7 @@ export default function RootLayout({ children }) {
                 '@type': 'SearchAction',
                 target: {
                   '@type': 'EntryPoint',
-                  urlTemplate: 'https://alma-fotografia.vercel.app/buscar?q={search_term_string}',
+                  urlTemplate: 'https://almafotografiauy.com/buscar?q={search_term_string}',
                 },
                 'query-input': 'required name=search_term_string',
               },

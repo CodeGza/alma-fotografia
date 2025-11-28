@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import Header from '@/components/landing/Header';
 import Hero from '@/components/landing/Hero';
 import Servicios from '@/components/landing/Servicios';
+import Videos from '@/components/landing/Videos';
 import Testimonios from '@/components/landing/Testimonios';
 import Reservas, { Contacto } from '@/components/landing/Reservas';
 import Footer from '@/components/landing/Footer';
@@ -11,6 +12,7 @@ import {
   getFeaturedTestimonials,
   getPublicGalleriesPreview,
 } from '@/app/actions/landing-actions';
+import { getActiveLandingVideos } from '@/app/actions/landing-video-actions';
 
 export const metadata = {
   title: 'Alma Fotografía | Capturando momentos especiales',
@@ -50,6 +52,12 @@ async function ServiciosContent() {
   return <Servicios services={services} />;
 }
 
+// Componente que carga los videos de la landing
+async function VideosContent() {
+  const { videos } = await getActiveLandingVideos();
+  return <Videos videos={videos} />;
+}
+
 
 
 // Página principal
@@ -65,6 +73,11 @@ export default function Home() {
       {/* Servicios Section con Suspense */}
       <Suspense fallback={<ServiciosSkeleton />}>
         <ServiciosContent />
+      </Suspense>
+
+      {/* Videos Section - Solo se muestra si hay videos activos */}
+      <Suspense fallback={null}>
+        <VideosContent />
       </Suspense>
 
       {/* Testimonios Section con Suspense */}

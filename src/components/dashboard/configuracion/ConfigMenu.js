@@ -9,7 +9,8 @@ import {
   Palette,
   Shield,
   Database,
-  ChevronRight
+  ChevronRight,
+  Video
 } from 'lucide-react';
 
 export default function ConfigMenu() {
@@ -23,6 +24,15 @@ export default function ConfigMenu() {
       href: '/dashboard/configuracion/servicios',
       color: 'text-[#79502A]',
       bg: 'bg-[#79502A]/10',
+      disabled: false
+    },
+    {
+      icon: Video,
+      title: 'Videos Landing',
+      description: 'Sube y gestiona los videos que se muestran en la página principal',
+      href: '/dashboard/configuracion/landing',
+      color: 'text-amber-600',
+      bg: 'bg-amber-50',
       disabled: false
     },
     {

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/server';
+import { createClient, createAdminClient } from '@/lib/server';
 import { createNotification } from './create-notification';
 import { sendEmail } from '@/lib/email/resend-client';
 import { getEmailTemplate } from '@/lib/email/email-templates';
@@ -112,8 +112,10 @@ export async function notifyLinkExpired(shareId) {
 export async function notifyLinkDeactivated(shareId, userId) {
   try {
     const supabase = await createClient();
+    // Usar admin client para bypasear RLS al obtener share
+    const supabaseAdmin = createAdminClient();
 
-    const { data: share, error } = await supabase
+    const { data: share, error } = await supabaseAdmin
       .from('gallery_shares')
       .select(`
         id,
@@ -127,6 +129,7 @@ export async function notifyLinkDeactivated(shareId, userId) {
       .single();
 
     if (error || !share) {
+      console.log('[notifyLinkDeactivated] Share not found:', shareId, error);
       return { success: false, error: 'Share not found' };
     }
 
@@ -141,8 +144,10 @@ export async function notifyLinkDeactivated(shareId, userId) {
 
     let notificationResult = null;
 
-    // Crear notificación in-app solo si está habilitada Y la opción específica está marcada
-    if (prefs && prefs.inapp_on_link_deactivated) {
+    // Crear notificación in-app (default: habilitado si no hay preferencias o si el campo es null/true)
+    const shouldSendInApp = !prefs || prefs.inapp_on_link_deactivated !== false;
+
+    if (shouldSendInApp) {
       notificationResult = await createNotification({
         userId,
         type: 'link_deactivated',
@@ -153,8 +158,10 @@ export async function notifyLinkDeactivated(shareId, userId) {
       });
     }
 
-    // Enviar email si: email_enabled está activado Y la opción está marcada Y hay email configurado
-    if (prefs && prefs.email_on_link_deactivated && prefs.notification_email) {
+    // Enviar email si: la opción está habilitada (o es null) Y hay email configurado
+    const shouldSendEmail = prefs && prefs.notification_email && prefs.email_on_link_deactivated !== false;
+
+    if (shouldSendEmail) {
       const emailTemplate = getEmailTemplate('link_deactivated', {
         galleryTitle: gallery.title,
         galleryUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/galerias/${gallery.id}`,
@@ -169,7 +176,7 @@ export async function notifyLinkDeactivated(shareId, userId) {
       }
     }
 
-    return notificationResult || { success: true, skipped: 'In-app disabled' };
+    return notificationResult || { success: true };
   } catch (error) {
     return { success: false, error: error.message };
   }

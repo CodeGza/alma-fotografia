@@ -59,7 +59,7 @@ export async function POST(request) {
     // 1. Obtener datos del enlace antes de eliminarlo (usando admin para bypasear RLS)
     const { data: shareData, error: fetchError } = await supabaseAdmin
       .from('gallery_shares')
-      .select('*')
+      .select('*, galleries(id, title)')
       .eq('id', shareId)
       .single();
 

@@ -60,7 +60,8 @@
       "Bash(fi)",
       "Bash(pnpm run build)",
       "Bash(git remote add:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(pnpm i:*)"
     ],
     "deny": [],
     "ask": []

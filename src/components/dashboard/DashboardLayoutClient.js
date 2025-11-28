@@ -293,7 +293,7 @@ export default function DashboardLayoutClient({ children, userName }) {
       {/* ============================================ */}
       {/* ÁREA DE CONTENIDO PRINCIPAL */}
       {/* ============================================ */}
-      <main className="flex-1 lg:ml-[280px] bg-white">
+      <main className="flex-1 lg:ml-[280px] bg-white overflow-x-hidden">
         {/* Header mobile */}
         <header className="lg:hidden sticky top-0 z-30 bg-[#2D2D2D] shadow-md px-6 py-4">
           <div className="flex items-center justify-between">
@@ -323,7 +323,7 @@ export default function DashboardLayoutClient({ children, userName }) {
         </header>
 
         {/* Contenido de las páginas */}
-        <div className="p-6 lg:p-12 max-w-[1400px] mx-auto">
+        <div className="p-4 sm:p-6 lg:p-12 max-w-[1400px] mx-auto overflow-x-hidden">
           {children}
         </div>
       </main>

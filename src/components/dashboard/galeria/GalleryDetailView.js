@@ -59,6 +59,7 @@ import { iconMap } from '@/lib/validations/gallery';
 import { deleteCloudinaryImage, deleteGalleries, updateAllowShareFavorites } from '@/app/actions/gallery-actions';
 import { assignPhotosToSection } from '@/app/actions/photo-sections-actions';
 import { useToast } from '@/components/ui/Toast';
+import GalleryStorageSize from './GalleryStorageSize';
 
 // Componente SortableSectionHeader para drag & drop de secciones (OLD - sin fotos)
 function SortableSectionHeader({ section }) {
@@ -1323,7 +1324,9 @@ export default function GalleryDetailView({ gallery }) {
                   <Download className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#C6A97D]" />
                 </motion.div>
                 <div>
-                  <p className="font-fira text-base sm:text-lg font-semibold text-[#FFF8E2]">{totalSizeMB} MB</p>
+                  <div className="font-fira text-base sm:text-lg font-semibold text-[#FFF8E2]">
+                    <GalleryStorageSize galleryId={id} />
+                  </div>
                   <p className="font-fira text-xs text-[#C6A97D]">Tamaño</p>
                 </div>
               </motion.div>

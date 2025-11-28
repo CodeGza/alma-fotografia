@@ -275,6 +275,11 @@ export async function updateUser({ userId, full_name, username, permissions }) {
       return { success: false, error: 'No autorizado' };
     }
 
+    // Protección: Un admin no puede quitarse sus propios permisos de admin
+    if (userId === user.id && !permissions?.manage_users) {
+      return { success: false, error: 'No podés quitarte tus propios permisos de administrador' };
+    }
+
     // Asegurar que permissions sea un objeto válido
     const permissionsToSave = permissions || {};
 

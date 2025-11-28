@@ -79,12 +79,35 @@ export async function POST(request) {
     }
 
     // Marcar que ya no requiere cambio de contraseña
-    const { error: profileUpdateError } = await supabase
+    // Usar cliente admin para bypasear RLS
+    const supabaseAdmin = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // Handle error if needed
+            }
+          },
+        },
+      }
+    );
+
+    const { error: profileUpdateError } = await supabaseAdmin
       .from('user_profiles')
       .update({ requires_password_change: false })
       .eq('id', user.id);
 
     if (profileUpdateError) {
+      console.error('Error actualizando perfil:', profileUpdateError);
       return NextResponse.json(
         { success: false, error: 'Error al actualizar el perfil' },
         { status: 500 }

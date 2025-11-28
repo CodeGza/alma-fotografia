@@ -18,7 +18,7 @@ export const metadata = {
  * - Prepara datos de favoritos (para futuro)
  */
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 async function GalleriesContent() {
   const supabase = await createClient();

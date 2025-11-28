@@ -15,13 +15,11 @@ import GalleryDetailSkeleton from '@/components/dashboard/galeria/GalleryDetailS
  */
 
 /**
- * ISR - Cachea la página por 60 segundos
- * 
- * Por qué 60 segundos:
- * - Las galerías pueden actualizarse (agregar fotos)
- * - Balance entre performance y frescura
+ * ISR - Cachea la página por 5 minutos
+ *
+ * Balance entre performance y frescura de datos
  */
-export const revalidate = 60;
+export const revalidate = 300;
 
 /**
  * GalleryContent - Componente que carga los datos

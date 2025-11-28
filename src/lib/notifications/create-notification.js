@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/server';
+import { createClient, createAdminClient } from '@/lib/server';
 
 /**
  * create-notification.js
- * 
+ *
  * Helper para crear notificaciones desde server actions.
  * Separado de la lógica de UI para mantener arquitectura limpia.
  */
@@ -29,8 +29,8 @@ export async function createNotification({
   actionUrl = null,
 }) {
   try {
-
-    const supabase = await createClient();
+    // Usar admin client para bypasear RLS al crear notificaciones
+    const supabase = createAdminClient();
 
     // PROTECCIÓN ANTI-DUPLICADOS: Verificar si existe una notificación idéntica en los últimos 5 segundos
     const fiveSecondsAgo = new Date(Date.now() - 5000).toISOString();
@@ -78,6 +78,8 @@ export async function createNotification({
       }
     }
 
+    console.log('[createNotification] Inserting:', { userId, type, message, galleryId });
+
     const { data, error } = await supabase
       .from('notifications')
       .insert({
@@ -91,8 +93,12 @@ export async function createNotification({
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('[createNotification] Insert error:', error);
+      throw error;
+    }
 
+    console.log('[createNotification] Success:', data?.id);
     return { success: true, notification: data };
   } catch (error) {
     console.error('[createNotification] Error:', error);

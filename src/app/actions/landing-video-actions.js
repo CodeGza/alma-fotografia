@@ -278,7 +278,10 @@ export async function updateLandingVideo(videoId, updates) {
       return { success: false, error: 'No autorizado' };
     }
 
-    const { data, error } = await supabase
+    // Usar admin client para bypasear RLS
+    const adminSupabase = createAdminClient();
+
+    const { data, error } = await adminSupabase
       .from('landing_videos')
       .update({
         title: updates.title?.trim() || null,

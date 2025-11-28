@@ -13,9 +13,11 @@ import { getEmailTemplate } from '@/lib/email/email-templates';
 /**
  * Helper: Obtener el primer usuario admin activo
  * Para enviar notificaciones a UN solo admin (evitar duplicados)
+ * Usa admin client para bypasear RLS
  */
 async function getFirstAdminUser() {
-  const supabase = await createClient();
+  // Usar admin client para bypasear RLS y evitar problemas de autenticación
+  const supabase = createAdminClient();
 
   const { data: profile, error } = await supabase
     .from('user_profiles')
@@ -26,6 +28,7 @@ async function getFirstAdminUser() {
     .single();
 
   if (error || !profile) {
+    console.error('[getFirstAdminUser] Error:', error);
     return null;
   }
 
@@ -115,7 +118,8 @@ export async function notifyLinkExpired(shareId) {
  */
 export async function notifyLinkDeactivated(galleryId, galleryTitle, userId) {
   try {
-    const supabase = await createClient();
+    // Usar admin client para bypasear RLS
+    const supabase = createAdminClient();
 
     // Obtener el admin principal para notificar
     const admin = await getFirstAdminUser();
@@ -124,21 +128,28 @@ export async function notifyLinkDeactivated(galleryId, galleryTitle, userId) {
       return { success: false, error: 'No admin user found' };
     }
 
+    console.log('[notifyLinkDeactivated] Admin found:', admin.id, admin.email);
+
     const gallery = { id: galleryId, title: galleryTitle };
 
     // Verificar preferencias del admin
-    const { data: prefs } = await supabase
+    const { data: prefs, error: prefsError } = await supabase
       .from('notification_preferences')
       .select('inapp_on_link_deactivated, email_on_link_deactivated, notification_email')
       .eq('user_id', admin.id)
       .maybeSingle();
+
+    console.log('[notifyLinkDeactivated] Prefs:', prefs, 'Error:', prefsError);
 
     let notificationResult = null;
 
     // Crear notificación in-app (default: habilitado si no hay preferencias o si el campo es null/true)
     const shouldSendInApp = !prefs || prefs.inapp_on_link_deactivated !== false;
 
+    console.log('[notifyLinkDeactivated] shouldSendInApp:', shouldSendInApp);
+
     if (shouldSendInApp) {
+      console.log('[notifyLinkDeactivated] Creating notification for admin:', admin.id);
       notificationResult = await createNotification({
         userId: admin.id,
         type: 'link_deactivated',
@@ -146,6 +157,9 @@ export async function notifyLinkDeactivated(galleryId, galleryTitle, userId) {
         galleryId: gallery.id,
         actionUrl: `/dashboard/galerias/${gallery.id}`,
       });
+      console.log('[notifyLinkDeactivated] Notification result:', notificationResult);
+    } else {
+      console.log('[notifyLinkDeactivated] In-app notification disabled by preferences');
     }
 
     // Enviar email si: la opción está habilitada (o es null) Y hay email configurado
@@ -412,7 +426,8 @@ export async function cleanupOldNotifications() {
  */
 export async function notifyGalleryView(galleryId, clientInfo = null, isFavoritesView = false) {
   try {
-    const supabase = await createClient();
+    // Usar admin client para bypasear RLS
+    const supabase = createAdminClient();
 
     const { data: gallery, error } = await supabase
       .from('galleries')
@@ -1049,7 +1064,10 @@ export async function notifyTestimonialReceived(testimonialId) {
  */
 export async function notifyNewPublicBooking(bookingId) {
   try {
-    const supabase = await createClient();
+    // Usar admin client para bypasear RLS
+    const supabase = createAdminClient();
+
+    console.log('[notifyNewPublicBooking] Buscando booking:', bookingId);
 
     // Obtener la reserva con el tipo
     const { data: booking, error } = await supabase
@@ -1067,14 +1085,18 @@ export async function notifyNewPublicBooking(bookingId) {
       .single();
 
     if (error || !booking) {
+      console.error('[notifyNewPublicBooking] Booking not found:', error);
       return { success: false, error: 'Booking not found' };
     }
 
     // Obtener UN solo usuario admin
     const admin = await getFirstAdminUser();
     if (!admin) {
+      console.error('[notifyNewPublicBooking] No admin user found');
       return { success: false, error: 'No admin user found' };
     }
+
+    console.log('[notifyNewPublicBooking] Admin:', admin.id, admin.email);
 
     const bookingTypeName = booking.booking_type?.name || 'Reunión';
     const formattedDate = new Date(booking.booking_date + 'T00:00:00').toLocaleDateString('es-UY', {
@@ -1085,24 +1107,32 @@ export async function notifyNewPublicBooking(bookingId) {
     const message = `Nueva reserva de ${bookingTypeName}: ${booking.client_name} para el ${formattedDate} a las ${booking.start_time.substring(0, 5)}`;
 
     // Verificar preferencias del admin
-    const { data: prefs } = await supabase
+    const { data: prefs, error: prefsError } = await supabase
       .from('notification_preferences')
       .select('inapp_on_booking_pending, email_on_booking_pending, notification_email')
       .eq('user_id', admin.id)
       .maybeSingle();
+
+    console.log('[notifyNewPublicBooking] Prefs:', prefs, 'Error:', prefsError);
 
     let notificationResult = null;
 
     // Crear notificación in-app (default: habilitado)
     const shouldSendInApp = !prefs || prefs.inapp_on_booking_pending !== false;
 
+    console.log('[notifyNewPublicBooking] shouldSendInApp:', shouldSendInApp);
+
     if (shouldSendInApp) {
+      console.log('[notifyNewPublicBooking] Creating notification for admin:', admin.id);
       notificationResult = await createNotification({
         userId: admin.id,
         type: 'booking_pending',
         message,
         actionUrl: '/dashboard/agenda',
       });
+      console.log('[notifyNewPublicBooking] Notification result:', notificationResult);
+    } else {
+      console.log('[notifyNewPublicBooking] In-app notification disabled by preferences');
     }
 
     // Enviar email si está configurado

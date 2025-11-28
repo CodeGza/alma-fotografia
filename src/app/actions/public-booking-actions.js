@@ -282,7 +282,9 @@ export async function createPublicBooking({
     if (error) throw error;
 
     // Enviar notificación de nueva reserva pendiente a Fernanda
-    await notifyNewPublicBooking(data.id);
+    console.log('[createPublicBooking] Enviando notificación al admin...');
+    const notifyResult = await notifyNewPublicBooking(data.id);
+    console.log('[createPublicBooking] Resultado notificación admin:', notifyResult);
 
     // Enviar email de confirmación de solicitud al cliente
     const { data: bookingTypeData } = await supabase
@@ -298,6 +300,7 @@ export async function createPublicBooking({
       year: 'numeric'
     });
 
+    console.log('[createPublicBooking] Enviando email al cliente:', data.client_email);
     const clientEmailTemplate = getEmailTemplate('client_booking_requested', {
       bookingType: bookingTypeName,
       clientName: data.client_name,
@@ -307,11 +310,14 @@ export async function createPublicBooking({
     });
 
     if (clientEmailTemplate) {
-      await sendEmail({
+      const emailResult = await sendEmail({
         to: data.client_email,
         subject: clientEmailTemplate.subject,
         html: clientEmailTemplate.html,
       });
+      console.log('[createPublicBooking] Resultado email cliente:', emailResult);
+    } else {
+      console.error('[createPublicBooking] No se pudo generar template de email para cliente');
     }
 
     return {
@@ -422,7 +428,9 @@ export async function confirmPublicBooking(bookingId, internalNotes = null) {
     }
 
     // Enviar notificación de reserva confirmada a Fernanda
-    await notifyBookingConfirmed(data.id);
+    console.log('[confirmPublicBooking] Enviando notificación al admin...');
+    const notifyResult = await notifyBookingConfirmed(data.id);
+    console.log('[confirmPublicBooking] Resultado notificación admin:', notifyResult);
 
     // Enviar email de confirmación al cliente
     const bookingTypeName = data.booking_type?.name || 'Reunión';
@@ -432,6 +440,7 @@ export async function confirmPublicBooking(bookingId, internalNotes = null) {
       year: 'numeric'
     });
 
+    console.log('[confirmPublicBooking] Enviando email al cliente:', data.client_email);
     const clientEmailTemplate = getEmailTemplate('client_booking_confirmed', {
       bookingType: bookingTypeName,
       clientName: data.client_name,
@@ -441,11 +450,14 @@ export async function confirmPublicBooking(bookingId, internalNotes = null) {
     });
 
     if (clientEmailTemplate) {
-      await sendEmail({
+      const emailResult = await sendEmail({
         to: data.client_email,
         subject: clientEmailTemplate.subject,
         html: clientEmailTemplate.html,
       });
+      console.log('[confirmPublicBooking] Resultado email cliente:', emailResult);
+    } else {
+      console.error('[confirmPublicBooking] No se pudo generar template de email para cliente');
     }
 
     return {

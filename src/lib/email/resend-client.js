@@ -50,7 +50,7 @@ export async function sendEmail({ to, subject, html, from }) {
     }
 
     // Email de envío con dominio verificado
-    const fromEmail = from || 'Alma Fotografía <hola@almafotografiauy.com>';
+    const fromEmail = from || 'Alma Fotografía <info@almafotografiauy.com>';
 
     console.log('📧 Enviando email a:', to);
     console.log('📧 Desde:', fromEmail);

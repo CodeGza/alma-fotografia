@@ -53,15 +53,10 @@ const baseStyles = `
     padding: 14px 32px;
     background-color: #79502A;
     color: #ffffff !important;
-    text-decoration: none;
+    text-decoration: none !important;
     border-radius: 8px;
     font-weight: 600;
     margin: 20px 0;
-    transition: all 0.3s;
-  }
-  .button:hover {
-    background-color: #8B5A2F;
-    transform: translateY(-2px);
   }
   .footer {
     padding: 20px 30px;
@@ -144,7 +139,7 @@ export function galleryCreatedEmail({ galleryTitle, galleryUrl, clientEmail }) {
     </ul>
 
     <center>
-      <a href="${galleryUrl}" class="button">Ver galería →</a>
+      <a href="${galleryUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Ver galería →</a>
     </center>
 
     <p style="margin-top: 30px; color: #666; font-size: 14px;">
@@ -178,7 +173,7 @@ export function galleryViewEmail({ galleryTitle, galleryUrl, clientName }) {
     <p>Puedes ver las estadísticas completas de tu galería y revisar los favoritos seleccionados.</p>
 
     <center>
-      <a href="${galleryUrl}" class="button">Ver detalles →</a>
+      <a href="${galleryUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Ver detalles →</a>
     </center>
   `;
 
@@ -205,7 +200,7 @@ export function favoritesSelectedEmail({ galleryTitle, galleryUrl, clientName, t
     <p>Accede a la galería para ver qué fotos eligió y continuar con el proceso de entrega.</p>
 
     <center>
-      <a href="${galleryUrl}" class="button">Ver favoritos →</a>
+      <a href="${galleryUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Ver favoritos →</a>
     </center>
   `;
 
@@ -244,7 +239,7 @@ export function favoritesEditedEmail({ galleryTitle, galleryUrl, clientName, tot
     <p>Revisa la selección actualizada de tu cliente y continúa con el proceso de entrega.</p>
 
     <center>
-      <a href="${galleryUrl}" class="button">Ver favoritos →</a>
+      <a href="${galleryUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Ver favoritos →</a>
     </center>
   `;
 
@@ -277,7 +272,7 @@ export function linkExpiringEmail({ galleryTitle, galleryUrl, daysRemaining }) {
     </ul>
 
     <center>
-      <a href="${galleryUrl}" class="button">Gestionar enlace →</a>
+      <a href="${galleryUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Gestionar enlace →</a>
     </center>
   `;
 
@@ -311,7 +306,7 @@ export function linkExpiredEmail({ galleryTitle, galleryUrl }) {
     </ol>
 
     <center>
-      <a href="${galleryUrl}" class="button">Generar nuevo enlace →</a>
+      <a href="${galleryUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Generar nuevo enlace →</a>
     </center>
   `;
 
@@ -339,7 +334,7 @@ export function linkDeactivatedEmail({ galleryTitle, galleryUrl }) {
     <p>Puedes generar un nuevo enlace en cualquier momento desde la galería.</p>
 
     <center>
-      <a href="${galleryUrl}" class="button">Ver galería →</a>
+      <a href="${galleryUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Ver galería →</a>
     </center>
   `;
 
@@ -396,7 +391,7 @@ export function galleryRestoredEmail({ galleryTitle, galleryUrl }) {
     </ul>
 
     <center>
-      <a href="${galleryUrl}" class="button">Ver galería →</a>
+      <a href="${galleryUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Ver galería →</a>
     </center>
   `;
 
@@ -453,7 +448,7 @@ function bookingPendingEmail({ bookingType, clientName, clientEmail, bookingDate
     <p>Un cliente ha solicitado una reunión. Revisa los detalles y apruébala o recházala desde tu agenda.</p>
 
     <div style="text-align: center;">
-      <a href="${agendaUrl}" class="button">Ver en Agenda</a>
+      <a href="${agendaUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Ver en Agenda</a>
     </div>
   `;
 
@@ -482,7 +477,7 @@ function bookingConfirmedEmail({ bookingType, clientName, clientEmail, bookingDa
     <p>Has confirmado esta reunión. El cliente ha sido notificado y la cita está agregada a tu agenda.</p>
 
     <div style="text-align: center;">
-      <a href="${agendaUrl}" class="button">Ver Agenda Completa</a>
+      <a href="${agendaUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Ver Agenda Completa</a>
     </div>
   `;
 
@@ -511,7 +506,7 @@ function bookingReminderEmail({ bookingType, clientName, clientEmail, bookingDat
     <p>Este es un recordatorio de que mañana tienes una reunión confirmada. No olvides prepararte con anticipación.</p>
 
     <div style="text-align: center;">
-      <a href="${agendaUrl}" class="button">Ver Detalles</a>
+      <a href="${agendaUrl}" class="button" style="color: #ffffff !important; text-decoration: none;">Ver Detalles</a>
     </div>
   `;
 

@@ -63,7 +63,8 @@
       "Bash(npm install:*)",
       "Bash(pnpm i:*)",
       "Bash(node scripts/upload-og-image.js:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []

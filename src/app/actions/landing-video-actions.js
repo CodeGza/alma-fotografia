@@ -90,6 +90,8 @@ export async function saveLandingVideo({ videoUrl, publicId, title = '', descrip
 
     const newOrder = (lastVideo?.display_order || 0) + 1;
 
+    console.log('[saveLandingVideo] Guardando video con publicId:', publicId);
+
     // Guardar en base de datos con admin client
     const { data, error } = await adminSupabase
       .from('landing_videos')
@@ -107,6 +109,7 @@ export async function saveLandingVideo({ videoUrl, publicId, title = '', descrip
 
     if (error) throw error;
 
+    console.log('[saveLandingVideo] Video guardado:', data);
     return { success: true, video: data };
   } catch (error) {
     console.error('[saveLandingVideo] Error:', error);

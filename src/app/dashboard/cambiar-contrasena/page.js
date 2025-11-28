@@ -83,8 +83,11 @@ export default function CambiarContrasenaPage() {
       }
 
       setSuccessMsg('Contraseña cambiada correctamente. Redirigiendo...');
+      setLoading(false);
+
+      // Forzar redirección con window.location para evitar problemas de caché
       setTimeout(() => {
-        router.replace('/dashboard');
+        window.location.href = '/dashboard';
       }, 1500);
     } catch (error) {
       setErrorMsg('Error al cambiar la contraseña');

@@ -308,8 +308,11 @@ export async function deleteLandingVideo(videoId) {
       return { success: false, error: 'No autorizado' };
     }
 
+    // Usar admin client para bypasear RLS
+    const adminSupabase = createAdminClient();
+
     // Obtener datos del video para eliminar de Cloudinary
-    const { data: video, error: fetchError } = await supabase
+    const { data: video, error: fetchError } = await adminSupabase
       .from('landing_videos')
       .select('cloudinary_public_id')
       .eq('id', videoId)
@@ -329,8 +332,8 @@ export async function deleteLandingVideo(videoId) {
       }
     }
 
-    // Eliminar de base de datos
-    const { error } = await supabase
+    // Eliminar de base de datos con admin client
+    const { error } = await adminSupabase
       .from('landing_videos')
       .delete()
       .eq('id', videoId);

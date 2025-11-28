@@ -19,7 +19,7 @@ export async function GET() {
       getStorageLimit()
     ]);
 
-    const { bytes: storageUsageBytes, count: filesCount } = actualUsage;
+    const { bytes: storageUsageBytes, count: filesCount, images: imagesCount, videos: videosCount } = actualUsage;
 
     // Convertir a unidades legibles
     const storageMB = (storageUsageBytes / (1024 * 1024)).toFixed(2);
@@ -34,6 +34,8 @@ export async function GET() {
     // Log para debug
     console.log('📊 Storage actualizado:', {
       files: filesCount,
+      images: imagesCount,
+      videos: videosCount,
       used: `${storageMB} MB (${storageGB} GB)`,
       limit: `${limitGB} GB`,
       percentage: `${percentage}%`,
@@ -48,6 +50,8 @@ export async function GET() {
         limitGB,
         percentage,
         filesCount,
+        imagesCount,
+        videosCount,
         raw: {
           bytes: storageUsageBytes,
           limit: limitBytes

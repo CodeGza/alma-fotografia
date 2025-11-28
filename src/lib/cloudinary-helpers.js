@@ -80,16 +80,19 @@ export function getFullUrl(url) {
 /**
  * Obtiene el uso real de almacenamiento calculado desde los recursos
  * Es más preciso que usage() porque no tiene delay
- * 
- * @returns {Promise<{bytes: number, count: number}>}
+ * Incluye imágenes Y videos
+ *
+ * @returns {Promise<{bytes: number, count: number, images: number, videos: number}>}
  */
 export async function getActualStorageUsage() {
   try {
     let totalBytes = 0;
     let totalCount = 0;
-    let nextCursor = null;
+    let imageCount = 0;
+    let videoCount = 0;
 
-    // Cloudinary limita a 500 recursos por request, así que paginamos
+    // Contar imágenes
+    let nextCursor = null;
     do {
       const result = await cloudinary.api.resources({
         resource_type: 'image',
@@ -98,19 +101,39 @@ export async function getActualStorageUsage() {
         next_cursor: nextCursor
       });
 
-      // Sumar bytes de cada recurso
       result.resources.forEach(resource => {
         totalBytes += resource.bytes || 0;
       });
 
-      totalCount += result.resources.length;
+      imageCount += result.resources.length;
       nextCursor = result.next_cursor;
+    } while (nextCursor);
 
-    } while (nextCursor); // Continuar si hay más páginas
+    // Contar videos
+    nextCursor = null;
+    do {
+      const result = await cloudinary.api.resources({
+        resource_type: 'video',
+        type: 'upload',
+        max_results: 500,
+        next_cursor: nextCursor
+      });
+
+      result.resources.forEach(resource => {
+        totalBytes += resource.bytes || 0;
+      });
+
+      videoCount += result.resources.length;
+      nextCursor = result.next_cursor;
+    } while (nextCursor);
+
+    totalCount = imageCount + videoCount;
 
     return {
       bytes: totalBytes,
-      count: totalCount
+      count: totalCount,
+      images: imageCount,
+      videos: videoCount
     };
   } catch (error) {
     console.error('Error calculando storage real:', error);

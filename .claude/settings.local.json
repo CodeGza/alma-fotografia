@@ -61,7 +61,9 @@
       "Bash(pnpm run build)",
       "Bash(git remote add:*)",
       "Bash(npm install:*)",
-      "Bash(pnpm i:*)"
+      "Bash(pnpm i:*)",
+      "Bash(node scripts/upload-og-image.js:*)",
+      "Bash(git config:*)"
     ],
     "deny": [],
     "ask": []

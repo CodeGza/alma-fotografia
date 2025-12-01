@@ -111,7 +111,8 @@ export async function validateShareToken(token, galleryId) {
  */
 export async function getGalleryWithToken(slug, token) {
   try {
-    const supabase = await createClient();
+    // ✅ Usar admin client para bypassear RLS con token compartido
+    const supabase = createAdminClient();
 
     // 1. Obtener galería
     const { data: gallery, error: galleryError } = await supabase

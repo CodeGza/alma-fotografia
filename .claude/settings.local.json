@@ -64,7 +64,12 @@
       "Bash(pnpm i:*)",
       "Bash(node scripts/upload-og-image.js:*)",
       "Bash(git config:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(npx eslint:*)",
+      "Bash(node check-order.js:*)",
+      "Bash(node shuffle-order.js:*)",
+      "Bash(ren:*)",
+      "WebFetch(domain:www.almafotografiauy.com)"
     ],
     "deny": [],
     "ask": []

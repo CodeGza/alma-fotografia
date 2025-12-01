@@ -155,7 +155,13 @@ async function FavoritesContent({ galleryId }) {
   });
 
   // Filtrar solo clientes que tienen al menos una foto válida de esta galería
-  const finalData = Object.values(favoritesByClient).filter(client => client.photos.length > 0);
+  // y ordenar las fotos de cada cliente por display_order
+  const finalData = Object.values(favoritesByClient)
+    .filter(client => client.photos.length > 0)
+    .map(client => ({
+      ...client,
+      photos: client.photos.sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+    }));
 
   return (
     <FavoritesView

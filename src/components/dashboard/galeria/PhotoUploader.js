@@ -441,17 +441,17 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
 
     setUploading(true);
 
-    // ✅ Ordenar archivos según la opción seleccionada ANTES de subir
-    const sortedFiles = sortFiles(selectedFiles, sortOrder);
+    // ✅ Usar sortedFiles que ya está ordenado naturalmente
+    const filesToUpload = [...selectedFiles].sort((a, b) => naturalCompare(a.name, b.name));
 
     // ✅ Batch size de 5 para mejor balance velocidad/estabilidad
     const BATCH_SIZE = 5;
     const batches = [];
 
     // Crear batches con índice global correcto
-    for (let i = 0; i < sortedFiles.length; i += BATCH_SIZE) {
+    for (let i = 0; i < filesToUpload.length; i += BATCH_SIZE) {
       batches.push({
-        files: sortedFiles.slice(i, i + BATCH_SIZE),
+        files: filesToUpload.slice(i, i + BATCH_SIZE),
         startIndex: i, // ✅ Guardar índice inicial del batch
       });
     }

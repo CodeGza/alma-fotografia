@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, memo, useRef } from 'react';
 import Image from 'next/image';
+import Masonry from 'react-masonry-css';
 import {
   Download, X, ChevronLeft, ChevronRight, Heart,
   Share2, Check, Mail, Lock, Loader2, AlertCircle,
@@ -207,8 +208,21 @@ const PhotoGrid = memo(({
   // Primeras 8 fotos cargan con prioridad (above the fold)
   const PRIORITY_COUNT = 8;
 
+  // Masonry breakpoints para layout horizontal
+  const masonryBreakpoints = {
+    default: 4,
+    1280: 4,
+    1024: 3,
+    768: 2,
+    640: 2
+  };
+
   return (
-    <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2">
+    <Masonry
+      breakpointCols={masonryBreakpoints}
+      className="flex -ml-2 w-auto"
+      columnClassName="pl-2 bg-clip-padding"
+    >
       {photos.map((photo, index) => (
         <PhotoItem
           key={photo.id}
@@ -229,7 +243,7 @@ const PhotoGrid = memo(({
           isPriority={index < PRIORITY_COUNT}
         />
       ))}
-    </div>
+    </Masonry>
   );
 });
 
@@ -277,6 +291,15 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
   const lastNotificationSentRef = useRef(false);
   const isSubmittingRef = useRef(false); // Flag para evitar submissions simultáneas
   const { showToast } = useToast();
+
+  // Masonry breakpoints para layout horizontal
+  const masonryBreakpoints = {
+    default: 4,
+    1280: 4,
+    1024: 3,
+    768: 2,
+    640: 2
+  };
 
   const {
     id: galleryId,
@@ -1587,8 +1610,12 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
 
                   return (
                     <div key={`photo-${photo.id}`} className="mb-2">
-                      <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2">
-                        <div className="group relative break-inside-avoid">
+                      <Masonry
+                        breakpointCols={masonryBreakpoints}
+                        className="flex -ml-2 w-auto"
+                        columnClassName="pl-2 bg-clip-padding"
+                      >
+                        <div className="group relative">
                           <div
                             className="relative w-full bg-gray-100 overflow-hidden cursor-pointer"
                             onClick={() => openLightbox(photo, currentIndex)}
@@ -1645,7 +1672,7 @@ export default function PublicGalleryView({ gallery, token, isFavoritesView = fa
                             )}
                           </div>
                         </div>
-                      </div>
+                      </Masonry>
                     </div>
                   );
                 } else {

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import ProtectedGalleryWrapper from '@/components/public/ProtectedGalleryWrapper';
 import PublicGallerySkeleton from '@/components/public/PublicGallerySkeleton';
 import { getGalleryWithToken, getPublicGallery } from '@/lib/validations/validate-share-token';
-import { createClient } from '@/lib/server';
+import { createClient, createAdminClient } from '@/lib/server';
 
 /**
  * Página pública de galería compartida
@@ -143,14 +143,15 @@ export async function generateMetadata({ params, searchParams }) {
   }
 
   try {
-    const supabase = await createClient();
+    // Usar admin client para bypassear RLS en metadata (necesario para que los scrapers accedan)
+    const supabase = createAdminClient();
 
     // Obtener share
     const { data: shareData } = await supabase
       .from('gallery_shares')
       .select('gallery_id, is_active')
       .eq('share_token', token)
-      .single();
+      .maybeSingle();
 
     if (!shareData || !shareData.is_active) {
       return {
@@ -169,7 +170,7 @@ export async function generateMetadata({ params, searchParams }) {
       .from('galleries')
       .select('title, description, event_date, cover_image')
       .eq('id', shareData.gallery_id)
-      .single();
+      .maybeSingle();
 
     if (!gallery) {
       return {
@@ -190,6 +191,14 @@ export async function generateMetadata({ params, searchParams }) {
         })
       : '';
 
+    // Usar cover_image si existe, sino fallback al OG image del logo
+    const ogImage = gallery.cover_image || '/og-image.png';
+
+    // Asegurar que la URL de la imagen sea absoluta
+    const absoluteOgImage = ogImage.startsWith('http')
+      ? ogImage
+      : `https://www.almafotografiauy.com${ogImage}`;
+
     return {
       title: `${gallery.title} | Alma Fotografía`,
       description: gallery.description || `Galería de fotos${formattedDate ? ` - ${formattedDate}` : ''}. Ve y descarga tus fotos profesionales.`,
@@ -200,22 +209,24 @@ export async function generateMetadata({ params, searchParams }) {
       openGraph: {
         title: gallery.title,
         description: gallery.description || 'Galería de fotos profesionales',
-        images: gallery.cover_image ? [
+        url: `https://www.almafotografiauy.com/galeria/${slug}`,
+        images: [
           {
-            url: gallery.cover_image,
+            url: absoluteOgImage,
             width: 1200,
             height: 630,
-            alt: `${gallery.title} - Portada`,
+            alt: gallery.cover_image ? `${gallery.title} - Portada` : 'Alma Fotografía',
           }
-        ] : [],
+        ],
         type: 'website',
         siteName: 'Alma Fotografía',
+        locale: 'es_UY',
       },
       twitter: {
         card: 'summary_large_image',
         title: gallery.title,
         description: gallery.description || 'Galería de fotos profesionales',
-        images: gallery.cover_image ? [gallery.cover_image] : [],
+        images: [absoluteOgImage],
       },
       robots: 'noindex, nofollow', // Galerías privadas no deben indexarse
     };

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
+import Masonry from 'react-masonry-css';
 import { useRouter } from 'next/navigation';
 import {
   Heart,
@@ -188,7 +189,9 @@ function ClientFavoritesSection({
           if (!response.ok) throw new Error('Error al obtener la imagen');
 
           const blob = await response.blob();
-          const fileName = `foto_favorita_${gallerySlug}_${photoIndex}.jpg`;
+          // Usar el nombre original de la foto (sin extensión) y agregar .jpg
+          let fileName = photo.file_name || `foto_favorita_${gallerySlug}_${photoIndex}.jpg`;
+          fileName = fileName.replace(/\.(jpg|jpeg|png|webp|gif)$/i, '') + '.jpg';
 
           zip.file(fileName, blob);
           setDownloadProgress(prev => ({ ...prev, current: photoIndex }));
@@ -247,7 +250,9 @@ function ClientFavoritesSection({
           if (!response.ok) throw new Error('Error al obtener la imagen');
 
           const blob = await response.blob();
-          const fileName = `seleccionadas_${gallerySlug}_${photoIndex}.jpg`;
+          // Usar el nombre original de la foto (sin extensión) y agregar .jpg
+          let fileName = photo.file_name || `seleccionadas_${gallerySlug}_${photoIndex}.jpg`;
+          fileName = fileName.replace(/\.(jpg|jpeg|png|webp|gif)$/i, '') + '.jpg';
 
           zip.file(fileName, blob);
           photoIndex++;
@@ -642,7 +647,17 @@ function ClientFavoritesSection({
           </div>
         ) : (
           <div className="px-0">
-          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-6 gap-1 sm:gap-2 space-y-1 sm:space-y-2">
+          <Masonry
+            breakpointCols={{
+              default: 4,
+              1280: 4,
+              1024: 3,
+              768: 2,
+              640: 2
+            }}
+            className="flex -ml-2 w-auto"
+            columnClassName="pl-2 bg-clip-padding"
+          >
             {paginatedPhotos.map((photo) => {
               const photoUrl = photo.cloudinary_url || photo.file_path;
               const isSelected = selectedPhotos.has(photo.id);
@@ -655,7 +670,7 @@ function ClientFavoritesSection({
               return (
                 <div
                   key={photo.id}
-                  className="group relative mb-0.5 sm:mb-2 break-inside-avoid"
+                  className="group relative mb-2"
                 >
                   <div
                     onClick={() => {
@@ -739,7 +754,7 @@ function ClientFavoritesSection({
                 </div>
               );
             })}
-          </div>
+          </Masonry>
 
           {/* Paginación */}
           {totalPages > 1 && (
@@ -1191,7 +1206,9 @@ export default function FavoritesView({ gallery, favoritesByClient }) {
             if (!response.ok) throw new Error('Error al obtener la imagen');
 
             const blob = await response.blob();
-            const fileName = `foto_favorita_${gallerySlug}_${photoIndex}.jpg`;
+            // Usar el nombre original de la foto (sin extensión) y agregar .jpg
+            let fileName = photo.file_name || `foto_favorita_${gallerySlug}_${photoIndex}.jpg`;
+            fileName = fileName.replace(/\.(jpg|jpeg|png|webp|gif)$/i, '') + '.jpg';
 
             zip.file(fileName, blob);
             photoIndex++;

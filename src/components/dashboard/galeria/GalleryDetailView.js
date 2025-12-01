@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import Masonry from 'react-masonry-css';
 import {
   Calendar,
   Mail,
@@ -235,7 +236,7 @@ function SortablePhoto({ photo, photoIndex, isCover, isReorderMode, handleSetAsC
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative mb-2 break-inside-avoid ${isDragging ? 'opacity-40 scale-105 z-50' : 'opacity-100'}`}
+      className={`group relative ${isDragging ? 'opacity-40 scale-105 z-50' : 'opacity-100'}`}
     >
       <div className="relative w-full bg-gray-200 overflow-hidden">
         <Image
@@ -311,6 +312,14 @@ export default function GalleryDetailView({ gallery }) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
   const [reorderMode, setReorderMode] = useState(false);
+
+  // Configuración de breakpoints para Masonry (orden horizontal)
+  const masonryBreakpoints = {
+    default: 4, // 4 columnas en desktop
+    1024: 4,    // lg: 4 columnas
+    768: 3,     // md: 3 columnas
+    640: 2      // sm: 2 columnas
+  };
   const [selectedPhotos, setSelectedPhotos] = useState(new Set());
   const [deletingPhotos, setDeletingPhotos] = useState(false);
   const [changingCover, setChangingCover] = useState(false);
@@ -378,14 +387,26 @@ export default function GalleryDetailView({ gallery }) {
     show_all_sections,
   } = gallery;
 
+  // Extraer primer número encontrado en el nombre del archivo
+  const extractNumber = useCallback((filename) => {
+    const match = filename?.match(/(\d+)/);
+    return match ? parseInt(match[0], 10) : null;
+  }, []);
+
   // Usar localPhotos para permitir reordenar antes de guardar
   // Memoizar para evitar re-renders innecesarios
   const workingPhotos = useMemo(() => {
-    const sorted = [...localPhotos].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    let photos = [...localPhotos];
+
+    // Filtrar por sección
     if (selectedSection) {
-      return sorted.filter(photo => photo.section_id === selectedSection);
+      photos = photos.filter(photo => photo.section_id === selectedSection);
+    } else {
+      photos = [];
     }
-    return [];
+
+    // Siempre ordenar por display_order (orden guardado en BD)
+    return photos.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
   }, [localPhotos, selectedSection]);
 
   // Memoizar IDs para SortableContext (evita re-inicialización de drag-drop)
@@ -530,7 +551,6 @@ export default function GalleryDetailView({ gallery }) {
       setCoverImageSize(0);
     }
   };
-
 
   const handleUploadComplete = async () => {
     // Dar un breve tiempo para que Cloudinary procese las imágenes
@@ -1579,6 +1599,7 @@ export default function GalleryDetailView({ gallery }) {
                           <span>Reordenar</span>
                         </button>
                       )}
+
                       <button
                         onClick={() => setShowSectionsModal(true)}
                         className="p-1.5 sm:p-2 md:p-2.5 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-all duration-200 flex items-center justify-center whitespace-nowrap flex-shrink-0 shadow-sm text-gray-900"
@@ -1698,20 +1719,25 @@ export default function GalleryDetailView({ gallery }) {
                     items={sortableIds}
                     strategy={rectSortingStrategy}
                   >
-                    {/* Masonry layout igual que vista normal */}
-                    <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2">
+                    {/* Masonry layout con orden horizontal */}
+                    <Masonry
+                      breakpointCols={masonryBreakpoints}
+                      className="flex -ml-2 w-auto"
+                      columnClassName="pl-2 bg-clip-padding"
+                    >
                       {workingPhotos.map((photo, index) => (
-                        <SortablePhoto
-                          key={photo.id}
-                          photo={photo}
-                          photoIndex={index}
-                          isCover={cover_image === photo.file_path}
-                          isReorderMode={true}
-                          handleSetAsCover={handleSetAsCover}
-                          changingCover={changingCover}
-                        />
+                        <div key={`${photo.id}-reorder-${index}`} className="mb-2">
+                          <SortablePhoto
+                            photo={photo}
+                            photoIndex={index}
+                            isCover={cover_image === photo.file_path}
+                            isReorderMode={true}
+                            handleSetAsCover={handleSetAsCover}
+                            changingCover={changingCover}
+                          />
+                        </div>
                       ))}
-                    </div>
+                    </Masonry>
                   </SortableContext>
 
                   {/* DragOverlay: Preview flotante durante el drag */}
@@ -1739,16 +1765,20 @@ export default function GalleryDetailView({ gallery }) {
             ) : selectionMode ? (
               /* Modo selección: masonry con checkboxes */
               <div className="px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 lg:py-8 max-w-full overflow-hidden">
-                <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2">
+                <Masonry
+                  breakpointCols={masonryBreakpoints}
+                  className="flex -ml-2 w-auto"
+                  columnClassName="pl-2 bg-clip-padding"
+                >
                   {photosToShow.map((photo, index) => {
                     const isSelected = selectedPhotos.has(photo.id);
                     const isCover = cover_image === photo.file_path;
 
                     return (
                       <div
-                        key={photo.id}
+                        key={`${photo.id}-select-${index}`}
                         onClick={() => togglePhotoSelection(photo.id)}
-                        className={`group relative mb-2 break-inside-avoid max-w-full cursor-pointer transition-all hover:opacity-80 ${
+                        className={`group relative mb-2 max-w-full cursor-pointer transition-all hover:opacity-80 ${
                           isSelected ? 'ring-2 sm:ring-4 ring-[#79502A]' : ''
                         }`}
                       >
@@ -1788,25 +1818,30 @@ export default function GalleryDetailView({ gallery }) {
                       </div>
                     );
                   })}
-                </div>
+                </Masonry>
               </div>
             ) : (
-              /* Modo normal: masonry layout */
+              /* Modo normal: masonry layout con orden horizontal */
               <div className="px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 lg:py-8 max-w-full overflow-hidden">
-                <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-2">
+                <Masonry
+                  breakpointCols={masonryBreakpoints}
+                  className="flex -ml-2 w-auto"
+                  columnClassName="pl-2 bg-clip-padding"
+                >
                   {photosToShow.map((photo, index) => (
-                    <SortablePhoto
-                      key={photo.id}
-                      photo={photo}
-                      photoIndex={index}
-                      isCover={cover_image === photo.file_path}
-                      isReorderMode={false}
-                      handleSetAsCover={handleSetAsCover}
-                      changingCover={changingCover}
-                      sections={sections}
-                    />
+                    <div key={`${photo.id}-normal-${index}`} className="mb-2">
+                      <SortablePhoto
+                        photo={photo}
+                        photoIndex={index}
+                        isCover={cover_image === photo.file_path}
+                        isReorderMode={false}
+                        handleSetAsCover={handleSetAsCover}
+                        changingCover={changingCover}
+                        sections={sections}
+                      />
+                    </div>
                   ))}
-                </div>
+                </Masonry>
               </div>
             )}
           </div>

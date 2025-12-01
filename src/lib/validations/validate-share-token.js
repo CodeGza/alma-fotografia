@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/server';
+import { createClient, createAdminClient } from '@/lib/server';
 import { notifyLinkExpired } from '@/lib/notifications/notification-helpers';
 
 /**
@@ -281,12 +281,20 @@ export async function deactivateExpiredLinks() {
  */
 export async function getPublicGallery(slug) {
   try {
-    const supabase = await createClient();
+    // ✅ Usar admin client para bypassear RLS en galerías públicas
+    const supabase = createAdminClient();
 
     // 1. Obtener galería pública
     const { data: gallery, error: galleryError } = await supabase
       .from('galleries')
-      .select('*')
+      .select(`
+        *,
+        service_types (
+          name,
+          slug,
+          icon_name
+        )
+      `)
       .eq('slug', slug)
       .eq('is_public', true)
       .maybeSingle();

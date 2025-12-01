@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
 import { Upload, X, Loader2, AlertCircle, ChevronLeft, ChevronRight, CheckSquare, Trash2, Eye, Plus, Folder } from 'lucide-react';
@@ -20,10 +20,36 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
   const PREVIEWS_PER_PAGE = 30;
   const { showToast } = useToast();
 
+  // Orden natural: compara strings considerando números como enteros (foto-2 antes que foto-100)
+  const naturalCompare = (a, b) => {
+    const ax = [], bx = [];
+
+    a.replace(/(\d+)|(\D+)/g, (_, num, str) => {
+      ax.push([num || Infinity, str || '']);
+    });
+    b.replace(/(\d+)|(\D+)/g, (_, num, str) => {
+      bx.push([num || Infinity, str || '']);
+    });
+
+    while (ax.length && bx.length) {
+      const an = ax.shift();
+      const bn = bx.shift();
+      const nn = (an[0] - bn[0]) || an[1].localeCompare(bn[1]);
+      if (nn) return nn;
+    }
+
+    return ax.length - bx.length;
+  };
+
+  // ✅ Aplicar orden natural SIEMPRE automáticamente
+  const sortedFiles = useMemo(() => {
+    return [...selectedFiles].sort((a, b) => naturalCompare(a.name, b.name));
+  }, [selectedFiles]);
+
   const startIdx = previewPage * PREVIEWS_PER_PAGE;
   const endIdx = startIdx + PREVIEWS_PER_PAGE;
-  const previewsToShow = selectedFiles.slice(startIdx, endIdx);
-  const totalPages = Math.ceil(selectedFiles.length / PREVIEWS_PER_PAGE);
+  const previewsToShow = sortedFiles.slice(startIdx, endIdx);
+  const totalPages = Math.ceil(sortedFiles.length / PREVIEWS_PER_PAGE);
 
   // Generar nombre SEO-friendly basado en slug/título de galería
   const generatePrettyFileName = (index) => {
@@ -83,11 +109,11 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
   };
 
   const nextPhoto = () => {
-    setLightboxIndex((prev) => (prev + 1) % selectedFiles.length);
+    setLightboxIndex((prev) => (prev + 1) % sortedFiles.length);
   };
 
   const prevPhoto = () => {
-    setLightboxIndex((prev) => (prev - 1 + selectedFiles.length) % selectedFiles.length);
+    setLightboxIndex((prev) => (prev - 1 + sortedFiles.length) % sortedFiles.length);
   };
 
   const optimizeImage = async (file) => {
@@ -260,18 +286,29 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
 
       const optimizedBlob = await optimizeImage(file);
 
-      // Generar nombre bonito basado en galería + número
-      const prettyFileName = generatePrettyFileName(index);
+      // Extraer el número del nombre original (si existe)
+      const numberMatch = name.match(/(\d+)/);
+      const number = numberMatch ? numberMatch[0] : String(index + 1).padStart(3, '0');
+
+      // Generar nombre: [slug-galeria]-[numero].webp
+      const baseName = gallerySlug || galleryTitle
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
+        .replace(/[^a-z0-9]+/g, '-') // Reemplazar espacios y caracteres especiales con guiones
+        .replace(/^-+|-+$/g, ''); // Quitar guiones al inicio/fin
+
+      const fileName = `${baseName}-${number}.webp`;
 
       const optimizedFile = new File(
         [optimizedBlob],
-        prettyFileName,
+        fileName,
         { type: 'image/webp' }
       );
 
       if (process.env.NODE_ENV === 'development') {
         const reduction = ((1 - optimizedBlob.size / file.size) * 100).toFixed(1);
-        console.log(`📸 ${name} → ${prettyFileName}: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(optimizedBlob.size / 1024).toFixed(0)}KB (-${reduction}%)`);
+        console.log(`📸 ${name} → ${fileName}: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(optimizedBlob.size / 1024).toFixed(0)}KB (-${reduction}%)`);
       }
 
       // ==========================================
@@ -313,7 +350,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
           break;
 
         } catch (error) {
-          console.warn(`⚠️ Intento ${attempt}/${MAX_RETRIES} falló para ${prettyFileName}:`, error.message);
+          console.warn(`⚠️ Intento ${attempt}/${MAX_RETRIES} falló para ${fileName}:`, error.message);
 
           // Si es el último intento, lanzar error
           if (attempt === MAX_RETRIES) {
@@ -343,7 +380,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
         .insert({
           gallery_id: galleryId,
           file_path: result.url,
-          file_name: prettyFileName,
+          file_name: fileName, // Usar nombre original para mantener orden
           file_size: optimizedBlob.size,
           display_order: index,
           section_id: selectedSection || null, // Incluir sección seleccionada
@@ -404,14 +441,17 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
 
     setUploading(true);
 
+    // ✅ Ordenar archivos según la opción seleccionada ANTES de subir
+    const sortedFiles = sortFiles(selectedFiles, sortOrder);
+
     // ✅ Batch size de 5 para mejor balance velocidad/estabilidad
     const BATCH_SIZE = 5;
     const batches = [];
 
     // Crear batches con índice global correcto
-    for (let i = 0; i < selectedFiles.length; i += BATCH_SIZE) {
+    for (let i = 0; i < sortedFiles.length; i += BATCH_SIZE) {
       batches.push({
-        files: selectedFiles.slice(i, i + BATCH_SIZE),
+        files: sortedFiles.slice(i, i + BATCH_SIZE),
         startIndex: i, // ✅ Guardar índice inicial del batch
       });
     }
@@ -735,8 +775,8 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
 
           <div className="relative w-full h-full max-w-6xl max-h-[90vh] p-8">
             <Image
-              src={selectedFiles[lightboxIndex].preview}
-              alt={selectedFiles[lightboxIndex].name}
+              src={sortedFiles[lightboxIndex].preview}
+              alt={sortedFiles[lightboxIndex].name}
               fill
               className="object-contain"
               sizes="100vw"
@@ -745,7 +785,7 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
 
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/70 rounded-full">
             <p className="font-fira text-sm text-white">
-              {lightboxIndex + 1} / {selectedFiles.length}
+              {lightboxIndex + 1} / {sortedFiles.length}
             </p>
           </div>
         </div>

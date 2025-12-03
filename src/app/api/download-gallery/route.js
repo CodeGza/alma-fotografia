@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/server';
+import { createAdminClient } from '@/lib/server';
 import JSZip from 'jszip';
 
 /**
  * API Route para descargar todas las fotos de una galería como ZIP
  *
  * GET /api/download-gallery?galleryId=xxx&pin=xxxx
+ *
+ * IMPORTANTE: Usa createAdminClient() para bypassear RLS ya que las descargas
+ * son públicas y protegidas por PIN si está configurado
  */
 export async function GET(request) {
   try {
@@ -20,7 +23,8 @@ export async function GET(request) {
       );
     }
 
-    const supabase = await createClient();
+    // Usar admin client para bypassear RLS (protegido por PIN si está configurado)
+    const supabase = createAdminClient();
 
     // Obtener información de la galería
     const { data: gallery, error: galleryError } = await supabase

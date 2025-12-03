@@ -16,10 +16,11 @@ import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@
 
 /**
  * Obtener todos los tipos de reserva pública disponibles
+ * Usa admin client para acceso público sin sesión
  */
 export async function getPublicBookingTypes() {
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     const { data, error } = await supabase
       .from('public_booking_types')
@@ -40,10 +41,11 @@ export async function getPublicBookingTypes() {
 
 /**
  * Obtener horarios de trabajo configurados
+ * Usa admin client para acceso público sin sesión
  */
 export async function getWorkingHours() {
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     const { data, error } = await supabase
       .from('working_hours')
@@ -101,10 +103,11 @@ export async function getBlockedDates() {
 /**
  * Obtener slots disponibles para un tipo de reserva en una fecha específica
  * IMPORTANTE: Los slots son INDEPENDIENTES por tipo de reserva
+ * Usa admin client para acceso público sin sesión
  */
 export async function getAvailableSlots(bookingTypeId, date) {
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // 1. Obtener el tipo de reserva
     const { data: bookingType, error: typeError } = await supabase
@@ -194,6 +197,7 @@ export async function getAvailableSlots(bookingTypeId, date) {
 
 /**
  * Crear una reserva pública
+ * IMPORTANTE: Usa admin client para que usuarios sin sesión puedan crear reservas desde la landing
  */
 export async function createPublicBooking({
   bookingTypeId,
@@ -222,7 +226,7 @@ export async function createPublicBooking({
       };
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Obtener tipo de reserva para calcular end_time
     const { data: bookingType, error: typeError } = await supabase

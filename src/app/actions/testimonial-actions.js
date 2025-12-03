@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/server';
+import { createClient, createAdminClient } from '@/lib/server';
 import { revalidatePath } from 'next/cache';
 import { notifyTestimonialReceived } from '@/lib/notifications/notification-helpers';
 

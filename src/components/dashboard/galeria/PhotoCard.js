@@ -8,6 +8,7 @@ import { Eye, Trash2, MoreVertical, X } from 'lucide-react';
 export default function PhotoCard({ photo, index, onDelete, onView }) {
   const [showMenu, setShowMenu] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState(null);
+  const [imageError, setImageError] = useState(false);
 
   const handleTouchStart = () => {
     const timer = setTimeout(() => {
@@ -31,13 +32,26 @@ export default function PhotoCard({ photo, index, onDelete, onView }) {
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchEnd}
       >
-        <Image
-          src={photo.file_path}
-          alt={photo.file_name || `Foto ${index + 1}`}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-110"
-          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-        />
+        {imageError ? (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+            <p className="text-xs text-red-600 font-fira text-center px-2">
+              Error al cargar imagen
+            </p>
+          </div>
+        ) : (
+          <Image
+            src={photo.file_path}
+            alt={photo.file_name || `Foto ${index + 1}`}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-110"
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+            unoptimized
+            onError={() => {
+              console.error('Error loading image:', photo.file_path);
+              setImageError(true);
+            }}
+          />
+        )}
         
         {/* Overlay hover (solo desktop) */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors hidden sm:block" />

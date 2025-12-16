@@ -60,6 +60,7 @@ const nextConfig = {
   },
 
   images: {
+    unoptimized: true, // Desactivar optimización (Next.js 16 tiene problemas + Cloudinary ya optimiza)
     remotePatterns: [
       // Supabase
       {

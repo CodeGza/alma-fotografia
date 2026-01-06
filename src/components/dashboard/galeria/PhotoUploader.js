@@ -345,14 +345,9 @@ export default function PhotoUploader({ galleryId, gallerySlug, galleryTitle, on
         console.warn(`⚠️ No se pudo extraer EXIF de ${name}:`, exifError.message);
       }
 
-      // FALLBACK: Si no hay EXIF, usar fecha de modificación del archivo
-      if (!captureDate) {
-        captureDate = new Date(file.lastModified).toISOString();
-        dateSource = 'archivo';
-
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`📅 Usando fecha del archivo: ${new Date(captureDate).toLocaleString('es-UY')} (no tiene EXIF)`);
-        }
+      // Si no hay EXIF, captureDate queda null (solo usamos fecha real de cámara)
+      if (!captureDate && process.env.NODE_ENV === 'development') {
+        console.log(`⚠️ ${name}: Sin fecha EXIF, capture_date será NULL`);
       }
 
       // ==========================================

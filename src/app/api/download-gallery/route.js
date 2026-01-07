@@ -84,7 +84,7 @@ export async function GET(request) {
     // ==========================================
     // OPTIMIZACIÓN: Descargar fotos en lotes paralelos
     // ==========================================
-    const BATCH_SIZE = 10; // Descargar 10 fotos a la vez
+    const BATCH_SIZE = 20; // Descargar 20 fotos a la vez (aumentado de 10)
     const batches = [];
 
     for (let i = 0; i < photos.length; i += BATCH_SIZE) {
@@ -107,16 +107,21 @@ export async function GET(request) {
         const paddedNumber = String(globalIndex + 1).padStart(3, '0');
         const fileName = `${gallery.slug || 'galeria'}-${paddedNumber}.jpg`;
 
-        // Obtener la versión de alta calidad de Cloudinary en formato JPG
+        // Obtener la versión optimizada de Cloudinary en formato JPG
         let downloadUrl = url;
         if (url.includes('cloudinary.com')) {
-          // Usar q_90 en lugar de q_100 (casi imperceptible, mucho más rápido)
-          downloadUrl = url.replace(/\/upload\/.*?\//g, '/upload/f_jpg,q_90/');
+          // Usar q_85 y ancho máximo 2048px (excelente calidad, archivos más pequeños)
+          downloadUrl = url.replace(/\/upload\/.*?\//g, '/upload/f_jpg,q_85,w_2048/');
         }
 
         try {
-          // Descargar la imagen
-          const response = await fetch(downloadUrl);
+          // Descargar la imagen con timeout de 10 segundos
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+          const response = await fetch(downloadUrl, { signal: controller.signal });
+          clearTimeout(timeoutId);
+
           if (!response.ok) {
             console.error(`[download-gallery] Error descargando foto ${photo.id}:`, response.statusText);
             return null;
@@ -125,7 +130,11 @@ export async function GET(request) {
           const arrayBuffer = await response.arrayBuffer();
           return { fileName, arrayBuffer };
         } catch (error) {
-          console.error(`[download-gallery] Error procesando foto ${photo.id}:`, error);
+          if (error.name === 'AbortError') {
+            console.error(`[download-gallery] Timeout descargando foto ${photo.id}`);
+          } else {
+            console.error(`[download-gallery] Error procesando foto ${photo.id}:`, error);
+          }
           return null;
         }
       });
@@ -149,14 +158,14 @@ export async function GET(request) {
     const downloadTime = Date.now() - startTime;
     console.log(`[download-gallery] Todas las descargas completadas en ${downloadTime}ms`);
 
-    // Generar el ZIP con compresión mínima (más rápido)
+    // Generar el ZIP sin compresión (instantáneo, ya que JPG ya está comprimido)
     console.log(`[download-gallery] Generando ZIP...`);
     const zipStartTime = Date.now();
 
     const zipBlob = await zip.generateAsync({
       type: 'nodebuffer',
-      compression: 'DEFLATE',
-      compressionOptions: { level: 1 } // Nivel 1 (más rápido) en lugar de 6
+      compression: 'STORE', // Sin compresión (JPG ya está comprimido)
+      compressionOptions: { level: 0 }
     });
 
     const zipTime = Date.now() - zipStartTime;

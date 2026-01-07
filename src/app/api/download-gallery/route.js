@@ -78,46 +78,91 @@ export async function GET(request) {
     const zip = new JSZip();
     const folder = zip.folder(gallery.slug || gallery.title);
 
-    // Descargar y agregar cada foto al ZIP
-    for (let i = 0; i < photos.length; i++) {
-      const photo = photos[i];
-      const url = photo.file_path;
+    console.log(`[download-gallery] Iniciando descarga de ${photos.length} fotos`);
+    const startTime = Date.now();
 
-      // Generar nombre coherente: slug-galeria-001.jpg (siempre JPG)
-      const paddedNumber = String(i + 1).padStart(3, '0');
-      const fileName = `${gallery.slug || 'galeria'}-${paddedNumber}.jpg`;
+    // ==========================================
+    // OPTIMIZACIÓN: Descargar fotos en lotes paralelos
+    // ==========================================
+    const BATCH_SIZE = 10; // Descargar 10 fotos a la vez
+    const batches = [];
 
-      // Obtener la versión de máxima calidad de Cloudinary en formato JPG
-      let downloadUrl = url;
-      if (url.includes('cloudinary.com')) {
-        // Forzar formato JPG con máxima calidad (q_100)
-        downloadUrl = url.replace(/\/upload\/.*?\//g, '/upload/f_jpg,q_100/');
-      }
-
-      try {
-        // Descargar la imagen
-        const response = await fetch(downloadUrl);
-        if (!response.ok) {
-          console.error(`Error descargando foto ${photo.id}:`, response.statusText);
-          continue;
-        }
-
-        const arrayBuffer = await response.arrayBuffer();
-
-        // Agregar al ZIP
-        folder.file(fileName, arrayBuffer);
-      } catch (error) {
-        console.error(`Error procesando foto ${photo.id}:`, error);
-        // Continuar con las demás fotos
-      }
+    for (let i = 0; i < photos.length; i += BATCH_SIZE) {
+      batches.push(photos.slice(i, i + BATCH_SIZE));
     }
 
-    // Generar el ZIP
+    console.log(`[download-gallery] Procesando en ${batches.length} lotes de máximo ${BATCH_SIZE} fotos`);
+
+    // Procesar cada lote en paralelo
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const batch = batches[batchIndex];
+      const batchStartTime = Date.now();
+
+      // Descargar todas las fotos del lote en paralelo
+      const downloadPromises = batch.map(async (photo, indexInBatch) => {
+        const globalIndex = batchIndex * BATCH_SIZE + indexInBatch;
+        const url = photo.file_path;
+
+        // Generar nombre coherente: slug-galeria-001.jpg (siempre JPG)
+        const paddedNumber = String(globalIndex + 1).padStart(3, '0');
+        const fileName = `${gallery.slug || 'galeria'}-${paddedNumber}.jpg`;
+
+        // Obtener la versión de alta calidad de Cloudinary en formato JPG
+        let downloadUrl = url;
+        if (url.includes('cloudinary.com')) {
+          // Usar q_90 en lugar de q_100 (casi imperceptible, mucho más rápido)
+          downloadUrl = url.replace(/\/upload\/.*?\//g, '/upload/f_jpg,q_90/');
+        }
+
+        try {
+          // Descargar la imagen
+          const response = await fetch(downloadUrl);
+          if (!response.ok) {
+            console.error(`[download-gallery] Error descargando foto ${photo.id}:`, response.statusText);
+            return null;
+          }
+
+          const arrayBuffer = await response.arrayBuffer();
+          return { fileName, arrayBuffer };
+        } catch (error) {
+          console.error(`[download-gallery] Error procesando foto ${photo.id}:`, error);
+          return null;
+        }
+      });
+
+      // Esperar a que termine todo el lote
+      const results = await Promise.all(downloadPromises);
+
+      // Agregar las fotos exitosas al ZIP
+      let successCount = 0;
+      for (const result of results) {
+        if (result) {
+          folder.file(result.fileName, result.arrayBuffer);
+          successCount++;
+        }
+      }
+
+      const batchTime = Date.now() - batchStartTime;
+      console.log(`[download-gallery] Lote ${batchIndex + 1}/${batches.length}: ${successCount}/${batch.length} fotos descargadas en ${batchTime}ms`);
+    }
+
+    const downloadTime = Date.now() - startTime;
+    console.log(`[download-gallery] Todas las descargas completadas en ${downloadTime}ms`);
+
+    // Generar el ZIP con compresión mínima (más rápido)
+    console.log(`[download-gallery] Generando ZIP...`);
+    const zipStartTime = Date.now();
+
     const zipBlob = await zip.generateAsync({
       type: 'nodebuffer',
       compression: 'DEFLATE',
-      compressionOptions: { level: 6 }
+      compressionOptions: { level: 1 } // Nivel 1 (más rápido) en lugar de 6
     });
+
+    const zipTime = Date.now() - zipStartTime;
+    const totalTime = Date.now() - startTime;
+    console.log(`[download-gallery] ZIP generado en ${zipTime}ms (${(zipBlob.length / 1024 / 1024).toFixed(2)}MB)`);
+    console.log(`[download-gallery] Tiempo total: ${totalTime}ms`);
 
     // Nombre del archivo ZIP
     const zipFileName = `${gallery.slug || gallery.title.toLowerCase().replace(/\s+/g, '-')}.zip`;
